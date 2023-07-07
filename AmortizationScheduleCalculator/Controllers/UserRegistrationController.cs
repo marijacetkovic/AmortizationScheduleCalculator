@@ -15,16 +15,16 @@ namespace AmortizationScheduleCalculator.Controllers
         }
 
         [HttpGet("register", Name = "Register")]
-        public IEnumerable<User> GetRegistrationForm()
+        public IActionResult GetRegistrationForm()
         {
             //should be returning a page that contains registration form 
-            User[] userArray = Enumerable.Range(1, 3).Select(index => new User
-            {
-                BirthDate = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                Username = "marijacet",
-                Password = "12345678"
-            }).ToArray();
-            return userArray;
+            //User[] userArray = Enumerable.Range(1, 3).Select(index => new User
+            //{
+            //    BirthDate = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+            //    Username = "marijacet",
+            //    Password = "12345678"
+            //}).ToArray();
+            //return userArray;
         }
         [HttpGet("login", Name = "Login")]
         public string GetLoginForm()
