@@ -1,8 +1,23 @@
 import React, {useState} from 'react';
-import './style.css'
-function RegistrationForm() {
+import './style.css';
+
+class RegistrationForm extends React.Component  {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+        };
+      }
+
+    QSetViewInParent = (obj) => {
+        this.props.QIDFromChild(obj);
+      };
+
+    render(){
     return(
+    <div  className= "center " >
       <div className="form">
+        
           <div className="form-body">
               <div className="username">
                   <label className="form__label" for="firstName">First Name </label>
@@ -26,9 +41,11 @@ function RegistrationForm() {
               </div>
           </div>
           <div class="footer">
-              <button type="submit" class="btn">Register</button>
+              <button type="submit" class="btn" onClick={() => this.QSetView({ page: "login" })}> Register</button>
           </div>
-      </div>      
-    )       
+      </div>   
+      </div>   
+    ) 
+}      
 }
 export default RegistrationForm;
