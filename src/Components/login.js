@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import './style.css'
 class LoginForm extends React.Component {
 
@@ -31,16 +31,19 @@ class LoginForm extends React.Component {
               </div>
 
           </div>
+          <br></br>
           <div class="footer">
-              <button type="submit" class="btn">Login</button>
+              <button type="submit" class="btn btn-primary">Login</button>
           </div>
+
+          <br></br>
 
           <div className="here"
           >
             Don't have an account?
           </div>
 
-          <a className="here" href="#">Register here</a>
+          <a className="here" href="#" onClick={() => this.QSetView({ page: "login" })}>Register here</a>
       </div> 
       </div>     
     )       
