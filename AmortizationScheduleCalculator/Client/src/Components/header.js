@@ -1,7 +1,7 @@
 import React from 'react';
 function Header() {
     return(
-        <nav>
+        <nav >
             <div >
                 <h3>Registration</h3>
             </div>

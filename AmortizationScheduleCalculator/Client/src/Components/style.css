@@ -1,27 +1,28 @@
 body{
-    background: #FFFFFF;  /* fallback for old browsers */
+    background: #F8F9FA;  /* fallback for old browsers */
 }
 
 .form{
-    background-color: white;
+    background-color: #F8F9FA;
     border-radius: 5px;
     width: 550px;
     margin: 20px auto;
     padding: 20px;
-    /* height: 600px; */
 }
 
 .form-body{
-    text-align: left;
+    text-align: center;
     padding: 20px 10px;
 }
 
 .form-body > *{
     padding: 5px;
+    text-align: center;
 }
 
 .form__label{
     width: 40%;
+    text-align: left;
 }
 
 .form_input{
@@ -30,4 +31,23 @@ body{
 
 .footer{
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn{
+    border: 000000;
+}
+
+.center {
+    text-align: center;
+    position:"flex";
+    margin-top: auto;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+}
+
+.form-floating{
+    padding: 4px;
 }

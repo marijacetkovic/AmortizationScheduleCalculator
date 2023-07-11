@@ -37,8 +37,18 @@ namespace AmortizationScheduleCalculator.Controllers
         }
 
         //this gets the 
-        [HttpGet("login", Name = "Login")]
-        public string GetLoginForm()
-        { return "login form here"; }
+        [HttpPost("login", Name = "Login")]
+        public string GetLoginForm(User user)
+        {
+            var rowList = _db.Query<int>("SELECT * FROM \"User\" WHERE email = @Email and user_password = @User_Password", user);
+            if (rowList == null || !rowList.Any()) {
+                return "wrong mail or password";
+            }
+            else {
+                return "youre in";
+    
+            }
+
+        }
     }
 }

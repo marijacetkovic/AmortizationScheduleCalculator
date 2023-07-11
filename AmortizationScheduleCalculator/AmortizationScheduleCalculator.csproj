@@ -7,11 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Client\.vs\VSWorkspaceState.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.143" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.8" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
     <PackageReference Include="Npgsql" Version="7.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Client\.vs\myapp\FileContentIndex\c798d84a-1de2-4fa4-8566-8294ffc49cbc.vsidx" />
+    <None Include="Client\.vs\myapp\FileContentIndex\read.lock" />
+    <None Include="Client\.vs\myapp\v17\.wsuo" />
+    <None Include="Client\.vs\slnx.sqlite" />
   </ItemGroup>
 
 </Project>
