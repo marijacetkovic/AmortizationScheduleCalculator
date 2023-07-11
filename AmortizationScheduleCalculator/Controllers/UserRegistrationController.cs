@@ -1,4 +1,10 @@
+using AmortizationScheduleCalculator.Context;
+using AmortizationScheduleCalculator.Model;
+using Dapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Npgsql;
+using System.Data;
 
 namespace AmortizationScheduleCalculator.Controllers
 {
@@ -7,25 +13,30 @@ namespace AmortizationScheduleCalculator.Controllers
     public class UserRegistrationController : ControllerBase
     {
 
-        private readonly ILogger<UserRegistrationController> _logger;
+        private readonly IDbConnection _db;
 
-        public UserRegistrationController(ILogger<UserRegistrationController> logger)
+        public UserRegistrationController(IDbConnection db)
         {
-            _logger = logger;
+            _db = db;
         }
 
         [HttpGet("register", Name = "Register")]
-        public IActionResult GetRegistrationForm()
-        {
-            //should be returning a page that contains registration form 
-            //User[] userArray = Enumerable.Range(1, 3).Select(index => new User
-            //{
-            //    BirthDate = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            //    Username = "marijacet",
-            //    Password = "12345678"
-            //}).ToArray();
-            //return userArray;
+        public async Task<ActionResult<List<User>>> GetAllUsers(){
+            
+            string query = "select * from \"User\"";
+            var users = _db.Query<User>(query);
+            return Ok(users);
         }
+
+        [HttpPost("register", Name = "Register")]
+        public async Task<ActionResult<List<User>>> AddUser(User user)
+        {
+            await _db.ExecuteAsync("insert into \"User\" (name,surname,email,user_password) values (@Name, @Surname, @Email, @User_Password)", user);
+            return Ok(await GetAllUsers());
+
+        }
+
+        //this gets the 
         [HttpGet("login", Name = "Login")]
         public string GetLoginForm()
         { return "login form here"; }
