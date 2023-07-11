@@ -25,7 +25,7 @@ class RegistrationForm extends React.Component  {
     
       QPostSignup=()=>{
     
-        axios.post('https://localhost:7224/UserRegistration/register',{
+        axios.post('https://192.168.8.240:7224/UserRegistration/register',{
           name:this.state.user.name,
           surname:this.state.user.surname,
           email:this.state.user.email,

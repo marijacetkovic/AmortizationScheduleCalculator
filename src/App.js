@@ -1,10 +1,9 @@
-import React,{ useEffect, useState } from "react";
+import React from "react";
 import './App.css';
 import RegistrationForm from './Components/registrationForm';
 import Home from './Components/home';
 import Profile from './Components/profile';
 import Login from './Components/login';
-import useFetch from "./useFetch";
 
 
 class App extends React.Component {
@@ -55,7 +54,7 @@ class App extends React.Component {
     //  .then(data => console.log(data))
 
     try{
-      const response = await fetch('https://jsonplaceholder.typicode.com/posts')
+      const response = await fetch('https://192.168.8.240:7224/UserRegistration/register')
       const data = await response.json();
       console.log(data)
     }
