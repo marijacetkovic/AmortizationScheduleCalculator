@@ -48,21 +48,21 @@ class App extends React.Component {
   };
 
   //for registration
-  async componentDidMount(){
+  //async componentDidMount(){
     //fetch('')
     //  .then(response => response.json())
     //  .then(data => console.log(data))
 
-    try{
-      const response = await fetch('https://localhost:7224/UserRegistration/register')
-      const data = await response.json();
-      console.log(data)
-    }
-    catch(err){
-      console.log(err);
-    }
+    //try{
+     //const response = await fetch('https://localhost:7224/UserRegistration/register')
+      //const data = await response.json();
+      //console.log(data)
+   // }
+   // catch(err){
+    //  console.log(err);
+    //}
 
-  };
+ // };
 
   render(){
 

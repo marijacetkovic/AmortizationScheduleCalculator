@@ -22,18 +22,18 @@ class LoginForm extends React.Component {
           <div className="form-body">
     
               <div className="email">
-                  <label className="form__label" for="email">Email </label>
+                  <label className="form__label">Email </label>
                   <input  type="email" id="email" className="form__input" placeholder="Email"/>
               </div>
               <div className="password">
-                  <label className="form__label" for="password">Password </label>
+                  <label className="form__label" >Password </label>
                   <input className="form__input" type="password"  id="password" placeholder="Password"/>
               </div>
 
           </div>
           <br></br>
-          <div class="footer">
-              <button type="submit" class="btn btn-primary">Login</button>
+          <div className="footer">
+              <button type="submit" className="btn btn-primary">Login</button>
           </div>
 
           <br></br>

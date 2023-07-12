@@ -31,6 +31,7 @@ namespace AmortizationScheduleCalculator.Controllers
         [HttpPost("register", Name = "Register")]
         public async Task<ActionResult<List<User>>> AddUser(User user)
         {
+            var hashedPassword = user.User_Password;
             await _db.ExecuteAsync("insert into \"User\" (name,surname,email,user_password) values (@Name, @Surname, @Email, @User_Password)", user);
             return Ok(await GetAllUsers());
 

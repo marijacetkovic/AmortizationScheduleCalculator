@@ -53,24 +53,24 @@ class RegistrationForm extends React.Component  {
     
           <div className="form-body">
               <div className="username">
-                  <label className="form__label" for="firstName">First Name </label>
+                  <label className="form__label" >First Name </label>
                   <input onChange={(e) => this.QGetTextFromField(e)} name ="name"  className="form__input" type="text" id="firstName" placeholder="First Name"/>
               </div>
               <div className="lastname">
-                  <label className="form__label" for="lastName">Last Name </label>
+                  <label className="form__label" >Last Name </label>
                   <input onChange={(e) => this.QGetTextFromField(e)} type="text" name="surname" id="lastName"  className="form__input"placeholder="LastName"/>
               </div>
               <div className="email">
-                  <label className="form__label" for="email">Email </label>
+                  <label className="form__label" >Email </label>
                   <input onChange={(e) => this.QGetTextFromField(e)} name ="email" type="email" id="email" className="form__input" placeholder="Email"/>
               </div>
               <div className="password">
-                  <label className="form__label" for="password">Password </label>
+                  <label className="form__label" >Password </label>
                   <input onChange={(e) => this.QGetTextFromField(e)} name ="user_Password" className="form__input" type="password"  id="password" placeholder="Password"/>
               </div>
           </div>
-          <div class="footer">
-              <button type="submit" class="btn btn-primary" onClick={() => this.QPostSignup()}  > Register</button>
+          <div className="footer">
+              <button type="submit" className="btn btn-primary" onClick={() => this.QPostSignup()}  > Register</button>
           </div>
 
           
