@@ -1,9 +1,12 @@
 using AmortizationScheduleCalculator.Context;
 using AmortizationScheduleCalculator.Model;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using System.Data;
-
-
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +27,24 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(opt => { 
+    opt.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme { 
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type=SecuritySchemeType.ApiKey
+    });
+    opt.OperationFilter<SecurityRequirementsOperationFilter>();
+}
+);
+builder.Services.AddAuthentication().AddJwtBearer(options => {
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value!))
+};
+});
 
 
 builder.Services.AddScoped<IDbConnection>(db => DatabaseHelper.CreateConnection());
@@ -62,8 +82,8 @@ app.UseHttpsRedirection();
 app.UseCors();
 
 
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

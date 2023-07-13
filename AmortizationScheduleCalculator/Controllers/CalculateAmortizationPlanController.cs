@@ -29,6 +29,9 @@ namespace AmortizationScheduleCalculator.Controllers
             decimal totalLoanCost;
             decimal totalInterestPaid;
             decimal additionalCosts;
+            DateTime loanPayoffDate;
+
+            //calculate
 
             int numOfPayments = loanPeriod * 12;
             double monthlyInterestRate = interestRate / 12;
@@ -39,11 +42,16 @@ namespace AmortizationScheduleCalculator.Controllers
 
             totalLoanCost = monthlyPayment*numOfPayments;
             totalInterestPaid = totalLoanCost - loanAmount;
+            loanPayoffDate = loanStartDate.AddMonths(numOfPayments);
+
+            //update calculations
 
             scheduleReq.Monthly_Payment = monthlyPayment;
             scheduleReq.Total_Interest_Paid = totalInterestPaid;
             scheduleReq.Total_Loan_Cost = totalLoanCost;
+            scheduleReq.Loan_Payoff_Date = loanPayoffDate;
 
+            //store to database
             await _db.ExecuteAsync("insert into \"Request\" " +
                 "(loan_amount,loan_period,interest_rate,loan_start_date,approval_cost,insurance_cost, account_cost,other_costs," +
                 "monthly_payment,total_interest_paid,total_loan_cost,loan_payoff_date) " +

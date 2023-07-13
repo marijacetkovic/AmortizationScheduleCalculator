@@ -1,10 +1,18 @@
 using AmortizationScheduleCalculator.Context;
 using AmortizationScheduleCalculator.Model;
 using Dapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using System.Data;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using static BCrypt.Net.BCrypt;
 
 namespace AmortizationScheduleCalculator.Controllers
 {
@@ -14,10 +22,12 @@ namespace AmortizationScheduleCalculator.Controllers
     {
 
         private readonly IDbConnection _db;
+        private readonly IConfiguration _config;
 
-        public UserRegistrationController(IDbConnection db)
+        public UserRegistrationController(IDbConnection db, IConfiguration config)
         {
             _db = db;
+            _config = config;
         }
 
         [HttpGet("register", Name = "Register")]
@@ -31,25 +41,51 @@ namespace AmortizationScheduleCalculator.Controllers
         [HttpPost("register", Name = "Register")]
         public async Task<ActionResult<List<User>>> AddUser(User user)
         {
-            var hashedPassword = user.User_Password;
+            user.User_Password = BCrypt.Net.BCrypt.HashPassword(user.User_Password);
             await _db.ExecuteAsync("insert into \"User\" (name,surname,email,user_password) values (@Name, @Surname, @Email, @User_Password)", user);
             return Ok(await GetAllUsers());
 
         }
 
-        //this gets the 
         [HttpPost("login", Name = "Login")]
         public string GetLoginForm(User user)
         {
-            var rowList = _db.Query<int>("SELECT * FROM \"User\" WHERE email = @Email and user_password = @User_Password", user);
-            if (rowList == null || !rowList.Any()) {
-                return "wrong mail or password";
+            //first validate credentials - check password for given email (or username)
+            var hashedPassword = _db.Query<string>("SELECT user_password FROM \"User\" WHERE email = @Email", user).First();
+            //verify password
+            if (BCrypt.Net.BCrypt.Verify(user.User_Password, hashedPassword)) {
+                //when validate generate jwt token
+                string token = CreateToken(user);
+                return token;
+                
             }
             else {
-                return "youre in";
-    
+                return "wrong mail or password";
             }
 
+        }
+
+        [HttpGet("secretlink", Name = "Secret"), Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public string getSecret() {
+            return "now you know my secret!!!";
+        }
+
+
+        //creating jwt token
+        private string CreateToken(User user) {
+            List<Claim> claims = new List<Claim> {
+                new Claim(ClaimTypes.Name, user.Email)
+             };
+            //get secret key
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(30),
+                signingCredentials: creds
+                );
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            return jwt;
         }
     }
 }
