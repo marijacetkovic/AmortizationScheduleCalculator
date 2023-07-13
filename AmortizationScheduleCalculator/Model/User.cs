@@ -7,5 +7,6 @@
         public string Surname { get; set; }
         public required string Email { get; set; }
         public required string User_Password { get; set; }
+        //every user has a list of requests associated with it
     }
 }

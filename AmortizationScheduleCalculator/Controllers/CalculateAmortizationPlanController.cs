@@ -2,7 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using Dapper;
-
+using AmortizationScheduleCalculator.Services;
+using System.ComponentModel;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using static Dapper.SqlMapper;
+using System.Security.Claims;
 
 namespace AmortizationScheduleCalculator.Controllers
 {
@@ -11,60 +16,47 @@ namespace AmortizationScheduleCalculator.Controllers
     public class CalculateAmortizationPlanController : Controller
     {
         private readonly IDbConnection _db;
+        private ICalculateAmortizationPlan _calculate;
 
-        public CalculateAmortizationPlanController(IDbConnection db)
+        public CalculateAmortizationPlanController(IDbConnection db,ICalculateAmortizationPlan calculate)
         {
             _db = db;
+            _calculate = calculate;
         }
 
+       
         [HttpPost]
-        public async Task<ActionResult<List<Request>>> CalculateRequest(Request scheduleReq)
+        public async Task<IActionResult> CreateNewCalculation(Request scheduleReq)
         {
-            var loanAmount = scheduleReq.Loan_Amount;
-            var loanPeriod = scheduleReq.Loan_Period;
-            var interestRate = scheduleReq.Interest_Rate/100;
-            var loanStartDate = scheduleReq.Loan_Start_Date;
+            GetUserId();
+            Console.WriteLine("\n");
+       
+            Console.WriteLine("\n");
+            var scheduleList = new List<Schedule>();
+            try
+            {
+                scheduleList = await _calculate.CreateNewCalculation(scheduleReq);
+                return Ok(scheduleList);
 
-            decimal monthlyPayment;
-            decimal totalLoanCost;
-            decimal totalInterestPaid;
-            decimal additionalCosts;
-            DateTime loanPayoffDate;
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        protected void GetUserId()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
 
-            //calculate
-
-            int numOfPayments = loanPeriod * 12;
-            double monthlyInterestRate = interestRate / 12;
-            additionalCosts = scheduleReq.Account_Cost + scheduleReq.Approval_Cost + scheduleReq.Insurance_Cost + scheduleReq.Other_Costs;
-            loanAmount += additionalCosts;
-            //M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1]
-            monthlyPayment = (decimal) (((double)loanAmount * (monthlyInterestRate* Math.Pow(1+monthlyInterestRate, numOfPayments)))/(Math.Pow(1 + monthlyInterestRate, numOfPayments) -1));
-
-            totalLoanCost = monthlyPayment*numOfPayments;
-            totalInterestPaid = totalLoanCost - loanAmount;
-            loanPayoffDate = loanStartDate.AddMonths(numOfPayments);
-
-            //update calculations
-
-            scheduleReq.Monthly_Payment = monthlyPayment;
-            scheduleReq.Total_Interest_Paid = totalInterestPaid;
-            scheduleReq.Total_Loan_Cost = totalLoanCost;
-            scheduleReq.Loan_Payoff_Date = loanPayoffDate;
-
-            //store to database
-            await _db.ExecuteAsync("insert into \"Request\" " +
-                "(loan_amount,loan_period,interest_rate,loan_start_date,approval_cost,insurance_cost, account_cost,other_costs," +
-                "monthly_payment,total_interest_paid,total_loan_cost,loan_payoff_date) " +
-                "values (@Loan_Amount, @Loan_Period, @Interest_Rate, @Loan_Start_Date, @Approval_Cost, @Insurance_Cost, @Account_Cost, @Other_Costs, " +
-                "@Monthly_Payment, @Total_Interest_Paid, @Total_Loan_Cost, @Loan_Payoff_Date)", scheduleReq);
-            return Ok(await GetAllRequests());
-
+            Console.WriteLine("dasDasdasdas \n");
+            Console.WriteLine(identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name));
+            Console.WriteLine("\n:w:dasDasdasdas \n");
         }
         [HttpGet]
         public async Task<ActionResult<List<Request>>> GetAllRequests()
         {
             string query = "select * from \"Request\"";
-            var requests = _db.Query<Request>(query);
+            var requests = await _db.QueryAsync<Request>(query);
             return Ok(requests);
         }
     }

@@ -1,5 +1,6 @@
 using AmortizationScheduleCalculator.Context;
 using AmortizationScheduleCalculator.Model;
+using AmortizationScheduleCalculator.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
@@ -36,6 +37,7 @@ builder.Services.AddSwaggerGen(opt => {
     opt.OperationFilter<SecurityRequirementsOperationFilter>();
 }
 );
+
 builder.Services.AddAuthentication().AddJwtBearer(options => {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -48,6 +50,8 @@ builder.Services.AddAuthentication().AddJwtBearer(options => {
 
 
 builder.Services.AddScoped<IDbConnection>(db => DatabaseHelper.CreateConnection());
+builder.Services.AddTransient<ICalculateAmortizationPlan, CalculationAmortizationPlan>();
+builder.Services.AddTransient<IUserRegistration, UserRegistration>();
 var app = builder.Build();
 
 

@@ -2,9 +2,10 @@
 {
     public class Request
     {
+
         public int Request_Id { get; set; }
         //these user enters
-        public decimal Loan_Amount { get; set; }
+        public required decimal Loan_Amount { get; set; }
         public int Loan_Period { get; set; }
         public double Interest_Rate { get; set; }
         public DateTime Loan_Start_Date { get; set; }
