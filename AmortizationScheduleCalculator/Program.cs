@@ -48,10 +48,10 @@ builder.Services.AddAuthentication().AddJwtBearer(options => {
 };
 });
 
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IDbConnection>(db => DatabaseHelper.CreateConnection());
 builder.Services.AddTransient<ICalculateAmortizationPlan, CalculationAmortizationPlan>();
-builder.Services.AddTransient<IUserRegistration, UserRegistration>();
+builder.Services.AddScoped<IUserRegistration, UserRegistration>();
 var app = builder.Build();
 
 
@@ -81,6 +81,10 @@ if (app.Environment.IsDevelopment())
 //        spa.UseReactDevelopmentServer(npmScript: "start");
 //    }
 //});
+
+
+
+//app.UseRouting();
 
 app.UseHttpsRedirection();
 app.UseCors();

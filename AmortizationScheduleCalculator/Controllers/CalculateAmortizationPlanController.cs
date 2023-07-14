@@ -17,21 +17,20 @@ namespace AmortizationScheduleCalculator.Controllers
     {
         private readonly IDbConnection _db;
         private ICalculateAmortizationPlan _calculate;
+        private readonly IUserRegistration _register;
 
-        public CalculateAmortizationPlanController(IDbConnection db,ICalculateAmortizationPlan calculate)
+        public CalculateAmortizationPlanController(IDbConnection db,ICalculateAmortizationPlan calculate, IUserRegistration register)
         {
             _db = db;
             _calculate = calculate;
+            _register = register;
         }
 
        
-        [HttpPost]
-        public async Task<IActionResult> CreateNewCalculation(Request scheduleReq)
+        [HttpPost,Authorize]
+        public async Task<IActionResult> CreateNewCalculation(Request scheduleReq,string token)
         {
-            GetUserId();
-            Console.WriteLine("\n");
-       
-            Console.WriteLine("\n");
+
             var scheduleList = new List<Schedule>();
             try
             {
@@ -44,20 +43,13 @@ namespace AmortizationScheduleCalculator.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        protected void GetUserId()
+        
+        [HttpGet, Authorize]
+        public List<Request> GetAllRequests()
         {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
+           var id =Int32.Parse( _register.getUserId());
+           return _db.Query<Request>("select * from \"Request\" where r_user_id=@id", new { id = id }).ToList();
 
-            Console.WriteLine("dasDasdasdas \n");
-            Console.WriteLine(identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name));
-            Console.WriteLine("\n:w:dasDasdasdas \n");
-        }
-        [HttpGet]
-        public async Task<ActionResult<List<Request>>> GetAllRequests()
-        {
-            string query = "select * from \"Request\"";
-            var requests = await _db.QueryAsync<Request>(query);
-            return Ok(requests);
         }
     }
 }

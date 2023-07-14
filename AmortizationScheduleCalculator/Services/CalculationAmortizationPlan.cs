@@ -7,17 +7,20 @@ namespace AmortizationScheduleCalculator.Services
     public class CalculationAmortizationPlan:ICalculateAmortizationPlan
     {
         private readonly IDbConnection _db;
+        private readonly IUserRegistration _register;
         
         
 
-        public CalculationAmortizationPlan(IDbConnection db)
+        public CalculationAmortizationPlan(IDbConnection db, IUserRegistration register)
         {
             _db = db;
-            
+            _register = register; 
             
         }
         public async Task<List<Schedule>>  CreateNewCalculation(Request scheduleReq)
         {
+            Console.WriteLine("ovo debugujem "+_register.getUserId());
+            scheduleReq.R_User_Id = Int32.Parse(_register.getUserId());
             var loanAmount = scheduleReq.Loan_Amount;
             var loanPeriod = scheduleReq.Loan_Period;
             var interestRate = scheduleReq.Interest_Rate / 100;
@@ -52,9 +55,9 @@ namespace AmortizationScheduleCalculator.Services
             //store to database
             var id = await _db.QuerySingleAsync<int>("insert into \"Request\" " +
                 "(loan_amount,loan_period,interest_rate,loan_start_date,approval_cost,insurance_cost, account_cost,other_costs," +
-                "monthly_payment,total_interest_paid,total_loan_cost,loan_payoff_date) " +
+                "monthly_payment,total_interest_paid,total_loan_cost,loan_payoff_date,r_user_id) " +
                 "values (@Loan_Amount, @Loan_Period, @Interest_Rate, @Loan_Start_Date, @Approval_Cost, @Insurance_Cost, @Account_Cost, @Other_Costs, " +
-                "@Monthly_Payment, @Total_Interest_Paid, @Total_Loan_Cost, @Loan_Payoff_Date )" +
+                "@Monthly_Payment, @Total_Interest_Paid, @Total_Loan_Cost, @Loan_Payoff_Date,@R_User_Id )" +
                 "RETURNING request_id", scheduleReq);
             Console.WriteLine("\n SADdsa asddsa as dads das asd sda \n");
             Console.WriteLine(id);
@@ -78,7 +81,6 @@ namespace AmortizationScheduleCalculator.Services
                 principalPayment = Math.Round(principalPayment, 2);
                 interestPayment = Math.Round(interestPayment,2);
                 var remainingRounded = Math.Round(remainingBalance,2);
-                Console.WriteLine("iteration " + i);
                 Schedule newSchedule = new Schedule(currentDate, monthlyRounded, principalPayment, interestPayment, remainingRounded, id);
                 scheduleList.Add(newSchedule);
                  await _db.ExecuteAsync("insert into \"AmortizationSchedule\" (\"current_date\",monthly_paid,principal_paid,interest_paid,remaining_loan," +

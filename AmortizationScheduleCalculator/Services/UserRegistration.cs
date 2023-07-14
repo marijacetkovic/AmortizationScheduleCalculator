@@ -16,17 +16,20 @@ namespace AmortizationScheduleCalculator.Services
 
         private readonly IDbConnection _db;
         private readonly IConfiguration _config;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserRegistration(IDbConnection db, IConfiguration config)
+        public UserRegistration(IDbConnection db, IConfiguration config, IHttpContextAccessor httpContextAccessor)
         {
             _db = db;
             _config = config;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<List<User>> GetAllUsers()
         {
 
             string query = "select * from \"User\"";
+            
             List<User> users = _db.Query<User>(query).ToList();
             return users;
         }
@@ -71,10 +74,13 @@ namespace AmortizationScheduleCalculator.Services
         //creating jwt token
         public string CreateToken(User user)
         {
-            Console.WriteLine(user.User_Id.ToString());
+            Console.WriteLine("create token user id "+user.User_Id.ToString());
             List<Claim> claims = new List<Claim> {
-                new Claim(ClaimTypes.Name,user.User_Id.ToString())
+                new Claim(ClaimTypes.Name,user.User_Id.ToString()),
+                new Claim(ClaimTypes.Role, "User")
              };
+            //var identity = HttpContext.User.Identity;
+
             //get secret key
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
@@ -83,8 +89,19 @@ namespace AmortizationScheduleCalculator.Services
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds
                 );
+            
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
             return jwt;
+        }
+
+        public string getUserId()
+        {
+            string result = "";
+            if (_httpContextAccessor is not null)
+            {
+                result = _httpContextAccessor.HttpContext.User?.Identity?.Name;
+            }
+            return result;
         }
     }
 }

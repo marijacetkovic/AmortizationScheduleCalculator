@@ -10,5 +10,6 @@ namespace AmortizationScheduleCalculator.Services
         string userLoginValidation(User user);
         string getSecret();
         string CreateToken(User user);
+        string getUserId();
     }
 }
