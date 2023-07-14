@@ -28,7 +28,7 @@ namespace AmortizationScheduleCalculator.Controllers
 
        
         [HttpPost,Authorize]
-        public async Task<IActionResult> CreateNewCalculation(Request scheduleReq,string token)
+        public async Task<IActionResult> CreateNewCalculation(Request scheduleReq)
         {
 
             var scheduleList = new List<Schedule>();
@@ -43,13 +43,25 @@ namespace AmortizationScheduleCalculator.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        
+
         [HttpGet, Authorize]
-        public List<Request> GetAllRequests()
+        public List<Request> getAllRequests()
         {
-           var id =Int32.Parse( _register.getUserId());
-           return _db.Query<Request>("select * from \"Request\" where r_user_id=@id", new { id = id }).ToList();
+            var id = Int32.Parse(_register.getUserId());
+            return _db.Query<Request>("select * from \"Request\" where r_user_id=@id", new { id = id }).ToList();
 
         }
+        [HttpGet("schedule"), Authorize]
+        public async Task<List<Schedule>> getSchedule([FromQuery] string reqName)
+
+        {
+            var amortizationSchedule = 
+                (await _db.QueryAsync<Schedule>("select * from \"AmortizationSchedule\" where s_request_id = ( " +
+                "select request_id from \"Request\" where request_name=@reqname and r_user_id=@id)",
+                new { reqname = reqName,id=Int32.Parse(_register.getUserId())})).ToList();
+            return amortizationSchedule;
+
+        }
+
     }
 }

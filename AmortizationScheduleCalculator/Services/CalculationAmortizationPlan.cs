@@ -54,9 +54,9 @@ namespace AmortizationScheduleCalculator.Services
 
             //store to database
             var id = await _db.QuerySingleAsync<int>("insert into \"Request\" " +
-                "(loan_amount,loan_period,interest_rate,loan_start_date,approval_cost,insurance_cost, account_cost,other_costs," +
+                "(request_name,loan_amount,loan_period,interest_rate,loan_start_date,approval_cost,insurance_cost, account_cost,other_costs," +
                 "monthly_payment,total_interest_paid,total_loan_cost,loan_payoff_date,r_user_id) " +
-                "values (@Loan_Amount, @Loan_Period, @Interest_Rate, @Loan_Start_Date, @Approval_Cost, @Insurance_Cost, @Account_Cost, @Other_Costs, " +
+                "values (@Request_Name,@Loan_Amount, @Loan_Period, @Interest_Rate, @Loan_Start_Date, @Approval_Cost, @Insurance_Cost, @Account_Cost, @Other_Costs, " +
                 "@Monthly_Payment, @Total_Interest_Paid, @Total_Loan_Cost, @Loan_Payoff_Date,@R_User_Id )" +
                 "RETURNING request_id", scheduleReq);
             Console.WriteLine("\n SADdsa asddsa as dads das asd sda \n");

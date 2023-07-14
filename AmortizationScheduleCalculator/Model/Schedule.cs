@@ -11,6 +11,7 @@
             Remaining_Loan = remainingLoan;
             S_Request_Id = sRequestId;
         }
+        public Schedule() { }
         public int Schedule_Id { get; set; }
         public DateTime Current_Date { get; set; }
         public decimal Monthly_Paid { get; set; }
