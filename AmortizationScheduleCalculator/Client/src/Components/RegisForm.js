@@ -40,9 +40,7 @@ class Forma extends Component {
     };
   }
 
-  handleSubmit = (e) => {
-    e.preventDefault();
-
+  handleSubmit = () => {
     if (formValid(this.state)) {
       console.log(`
         --SUBMITTING--
@@ -51,6 +49,7 @@ class Forma extends Component {
         Email: ${this.state.email}
         Password: ${this.state.user_Password}
       `);
+        this.QPostSignup();
     } else {
       console.error("FORM INVALID - DISPLAY ERROR MESSAGE");
     }
@@ -198,8 +197,7 @@ class Forma extends Component {
               )}
             </div>
                     <div className="createAccounta">
-                        <button onClick={() => {this.handleSubmit();
-                            this.QPostSignup()}} className="buttona" type="button">Submit</button>
+                        <button onClick={() => {this.handleSubmit()}} className="buttona" type="button">Submit</button>
               <a onClick={() => this.QSetViewInParent({ page: "login" })} > <small > Already Have an Account?</small> </a>
             </div>
           </form>
