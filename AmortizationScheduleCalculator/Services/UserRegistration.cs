@@ -1,8 +1,5 @@
 ﻿using AmortizationScheduleCalculator.Model;
 using Dapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -63,11 +60,6 @@ namespace AmortizationScheduleCalculator.Services
                 return "wrong mail or password";
             }
 
-        }
-
-        public string getSecret()
-        {
-            return "now you know my secret!!!";
         }
 
 

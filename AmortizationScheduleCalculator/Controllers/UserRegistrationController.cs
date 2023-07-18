@@ -1,19 +1,9 @@
-using AmortizationScheduleCalculator.Context;
 using AmortizationScheduleCalculator.Model;
 using AmortizationScheduleCalculator.Services;
-using Dapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Microsoft.IdentityModel.Tokens;
-using Npgsql;
-using System.Data;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using static BCrypt.Net.BCrypt;
+
 
 namespace AmortizationScheduleCalculator.Controllers
 {
@@ -54,11 +44,5 @@ namespace AmortizationScheduleCalculator.Controllers
             return _register.getSecret();
         }
 
-
-        //creating jwt token
-        private string CreateToken(User user)
-        {
-            return _register.CreateToken(user);
-        }
     }
 }
