@@ -1,0 +1,123 @@
+.wrappera {
+    height: 70vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #F8F9FA;
+  }
+  
+  .form-wrappera {
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 40px;
+    border-radius: 10px;
+    box-shadow: 0px 10px 50px #555;
+    background-color: #ffffff;
+  }
+  
+  .forma {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .h1a {
+    text-align: center;
+    width: 100%;
+    color: #111;
+    font-weight: lighter;
+    font-family: "Segoe UI";
+  }
+  
+  .labela {
+    font-size: 0.8em;
+    margin-bottom: 0.25em;
+    color: #222;
+    text-align: left;
+    font-weight: lighter;
+  }
+  
+  .inputa {
+    padding: 10px 10px;
+    border-radius: 5px;
+    outline: none;
+    border: 1px solid #cfcfcf;
+  }
+  
+  input::placeholder {
+    font-size: 1.2em;
+    font-weight: lighter;
+    color: #999;
+  }
+  
+  .inputa.error {
+    border: 1px solid red;
+  }
+  
+  .errorMessagea {
+    color: red;
+    font-size: 0.75em;
+    display: relative;
+  }
+  
+  .firstNamea {
+    margin-right: 1%;
+  }
+  
+  .lastNamea {
+    margin-left: 1%;
+  }
+  
+  .firstNamea,
+  .lastNamea,
+  .emaila,
+  .passworda {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+  }
+  
+  .firstNamea,
+  .lastNamea {
+    width: 49%;
+  }
+  
+  .emaila,
+  .passworda{
+    width: 100%;
+  }
+  
+  .createAccounta {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .createAccounta button {
+    background-color: #526D82;
+    color: #fff;
+    border: 2px solid #fff;
+    width: 100%;
+    margin-top: 1em;
+    padding: 8px 0px;
+    font-size: 1.1em;
+    font-weight: lighter;
+    letter-spacing: 1px;
+    margin-bottom: 0.25em;
+  }
+  
+  .createAccounta button:hover {
+    color: #FFFFFF;
+    background-color: #9DB2BF;
+    border: 2px solid #9DB2BF;
+  }
+  
+  .createAccounta small {
+    color: #999;
+    font-weight: lighter;
+  }
+  
