@@ -31,12 +31,21 @@ namespace AmortizationScheduleCalculator.Services
             return users;
         }
 
-        public async Task<List<User>> AddUser(User user)
+        public async Task<int> RegistrateUser(User user)
         {
             user.User_Password = BCrypt.Net.BCrypt.HashPassword(user.User_Password);
-            user.User_Id = await _db.QueryFirstAsync<int>("insert into \"User\" (name,surname,email,user_password) values (@Name, @Surname, @Email, @User_Password) returning user_id", user);
-            Console.WriteLine(user.User_Id);
-            return await GetAllUsers();
+            try
+            {
+                user.User_Id = await _db.QueryFirstAsync<int>("insert into \"User\" (name,surname,email,user_password) values (@Name, @Surname, @Email, @User_Password) returning user_id", user);
+                Console.WriteLine(user.User_Id);
+                return 1;
+            }
+            //error is raised when tried to enter email that alr exists
+            catch(Exception e) { 
+                Console.WriteLine(e);
+                return 0;
+            }
+            
 
         }
 
@@ -78,7 +87,7 @@ namespace AmortizationScheduleCalculator.Services
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.Now.AddMinutes(1),
                 signingCredentials: creds
                 );
             

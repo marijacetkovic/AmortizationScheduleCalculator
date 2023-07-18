@@ -27,7 +27,7 @@ namespace AmortizationScheduleCalculator.Controllers
         [HttpPost("register", Name = "Register")]
         public async Task<ActionResult<List<User>>> AddUser(User user)
         {
-            var result = await _register.AddUser(user);
+            var result = await _register.RegistrateUser(user);
             return Ok(result);
 
         }
@@ -38,11 +38,8 @@ namespace AmortizationScheduleCalculator.Controllers
             return _register.userLoginValidation(user);
         }
 
-        [HttpGet("secretlink", Name = "Secret"), Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public string getSecret()
-        {
-            return _register.getSecret();
-        }
+      //  [HttpGet("secretlink", Name = "Secret"), Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+      
 
     }
 }
