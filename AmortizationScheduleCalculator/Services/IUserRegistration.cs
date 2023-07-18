@@ -6,8 +6,8 @@ namespace AmortizationScheduleCalculator.Services
     {
         Task<List<User>> GetAllUsers();
         Task<int> RegistrateUser(User user);
-        string userLoginValidation(User user);
-        string CreateToken(User user);
+        string userLoginValidation(UserInput user);
+        string CreateToken(int id);
         string getUserId();
     }
 }

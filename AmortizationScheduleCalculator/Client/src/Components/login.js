@@ -5,17 +5,18 @@ import axios from 'axios';
 class LoginForm extends React.Component {
 
     constructor(props) {
-      super(props);
-      
-      this.state = {
-        isActive:false,
-        name: "login",
-          user: {
-            email: "",
-            password: ""
-          }
-        
-      };
+
+        super(props);
+        this.state = {
+            isActive: false,
+            name: "login",
+            user: {
+                email: "",
+                password: ""
+            },
+            token: "",
+        };
+
     }
 
     handleShow = ()=>{
@@ -50,22 +51,40 @@ class LoginForm extends React.Component {
       this.props.QUserFromChild(this.state.user);
     };
 
-    QPostLogin=()=>{
-      axios.post('https://localhost:7224/UserRegistration/login',{
-        email:this.state.user.email,
-        password:this.state.user.password
-      },{withCredentials:true})
-      .then(response=>{
-        console.log("Sent to server...")
-        this.QSendUser2Parent(response.data[0])
-      })
-      .catch(err=>{
-        console.log(err)
-      })
-    }
-    QSendUser2Parent=(obj)=>{
-      this.props.QUserFromChild(obj)
-    } 
+    QPostLogin = () => {
+
+        axios.post('https://localhost:7224/UserRegistration/login', {
+            email: this.state.user.email,
+            password: this.state.user.password
+        })
+            .then(response => {
+                this.setState({ token: response.data }, () => {
+                     this.QGetCalculation();
+                });
+                
+               
+            })
+           
+            .catch(err => {
+                console.log(err)
+            })
+    };
+  //{ withCredentials: true }
+
+    QGetCalculation = () => {
+        axios.get('https://localhost:7224/CalculateAmortizationPlan', {
+            headers: {
+                Authorization: `Bearer ${this.state.token}`
+            
+            }
+        })
+            .then(response => {
+                this.props.QIDFromChild({ page: "profile" })
+            }).catch(err => {
+                this.props.QIDFromChild({ page: "login" });
+            })
+    };
+
  
 
       render(){
@@ -98,7 +117,7 @@ class LoginForm extends React.Component {
                   />
                 </div>
                 <div className="createAccounta">
-                  <button onClick={() => this.QPostLogin()} className="buttona" type="submit">Login</button>
+                  <button onClick={() => this.QPostLogin()} className="buttona" type="button">Login</button>
                   <a onClick={(e) => this.QSetViewInParent({ page: "registration" })} ><small> Don't have an account?</small></a>
                 </div>
               </form>

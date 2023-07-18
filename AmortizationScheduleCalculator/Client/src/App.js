@@ -53,13 +53,6 @@ class App extends React.Component {
     })
    };
 
-   componentDidMount(){
-    axios.get('https://localhost:7224/UserRegistration/login')
-    .then(response=>{
-      console.log(response)
-    })
-   };
-   
 
 
 

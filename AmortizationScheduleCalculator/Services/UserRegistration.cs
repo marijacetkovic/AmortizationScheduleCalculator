@@ -49,18 +49,18 @@ namespace AmortizationScheduleCalculator.Services
 
         }
 
-        public string userLoginValidation(User user)
+        public string userLoginValidation(UserInput loginUser)
         {
-            Console.WriteLine(user.User_Id);
             //first validate credentials - check password for given email (or username)
-            var hashedPassword = _db.Query<string>("SELECT user_password FROM \"User\" WHERE email = @Email", user).First();
+            var hashedPassword = _db.Query<string>("SELECT user_password FROM \"User\" WHERE email = @Email", loginUser).First();
             //verify password
-            if (BCrypt.Net.BCrypt.Verify(user.User_Password, hashedPassword))
+            if (BCrypt.Net.BCrypt.Verify(loginUser.password, hashedPassword))
             {
                 //when validate generate jwt token
-                int id = _db.Query<int>("SELECT user_id FROM \"User\" WHERE email = @Email", user).First();
-                user.User_Id = id;
-                string token = CreateToken(user);
+                int id = _db.Query<int>("SELECT user_id FROM \"User\" WHERE email = @Email", loginUser).First();
+                //var user = new User();
+                //user.User_Id = id;
+                string token = CreateToken(id);
                 return token;
 
             }
@@ -73,11 +73,11 @@ namespace AmortizationScheduleCalculator.Services
 
 
         //creating jwt token
-        public string CreateToken(User user)
+        public string CreateToken(int id)
         {
-            Console.WriteLine("create token user id "+user.User_Id.ToString());
+            Console.WriteLine("create token user id "+id.ToString());
             List<Claim> claims = new List<Claim> {
-                new Claim(ClaimTypes.Name,user.User_Id.ToString()),
+                new Claim(ClaimTypes.Name,id.ToString()),
                 new Claim(ClaimTypes.Role, "User")
              };
             //var identity = HttpContext.User.Identity;
@@ -87,7 +87,7 @@ namespace AmortizationScheduleCalculator.Services
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(1),
+                expires: DateTime.Now.AddSeconds(20),
                 signingCredentials: creds
                 );
             
