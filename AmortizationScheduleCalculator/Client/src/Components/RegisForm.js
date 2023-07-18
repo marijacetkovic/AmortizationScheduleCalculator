@@ -98,19 +98,26 @@ class Forma extends Component {
 
   QPostSignup = () => {
     const profile = {};
-    profile['firstname'] = this.state.user.firstname;
+    profile['name'] = this.state.user.firstname;
     profile['surname'] = this.state.user.surname;
     profile['email'] = this.state.user.email;
     profile['user_Password'] = this.state.user.user_Password;
 
-    axios.post('https://localhost:7224/UserRegistration/register',profile)
+      axios.post('https://localhost:7224/UserRegistration/register',profile)
         .then(response => {
             console.log("Sent to server...")
+            if (response.data === 1) {
+                this.props.QIDFromChild({ page: "login" })
+            }
+            else {
+                alert("Email already exists.")
+                
+            }
         })
         .catch(err => {
             console.log(err)
         })
-    this.props.QIDFromChild({ page: "login" })
+  
   };
 
   QSetViewInParent = (obj) => {
@@ -133,7 +140,7 @@ class Forma extends Component {
         <div className="form-wrappera">
           <h1 className="h1a">Create Account</h1>
           <br></br>
-          <form className="forma" onSubmit={this.handleSubmit} noValidate>
+          <form className="forma" noValidate>
             <div className="firstNamea">
               <label className="labela" >First Name</label>
               <input
@@ -190,8 +197,9 @@ class Forma extends Component {
                 <span className="errorMessagea">{formErrors.user_Password}</span>
               )}
             </div>
-            <div className="createAccounta">
-              <button onClick={() => this.QSetViewInParent({ page: "login" })} className="buttona" type="submit">Submit</button>
+                    <div className="createAccounta">
+                        <button onClick={() => {this.handleSubmit();
+                            this.QPostSignup()}} className="buttona" type="button">Submit</button>
               <a onClick={() => this.QSetViewInParent({ page: "login" })} > <small > Already Have an Account?</small> </a>
             </div>
           </form>

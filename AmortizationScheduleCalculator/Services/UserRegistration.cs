@@ -42,7 +42,7 @@ namespace AmortizationScheduleCalculator.Services
             }
             //error is raised when tried to enter email that alr exists
             catch(Exception e) { 
-                Console.WriteLine(e);
+                Console.WriteLine("Email exists");
                 return 0;
             }
             
