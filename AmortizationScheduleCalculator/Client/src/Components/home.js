@@ -8,8 +8,21 @@ class Home extends React.Component {
     super(props);
     
     this.state = {
-     calculation: {}
+     calculation: {},
+     selectedDate: '',
+      timestamp: '',
     };
+   this.handleDateChange = this.handleDateChange.bind(this);
+  };
+
+  handleDateChange = (event) => {
+    const selectedDate = event.target.value;
+    this.setState({ selectedDate });
+
+    // Convert the selected date to a timestamp
+    const dateObject = new Date(selectedDate);
+    const timestampInSeconds = Math.floor(dateObject.getTime() / 1000);
+    this.setState({ timestamp: timestampInSeconds });
   };
   
   QGetTextFromField = (e) => {
@@ -29,15 +42,21 @@ class Home extends React.Component {
   };
 
   QPostField = () => {
-    axios.post('/calculator',{
-      amount:this.state.calculation.amount,
-      period:this.state.calculation.period,
-      start:this.state.calculation.start,
-      rate:this.state.calculation.rate,
-      approval:this.state.calculation.approval,
-      insurance:this.state.calculation.insurance,
-      account:this.state.calculation.account,
-      costs:this.state.calculation.costs,
+    axios.post('/https://localhost:7224/CalculateAmortizationPlan',{
+      request_Name:this.state.calculation.nameFor,
+      loan_Amount:this.state.calculation.amount,
+      loan_Period:this.state.calculation.period,
+      loan_Start_Date:this.state.calculation.start,
+      interest_Rate:this.state.calculation.rate,
+      approval_Cost:this.state.calculation.approval,
+      insurance_Cost:this.state.calculation.insurance,
+      account_Cost:this.state.calculation.account,
+      other_Costs:this.state.calculation.costs,
+      monthly_Payment: 0,
+      total_Interest_Paid: 0,
+      total_Loan_Cost: 0,
+      loan_Payoff_Date: "2023-07-19T07:22:56.004Z",
+      r_User_Id: 0
     })
     .then(response=>{
       console.log("Sent to server...")
@@ -47,130 +66,98 @@ class Home extends React.Component {
     })
 
     //we nee to redired to new component
-    this.props.QIDFromChild({page: "profile"})
+    this.props.QIDFromChild({page: "calculation"})
   };
 
   
   render() {
-  return (
-    
-  <div>
+    const { selectedDate, timestamp } = this.state;
+    return (
+    <div>
 
-    <div style={{ textAlign: "center",display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'}}>
-    <form style={{width: "30%", marginTop: "2%"}}>
+      <div className="centerDiv">
+      <form id="formH">
 
-    <div className="form-floating">
-    <span
-        style={{
-          position: 'absolute',
-          left: '10px', // Adjust the left positioning as needed
-          top: '64%',
-          transform: 'translateY(-50%)',
-        }}
-      >
-        €
-      </span>
-      <input onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingInput" placeholder="" name="amount" style={{ paddingLeft: '25px' }} ></input>
-      
-      <label>Loan amount</label>
-    </div>
-    <div className="form-floating">
-      <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingPassword" placeholder="" name="period" style={{ paddingLeft: '25px' }} ></input>
-      <label >Loan period</label>
-    </div>
+        <div className="form-floating">
+          <input onChange={(e) => this.QGetTextFromField(e)} type="text" className="form-control" id="floatingInput" placeholder="" name="nameFor" style={{ paddingLeft: '25px' }} ></input>
+          
+          <label>Request name</label>
+        </div> 
 
-    <div className="form-floating">
-      <input  onChange={(e) => this.QGetTextFromField(e)} type="date" className="form-control" id="floatingDate" placeholder="" name="start" style={{ paddingLeft: '25px' }}></input>
-      <label>Loan start</label>
-    </div>
+        <div className="form-floating">
+          <span className="spanInput">
+            €
+          </span>
+          <input onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingInput" placeholder="" name="amount" style={{ paddingLeft: '25px' }} min={1}></input>
+          
+          <label>Loan amount</label>
+        </div>
 
-    <div className="form-floating">
-    <span
-        style={{
-          position: 'absolute',
-          left: '10px', // Adjust the left positioning as needed
-          top: '64%',
-          transform: 'translateY(-50%)',
-        }}
-      >
-        %
-        </span>
-      <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingRate" placeholder="" name="rate" style={{ paddingLeft: '25px' }}></input>
-      <label>Interest rate</label>
-    </div>
+        <div className="form-floating">
+          <span className="spanInputPeriod">
+            years
+          </span>
+          <input onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingPassword" placeholder="" name="period" style={{ paddingLeft: '25px' }} min={1} ></input>
+          <label>Loan period</label>
+        </div>
 
-    <div className="form-floating">
-    <span
-        style={{
-          position: 'absolute',
-          left: '10px', // Adjust the left positioning as needed
-          top: '64%',
-          transform: 'translateY(-50%)',
-        }}
-      >
-        €
-        </span>
-      <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingApproval" placeholder="" name="approval" style={{ paddingLeft: '25px' }}></input>
-      <label>Approval</label>
-    </div>
+        <div className="form-floating">
+          <input onChange={(e) => {this.QGetTextFromField(e);this.handleDateChange(e)}} type="date" value={selectedDate} className="form-control" id="floatingDate" placeholder="dd/mm/yyyy" name="start" style={{ paddingLeft: '25px' }}></input>
+          <label>Loan start</label>
+        </div>
 
-    <div className="form-floating">
-    <span
-        style={{
-          position: 'absolute',
-          left: '10px', // Adjust the left positioning as needed
-          top: '64%',
-          transform: 'translateY(-50%)',
-        }}
-      >
-        €
-        </span>
-      <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingInsurance" placeholder="" name="insurance" style={{ paddingLeft: '25px' }}></input>
-      <label>Insurance</label>
-    </div>
+        <div className="form-floating">
+            <span className="spanInput">
+                %
+            </span>
+          <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingRate" placeholder="" name="rate" style={{ paddingLeft: '25px' }} min={1}></input>
+          <label>Interest rate</label>
+        </div>
 
-    <div className="form-floating">
-      <span
-        style={{
-          position: 'absolute',
-          left: '10px', // Adjust the left positioning as needed
-          top: '64%',
-          transform: 'translateY(-50%)',
-        }}
-      >
-        €
-        </span>
-      <input  onChange={(e) => this.QGetTextFromField(e)} type="number" pattern="^[0-9]*$" className="form-control" id="floatingAccount" placeholder="" name="account" style={{ paddingLeft: '25px' }}></input>
-      <label>Account</label>
+        <div className="form-floating">
+        <span className="spanInput"
+          >
+            €
+            </span>
+          <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingApproval" placeholder="" name="approval" style={{ paddingLeft: '25px' }} min={1}></input>
+          <label>Approval</label>
+        </div>
+
+        <div className="form-floating">
+        <span className="spanInput"
+          >
+            €
+            </span>
+          <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingInsurance" placeholder="" name="insurance" style={{ paddingLeft: '25px' }} min={1}></input>
+          <label>Insurance</label>
+        </div>
+
+        <div className="form-floating">
+          <span className="spanInput">
+            €
+            </span>
+          <input  onChange={(e) => this.QGetTextFromField(e)} type="number" pattern="^[0-9]*$" className="form-control" id="floatingAccount" placeholder="" name="account" style={{ paddingLeft: '25px' }} min={1}></input>
+          <label>Account</label>
+        </div>
+
+        <div className="form-floating">
+        <span className="spanInput">
+            €
+            </span>
+          <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingCosts" placeholder="" name="costs" style={{ paddingLeft: '25px' }} min={1}></input>
+          <label>Other costs</label>
+        </div>
+
+          <br></br>
+        
+        <button onClick = {() => this.QPostField()} className="buttona" >Calculate</button>
+        
+    </form>
     </div>
 
-    <div className="form-floating">
-    <span
-        style={{
-          position: 'absolute',
-          left: '10px', // Adjust the left positioning as needed
-          top: '64%',
-          transform: 'translateY(-50%)',
-        }}
-      >
-        €
-        </span>
-      <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingCosts" placeholder="" name="costs" style={{ paddingLeft: '25px' }}></input>
-      <label>Other costs</label>
     </div>
-
-      <br></br>
-    
-    <button onClick = {(e) => this.QSetViewInParent({page: "calculation"})} className="buttona" >Calculate</button>
-    
-  </form>
-  </div>
-
-  </div>
-    );
-  }
+      );
+    }
 }
 
 

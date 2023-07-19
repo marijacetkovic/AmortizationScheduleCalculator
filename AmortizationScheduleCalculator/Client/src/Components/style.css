@@ -79,9 +79,40 @@ body{
     border: 2px solid #9DB2BF;
   }
 
-#floatingInput::before{
-    content: "€";
-    position: absolute;
+#formH{
+    width: 21%;
+    margin-top: -7%;
+}
 
+.centerDiv{
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.spanInput{
+    position: absolute;
+    left:10px;
+    top: 64%;
+    transform: translateY(-50%);
+    font-weight: 300;
+}
+
+.spanInputPeriod{
+    position: absolute;
+    left:85%;
+    top: 64%;
+    transform: translateY(-50%);
+    font-weight: 300;
+}
+
+.thElement{
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.tdElement{
+    font-size: 30px;
+    font-weight: 700;
 }
 
