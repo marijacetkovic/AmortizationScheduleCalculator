@@ -15,7 +15,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     //state is where our "global" variable will be store
-    this.state = { CurrentPage: "home", userStatus:{logged:false}};
+    this.state = { CurrentPage: "profile", userStatus:{logged:false}};
   }
  
   QGetView = (state) => {
@@ -36,7 +36,7 @@ class App extends React.Component {
       case "calculation":
           return <Calculation QIDFromChild={this.QSetView}/>;
       default:
-      return <Home />;
+      return <Profile/>;
 
     }
   };
@@ -78,22 +78,22 @@ class App extends React.Component {
     
     <div className="App">
 
-    <div className="container">
-      <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-        <a href="#" className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
-          <svg className="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"></svg>
-        </a>
+         {/* <div className="container">
+            <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+              <a href="#" className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+                <svg className="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"></svg>
+              </a>
 
-        <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-          <li> <button className= "uniButton" onClick={() => this.QSetView({ page: "home" })} ><div id="title">Amortization Calculator </div></button> </li> 
-        </ul>
+              <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+                <li> <button className= "uniButton" onClick={() => this.QSetView({ page: "home" })} ><div id="title">Amortization Calculator </div></button> </li> 
+              </ul>
 
-      <div className="col-md-3 text-end">
-          <button type="button" onClick={() => this.QSetView({ page: "login" })} className="btn btn-outline me-2">Login</button>
-          <button type="button" onClick={() => this.QSetView({ page: "registration" })} className="btn">Sign-up</button>
-      </div>
-      </header>
-  </div> 
+            <div className="col-md-3 text-end">
+                <button type="button" onClick={() => this.QSetView({ page: "login" })} className="btn btn-outline me-2">Login</button>
+                <button type="button" onClick={() => this.QSetView({ page: "registration" })} className="btn">Sign-up</button>
+            </div>
+            </header>
+  </div> */}
 
       <div id="viewer">
         {this.QGetView(this.state)}
