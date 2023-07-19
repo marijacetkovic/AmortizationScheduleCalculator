@@ -1,4 +1,6 @@
-﻿namespace AmortizationScheduleCalculator.Model
+﻿using Npgsql.PostgresTypes;
+
+namespace AmortizationScheduleCalculator.Model
 {
     public class Request
     {
@@ -24,6 +26,7 @@
         public DateTime Loan_Payoff_Date { get; set; }
         //foreign key
         public int R_User_Id { get; set; }
+
 
 
     }

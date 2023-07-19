@@ -28,13 +28,13 @@ namespace AmortizationScheduleCalculator.Controllers
 
        
         [HttpPost,Authorize]
-        public async Task<IActionResult> CreateNewCalculation(Request scheduleReq)
+        public async Task<IActionResult> CreateNewCalculation([FromBody] Request scheduleReq, [FromQuery] Dictionary<int, decimal> dict)
         {
 
             var scheduleList = new List<Schedule>();
             try
             {
-                scheduleList = await _calculate.CreateNewCalculation(scheduleReq);
+                scheduleList = await _calculate.CreateNewCalculation(scheduleReq, dict);
                 return Ok(scheduleList);
 
             }
