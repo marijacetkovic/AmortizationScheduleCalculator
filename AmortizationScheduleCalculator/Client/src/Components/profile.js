@@ -82,16 +82,16 @@ class Profile extends React.Component {
 
 
                    <div className="col-md-3 text-end">
-                  <button type="button" onClick={() => this.QSetViewInParent({ page: "login" })} className="btn btn-outline me-2">New calculation</button>
-                  <button type="button" onClick={() => this.QSetViewInParent({ page: "registration" })} className="btn">Logout</button>
+                  <button type="button" onClick={() => this.QSetViewInParent({ page: "profile" })} className="btn btn-outline me-2">New calculation</button>
+                  <button type="button" onClick={() => this.QSetViewInParent({ page: "login" })} className="btn">Logout</button>
                </div>
                   </header>
               </div> 
 
         <div className="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary" style={{width: "15%", height: "100%"}}>
           
-          <hr></hr>
-          <ul className="nav nav-pills flex-column mb-auto">
+          {/*<hr></hr>*/}
+          {/*<ul className="nav nav-pills flex-column mb-auto">
             
             <li>
               <button className="nav-link link-body-emphasis"  onClick={() => this.QSetViewInParent({ page: "Schedule" })}>
@@ -100,11 +100,11 @@ class Profile extends React.Component {
               </button>
             </li>
             </ul>
-          <hr></hr>
+    <hr></hr>*/}
 
-          <div className="dropdown" >
+        {/*} <div className="dropdown" >
             <a href="#" className="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            {/*<i class="bi bi-person"></i>*/}
+           <i class="bi bi-person"></i>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
               <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
             </svg>
@@ -114,7 +114,7 @@ class Profile extends React.Component {
               <li><a className="dropdown-item" href="#">New calculation</a></li>
               <li><a className="dropdown-item" href="#" onClick={() => this.QSetViewInParent({ page: "home" })}>Sign out</a></li>
             </ul>
-          </div>
+    </div>*/}
         
           </div>
 
@@ -192,7 +192,7 @@ class Profile extends React.Component {
 
               <br></br>
             
-              <button onClick= {() => this.QPostField()} className="buttona" type="submit">Calculate</button>
+              <button onClick={() => this.QSetViewInParent({page: "login"})}/*onClick= {() => this.QPostField()}*/ className="buttona" type="button">Calculate</button>
             
         </form>
         </div>

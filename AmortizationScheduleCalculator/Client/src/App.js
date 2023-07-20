@@ -15,7 +15,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     //state is where our "global" variable will be store
-    this.state = { CurrentPage: "profile", userStatus:{logged:false}};
+    this.state = { CurrentPage: "schedule", userStatus:{logged:false}};
   }
  
   QGetView = (state) => {
@@ -36,7 +36,7 @@ class App extends React.Component {
       case "calculation":
           return <Calculation QIDFromChild={this.QSetView}/>;
       default:
-      return <Profile/>;
+          return <Login/>;
 
     }
   };
@@ -93,7 +93,7 @@ class App extends React.Component {
                 <button type="button" onClick={() => this.QSetView({ page: "registration" })} className="btn">Sign-up</button>
             </div>
             </header>
-  </div> */}
+          </div> */}
 
       <div id="viewer">
         {this.QGetView(this.state)}

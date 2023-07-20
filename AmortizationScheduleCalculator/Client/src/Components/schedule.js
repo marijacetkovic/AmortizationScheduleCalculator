@@ -1,6 +1,7 @@
 import React from 'react';
 import  { MDBTable, MDBTableHead, MDBTableBody }  from 'mdb-react-ui-kit';
 import axios from 'axios';
+
 class Schedule extends React.Component {
 
     constructor(props) {
@@ -9,6 +10,10 @@ class Schedule extends React.Component {
             schedule: []
         };
       };
+
+      QSetViewInParent = (obj) => {
+        this.props.QIDFromChild(obj);
+    };
 
     componentDidMount()
       {
@@ -27,6 +32,23 @@ class Schedule extends React.Component {
 
             return (
                 <div>
+
+                        <div className="container">
+                          <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-3 border-bottom">
+                             <a href="#" className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+                                <svg className="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"></svg>
+                            </a>
+
+                        <div id="title">Amortization Calculator </div>
+
+                        <div className="col-md-3 text-end">
+                            <button type="button" onClick={() => this.QSetViewInParent({ page: "calculation" })} className="btn btn-outline me-2">New calculation</button>
+                            <button type="button" onClick={() => this.QSetViewInParent({ page: "login" })} className="btn">Logout</button>
+                        </div>
+                         </header>
+                      </div> 
+
+                 <div> 
                 <MDBTable striped hover style={{maxWidth: "1000px", margin:"auto"}}>
                     <MDBTableHead >
                     <tr>
@@ -75,7 +97,7 @@ class Schedule extends React.Component {
                     </tr>
                 </MDBTableBody>
                 </MDBTable>
-    
+                </div>
                 </div>
         );
  }

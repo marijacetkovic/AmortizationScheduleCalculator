@@ -24,7 +24,7 @@ class Calculation extends React.Component {
         });
       };
 
-      componentDidMount()
+    /*  componentDidMount()
       {
         axios.get('https://localhost:7224/CalculateAmortizationPlan')
         .then(response=>{
@@ -33,15 +33,32 @@ class Calculation extends React.Component {
             calculation:response.data
           })
         })
-      };
+      };*/
         
     render(){
         let data=this.state.calculation;
                 return (
                     <div>
+                       <div className="container">
+                          <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-3 border-bottom">
+                             <a href="#" className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+                                <svg className="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"></svg>
+                            </a>
+
+                        <div id="title">Amortization Calculator </div>
+
+                        <div className="col-md-3 text-end">
+                            <button type="button" onClick={() => this.QSetViewInParent({ page: "Schedule" })} className="btn btn-outline me-2">Schedule</button>
+                            <button type="button" onClick={() => this.QSetViewInParent({ page: "login" })} className="btn">Logout</button>
+                        </div>
+                         </header>
+                      </div> 
+                      
                       {data.length > 0 ?
                          data.map((d)=>{
                          return(
+                          <div>
+                            
                             <div style={{overflowX: "auto"}}>
                                 <div style={{width: "60%", margin: "auto", marginTop: "8%"}}>
                                     <div className="col" style={{ margin: "auto", marginTop: "5%" }}>
@@ -72,7 +89,7 @@ class Calculation extends React.Component {
                                     </div>
                                 </div>
                             </div>
-
+                          </div>
                      </div>
 
         );

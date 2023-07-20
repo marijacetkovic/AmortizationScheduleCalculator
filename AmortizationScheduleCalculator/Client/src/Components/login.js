@@ -99,7 +99,7 @@ class LoginForm extends React.Component {
                     </a>
 
                     <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-                      <li> <button className= "uniButton" onClick={() => this.QSetViewInParent({ page: "home" })} ><div id="title">Amortization Calculator </div></button> </li> 
+                      <li> <button className= "uniButton"><div id="title">Amortization Calculator </div></button> </li> 
                     </ul>
 
                   <div className="col-md-3 text-end">
