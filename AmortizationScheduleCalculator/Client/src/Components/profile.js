@@ -8,7 +8,8 @@ class Profile extends React.Component {
     super(props);
     
     this.state = {
-     calculation: {},
+        calculation: {
+        },
      selectedDate: '',
       timestamp: '',
     };
@@ -34,16 +35,17 @@ class Profile extends React.Component {
 
   //put the fields
   QPostField=()=>{
-    axios.post('/https://localhost:7224/CalculateAmortizationPlan',{
+      axios.post('https://localhost:7224/CalculateAmortizationPlan', {
+      request_Id:0,
       request_Name:this.state.calculation.nameFor,
-      amount:this.state.calculation.amount,
-      period:this.state.calculation.period,
-      start:this.state.calculation.start,
-      rate:this.state.calculation.rate,
-      approval:this.state.calculation.approval,
-      insurance:this.state.calculation.insurance,
-      account:this.state.calculation.account,
-      costs:this.state.calculation.costs,
+      loan_Amount:this.state.calculation.amount,
+      loan_Period:this.state.calculation.period,
+      interest_Rate: this.state.calculation.rate,
+      loan_Start_Date: this.state.calculation.date,
+      approval_Cost:this.state.calculation.approval,
+      insurance_Cost:this.state.calculation.insurance,
+      account_Costs:this.state.calculation.account,
+      other_Costs:this.state.calculation.costs,
       monthly_Payment: 0,
       total_Interest_Paid: 0,
       total_Loan_Cost: 0,
@@ -51,7 +53,8 @@ class Profile extends React.Component {
       r_User_Id: 0
     })
     .then(response=>{
-      console.log("Sent to server...")
+        console.log("Sent to server...")
+       
     })
     .catch(err=>{
       console.log(err)
@@ -132,7 +135,7 @@ class Profile extends React.Component {
               <span className="spanInput">
                   €
               </span>
-              <input  onChange={(e) => this.QGetTextFromField(e)} type="email" className="form-control" id="floatingInput" placeholder="" name="amount" style={{ paddingLeft: '25px' }} min={1}></input>
+              <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingInput" placeholder="" name="amount" style={{ paddingLeft: '25px' }} min={1}></input>
               <label>Loan amount</label>
             </div>
 
@@ -140,12 +143,12 @@ class Profile extends React.Component {
               <span className="spanInputPeriod">
                 years
               </span>
-              <input onChange={(e) => this.QGetTextFromField(e)} type="password" className="form-control" id="floatingPassword" placeholder="" name="period" style={{ paddingLeft: '25px' }} min={1}></input>
+              <input onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingPassword" placeholder="" name="period" style={{ paddingLeft: '25px' }} min={1}></input>
               <label>Loan period</label>
             </div>
 
             <div className="form-floating">
-              <input  onChange={(e) => {this.QGetTextFromField(e);this.handleDateChange(e)}} type="date" className="form-control" id="floatingDate" placeholder="" name="start" style={{ paddingLeft: '25px' }}></input>
+              <input  onChange={(e) => {this.QGetTextFromField(e)}} type="date" className="form-control" id="floatingDate" placeholder="" name="start" style={{ paddingLeft: '25px' }}></input>
               <label>Loan start</label>
             </div>
 
@@ -154,7 +157,7 @@ class Profile extends React.Component {
               >
                 %
               </span>
-              <input  onChange={(e) => this.QGetTextFromField(e)} type="text" className="form-control" id="floatingRate" placeholder="" name="rate" style={{ paddingLeft: '25px' }} min={1}></input>
+              <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingRate" placeholder="" name="rate" style={{ paddingLeft: '25px' }} min={1}></input>
               <label>Interest rate</label>
             </div>
 
@@ -162,7 +165,7 @@ class Profile extends React.Component {
             <span className="spanInput">
                 €
               </span>
-              <input  onChange={(e) => this.QGetTextFromField(e)} type="text" className="form-control" id="floatingApproval" placeholder="" name="approval" style={{ paddingLeft: '25px' }} min={1}></input>
+              <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingApproval" placeholder="" name="approval" style={{ paddingLeft: '25px' }} min={1}></input>
               <label>Approval</label>
             </div>
 
@@ -170,7 +173,7 @@ class Profile extends React.Component {
             <span className="spanInput">
                 €
               </span>      
-              <input  onChange={(e) => this.QGetTextFromField(e)} type="text" className="form-control" id="floatingInsurance" placeholder="" name="insurance" style={{ paddingLeft: '25px' }} min={1}></input>
+              <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingInsurance" placeholder="" name="insurance" style={{ paddingLeft: '25px' }} min={1}></input>
               <label>Insurance</label>
             </div>
 
@@ -178,7 +181,7 @@ class Profile extends React.Component {
             <span className="spanInput">
                 €
               </span>
-              <input  onChange={(e) => this.QGetTextFromField(e)} type="text" className="form-control" id="floatingAccount" placeholder="" name="account" style={{ paddingLeft: '25px' }} min={1}></input>
+              <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingAccount" placeholder="" name="account" style={{ paddingLeft: '25px' }} min={1}></input>
               <label>Account</label>
             </div>
 
@@ -186,13 +189,13 @@ class Profile extends React.Component {
             <span className="spanInput">
                 €
               </span>
-              <input  onChange={(e) => this.QGetTextFromField(e)} type="text" className="form-control" id="floatingCosts" placeholder="" name="costs" style={{ paddingLeft: '25px' }} min={1}></input>
+              <input  onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingCosts" placeholder="" name="costs" style={{ paddingLeft: '25px' }} min={1}></input>
               <label>Other costs</label>
             </div>
 
               <br></br>
             
-              <button onClick={() => this.QSetViewInParent({page: "login"})}/*onClick= {() => this.QPostField()}*/ className="buttona" type="button">Calculate</button>
+              <button onClick= {() => this.QPostField()} className="buttona" type="button">Calculate</button>
             
         </form>
         </div>

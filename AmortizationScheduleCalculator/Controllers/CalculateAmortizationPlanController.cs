@@ -19,22 +19,22 @@ namespace AmortizationScheduleCalculator.Controllers
         private ICalculateAmortizationPlan _calculate;
         private readonly IUserRegistration _register;
 
-        public CalculateAmortizationPlanController(IDbConnection db,ICalculateAmortizationPlan calculate, IUserRegistration register)
+        public CalculateAmortizationPlanController(IDbConnection db, ICalculateAmortizationPlan calculate, IUserRegistration register)
         {
             _db = db;
             _calculate = calculate;
             _register = register;
         }
 
-       
-        [HttpPost,Authorize]
-        public async Task<IActionResult> CreateNewCalculation([FromBody] Request scheduleReq, [FromQuery] Dictionary<int, decimal> dict)
+
+        [HttpPost, Authorize]
+        public async Task<IActionResult> CreateNewCalculation([FromBody] Request scheduleReq)
         {
 
             var scheduleList = new List<Schedule>();
             try
             {
-                scheduleList = await _calculate.CreateNewCalculation(scheduleReq, dict);
+                scheduleList = await _calculate.CreateNewCalculation(scheduleReq);
                 return Ok(scheduleList);
 
             }
@@ -55,12 +55,34 @@ namespace AmortizationScheduleCalculator.Controllers
         public async Task<List<Schedule>> getSchedule([FromQuery] string reqName)
 
         {
-            var amortizationSchedule = 
-                (await _db.QueryAsync<Schedule>("select * from \"AmortizationSchedule\" where s_request_id = ( " +
-                "select request_id from \"Request\" where request_name=@reqname and r_user_id=@id)",
-                new { reqname = reqName,id=Int32.Parse(_register.getUserId())})).ToList();
+            var amortizationSchedule = new List<Schedule>();
+            try {
+                amortizationSchedule = await _calculate.getSchedule(reqName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             return amortizationSchedule;
 
+        }
+
+        [HttpPost("applypartial"), Authorize]
+
+        public async Task<IActionResult> applyPartialPayment([FromQuery] string reqName, Dictionary<int, decimal> missedPayments)
+        {
+
+            List<Schedule> scheduleList;
+            try
+            {
+                scheduleList = await _calculate.ApplyPartialPayments(reqName,missedPayments);
+                return Ok(scheduleList);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }
