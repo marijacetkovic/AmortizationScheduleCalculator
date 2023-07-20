@@ -1,6 +1,7 @@
 import React from 'react';
 import './stylesForm.css';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 class LoginForm extends React.Component {
 
@@ -17,18 +18,6 @@ class LoginForm extends React.Component {
             token: "",
         };
 
-    }
-
-    handleShow = ()=>{
-      this.setState({
-          isActive: true
-      })
-    };
-
-    handleHide = () =>{
-        this.setState({
-            isActive: false
-        })
     };
 
     QSetView = (obj) => {
@@ -67,6 +56,7 @@ class LoginForm extends React.Component {
            
             .catch(err => {
                 console.log(err)
+                alert("User does not exist!")
             })
     };
   //{ withCredentials: true }
@@ -99,8 +89,12 @@ class LoginForm extends React.Component {
                     </a>
 
                     <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-                      <li> <button className= "uniButton"><div id="title">Amortization Calculator </div></button> </li> 
-                    </ul>
+                            <li>
+                                <button className="uniButton">
+                                    <div id="title">Amortization Calculator</div>
+                                </button>
+                            </li>
+                        </ul>
 
                   <div className="col-md-3 text-end">
                       <button type="button" onClick={() => this.QSetViewInParent({ page: "login" })} className="btn btn-outline me-2">Login</button>

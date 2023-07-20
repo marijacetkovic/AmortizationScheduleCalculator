@@ -42,7 +42,7 @@ class Schedule extends React.Component {
                         <div id="title">Amortization Calculator </div>
 
                         <div className="col-md-3 text-end">
-                            <button type="button" onClick={() => this.QSetViewInParent({ page: "calculation" })} className="btn btn-outline me-2">New calculation</button>
+                            <button type="button" onClick={() => this.QSetViewInParent({ page: "profile" })} className="btn btn-outline me-2">New calculation</button>
                             <button type="button" onClick={() => this.QSetViewInParent({ page: "login" })} className="btn">Logout</button>
                         </div>
                          </header>
@@ -65,34 +65,6 @@ class Schedule extends React.Component {
                     <td>Mark</td>
                     <td>Otto</td>
                     <td>@mdo</td>
-                    <td>@mdo</td>
-                    </tr>
-                    <tr>
-                    <td>2</td>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                    <td>@mdo</td>
-                    </tr>
-                    <tr>
-                    <td>2</td>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                    <td>@mdo</td>
-                    </tr>
-                    <tr>
-                    <td>2</td>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                    <td>@mdo</td>
-                    </tr>
-                    <tr>
-                    <th>2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
                     <td>@mdo</td>
                     </tr>
                 </MDBTableBody>

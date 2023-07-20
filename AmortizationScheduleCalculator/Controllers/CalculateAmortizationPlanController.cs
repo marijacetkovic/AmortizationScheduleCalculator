@@ -27,7 +27,7 @@ namespace AmortizationScheduleCalculator.Controllers
         }
 
        
-        [HttpPost,Authorize]
+        [HttpPost]
         public async Task<IActionResult> CreateNewCalculation([FromBody] Request scheduleReq, [FromQuery] Dictionary<int, decimal> dict)
         {
 
@@ -44,10 +44,11 @@ namespace AmortizationScheduleCalculator.Controllers
             }
         }
 
-        [HttpGet, Authorize]
+        [HttpGet]
         public List<Request> getAllRequests()
         {
-            var id = Int32.Parse(_register.getUserId());
+            //var id = Int32.Parse(_register.getUserId());
+            var id = 1;
             return _db.Query<Request>("select * from \"Request\" where r_user_id=@id", new { id = id }).ToList();
 
         }

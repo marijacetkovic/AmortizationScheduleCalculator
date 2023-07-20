@@ -42,7 +42,7 @@ body{
 
 .center {
     text-align: center;
-    position:"flex";
+    position:flex;
     margin-top: auto;
     align-items: center;
     justify-content: center;
@@ -51,7 +51,7 @@ body{
 
 .form-floating{
     padding: 4px;
-    position: 'relative'
+    position: relative;
 }
 .here2{
     border: none;
@@ -81,7 +81,7 @@ body{
 
 #formH{
     width: 21%;
-
+    min-width: 400px;
 }
 
 .centerDiv{
