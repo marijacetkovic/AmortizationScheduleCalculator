@@ -142,7 +142,7 @@ class Forma extends Component {
                     <svg className="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"></svg>
                 </a>
               <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-                  <li> <button className= "uniButton" onClick={() => this.QSetViewInParent({ page: "home" })} ><div id="title">Amortization Calculator </div></button> </li> 
+                  <li> <div className= "uniButton" ><div id="title">Amortization Calculator </div></div> </li> 
               </ul>
 
               <div className="col-md-3 text-end">
