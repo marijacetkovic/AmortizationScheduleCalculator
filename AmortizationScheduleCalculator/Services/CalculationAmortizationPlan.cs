@@ -133,12 +133,12 @@ namespace AmortizationScheduleCalculator.Services
             bool owed = false;
             int i = 0;
             decimal interestOwed=0, principalOwed=0, owedPayment=0, currentRemainingLoan = 0;
-            while (i< numOfPayments)
+            while (i<numOfPayments)
             {
                 Schedule newEntry = calculatedPlan.ElementAt(i);
                 newEntry.S_Request_Id = id;
                 //if a payment nr i is missed then the schedule at that index should be newly made
-                if (missedPayments.ContainsKey(i+1)) {
+                if (missedPayments.ContainsKey(i)) {
                     owed = true;
                     //retreive old entry and apply changes to it
                     decimal missedPayment = missedPayments[i];
@@ -162,13 +162,13 @@ namespace AmortizationScheduleCalculator.Services
                     }
                     principalOwed = owedPayment - interestOwed;
                     editedPlan.Add(newEntry);
-                    InsertScheduleDb(newEntry);
+                    await InsertScheduleDb(newEntry);
 
                 }
                 else
                 { if (!owed) {
                         editedPlan.Add(newEntry);
-                        InsertScheduleDb(calculatedPlan.ElementAt(i));
+                        await InsertScheduleDb(calculatedPlan.ElementAt(i));
                     } //nothings owed, we can continue normally
                     else {
                         owed = false; //dug otplacen
@@ -176,7 +176,7 @@ namespace AmortizationScheduleCalculator.Services
                         newEntry.Principal_Paid += principalOwed;
                         newEntry.Interest_Paid += interestOwed;
                         newEntry.Remaining_Loan = currentRemainingLoan - newEntry.Principal_Paid;
-                        InsertScheduleDb(newEntry);
+                        await InsertScheduleDb(newEntry);
                         editedPlan.Add(newEntry);
                     }
 
