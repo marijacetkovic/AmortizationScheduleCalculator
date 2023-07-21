@@ -16,7 +16,9 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     //state is where our "global" variable will be store
-      this.state = { CurrentPage: "login" };
+
+    this.state = { CurrentPage: "login", userStatus:{logged:false}};
+
   }
  
   QGetView = (state) => {

@@ -8,9 +8,8 @@ class Profile extends React.Component {
     super(props);
     
     this.state = {
-        calculation: {
+        calculation: { },
 
-        }
     };
   };
 
@@ -24,6 +23,7 @@ class Profile extends React.Component {
   //put the fields
   QPostField=()=>{
       axios.post('https://localhost:7224/CalculateAmortizationPlan', {
+
           request_Id: 0,
           request_Name: this.state.calculation.nameFor,
           loan_Amount: this.state.calculation.amount,
@@ -110,7 +110,9 @@ class Profile extends React.Component {
             </div>
 
             <div className="form-floating">
-              <input  onChange={(e) => this.QGetTextFromField(e)} type="date" className="form-control" id="floatingDate" placeholder="" name="start" style={{ paddingLeft: '25px' }}></input>
+
+              <input  onChange={(e) => {this.QGetTextFromField(e)}} type="date" className="form-control" id="floatingDate" placeholder="" name="start" style={{ paddingLeft: '25px' }}></input>
+
               <label>Loan start</label>
             </div>
 
