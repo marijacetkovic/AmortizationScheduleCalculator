@@ -110,7 +110,7 @@ namespace AmortizationScheduleCalculator.Services
                     "s_request_id)\r\nvalues (@Current_Date,@Monthly_Paid,@Principal_Paid,@Interest_Paid,@Remaining_Loan,@S_Request_Id)", newSchedule);
         }
 
-        int count = 0;
+        static int count = 0;
 
        public async Task<List<Schedule>> ApplyPartialPayments(string reqName, Dictionary<int, decimal> missedPayments) { 
             
@@ -122,7 +122,7 @@ namespace AmortizationScheduleCalculator.Services
             var monthlyPayment = req.Monthly_Payment;
             var numOfPayments = req.Loan_Period * 12;
             var totalLoanCost = req.Total_Loan_Cost;
-            var loanStartDate = req.Loan_Start_Date;
+            var currentDate = req.Loan_Start_Date.Date;
 
             var newName = req.Request_Name + " edit " + count;
             Request editedRequest = req;
@@ -130,15 +130,26 @@ namespace AmortizationScheduleCalculator.Services
             int id = await InsertRequestDb(editedRequest);
             count++;
             Console.WriteLine(newName);
-            bool owed = false, missed = false;
+            bool owed = false, missed = false, increased=false;
             int i = 0;
             decimal interestOwed=0, principalOwed=0, owedPayment=0, currentRemainingLoan = req.Loan_Amount;
             while (i<numOfPayments)
             {
-                Schedule newEntry = calculatedPlan.ElementAt(i);
+                Schedule newEntry = new Schedule();
+                
+
+                if (!increased) { newEntry = calculatedPlan.ElementAt(i); }
+                currentDate = currentDate.AddMonths(1);
+                newEntry.Current_Date = currentDate;
+
                 newEntry.S_Request_Id = id;
                 //if a payment nr i is missed then the schedule at that index should be newly made
                 if (missedPayments.ContainsKey(i+1)) {
+                    if(i==numOfPayments-1)
+                    {
+                        numOfPayments++;
+                        increased = true;
+                    }
                     owed = true;
                     missed = true;
                     //retreive old entry and apply changes to it
@@ -162,6 +173,7 @@ namespace AmortizationScheduleCalculator.Services
                     }
                     currentRemainingLoan -= newEntry.Principal_Paid;
                     newEntry.Remaining_Loan = currentRemainingLoan;
+                    if (increased) owedPayment = monthlyPayment;
                     principalOwed = owedPayment - interestOwed;
                     editedPlan.Add(newEntry);
                     await InsertScheduleDb(newEntry);
