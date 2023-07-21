@@ -130,55 +130,67 @@ namespace AmortizationScheduleCalculator.Services
             int id = await InsertRequestDb(editedRequest);
             count++;
             Console.WriteLine(newName);
-            bool owed = false;
+            bool owed = false, missed = false;
             int i = 0;
-            decimal interestOwed=0, principalOwed=0, owedPayment=0, currentRemainingLoan = 0;
+            decimal interestOwed=0, principalOwed=0, owedPayment=0, currentRemainingLoan = req.Loan_Amount;
             while (i<numOfPayments)
             {
                 Schedule newEntry = calculatedPlan.ElementAt(i);
                 newEntry.S_Request_Id = id;
                 //if a payment nr i is missed then the schedule at that index should be newly made
-                if (missedPayments.ContainsKey(i)) {
+                if (missedPayments.ContainsKey(i+1)) {
                     owed = true;
+                    missed = true;
                     //retreive old entry and apply changes to it
-                    decimal missedPayment = missedPayments[i];
+                    decimal missedPayment = missedPayments[i+1];
                     newEntry.Monthly_Paid = missedPayment;
-                    owedPayment = monthlyPayment - missedPayment; // + fee
-                    currentRemainingLoan = newEntry.Remaining_Loan + monthlyPayment - missedPayment;
-                    newEntry.Remaining_Loan = currentRemainingLoan;
+                    owedPayment += monthlyPayment - missedPayment; // + fee
+                    
                     if (newEntry.Principal_Paid >= missedPayment)
                     {
                         //we dnt want negative principal
                         newEntry.Principal_Paid = missedPayment;
-                        interestOwed = newEntry.Interest_Paid;
+                        interestOwed += newEntry.Interest_Paid;
                         newEntry.Interest_Paid = 0;
                     }
                     else
                     {
                         //else everything goes for principal
-                        interestOwed = newEntry.Interest_Paid;
+                        interestOwed += newEntry.Interest_Paid;
                         newEntry.Interest_Paid = monthlyPayment - newEntry.Principal_Paid;
                         interestOwed-= newEntry.Interest_Paid;
                     }
+                    currentRemainingLoan -= newEntry.Principal_Paid;
+                    newEntry.Remaining_Loan = currentRemainingLoan;
                     principalOwed = owedPayment - interestOwed;
                     editedPlan.Add(newEntry);
                     await InsertScheduleDb(newEntry);
 
                 }
                 else
-                { if (!owed) {
+                {
+                    missed = false;
+                    if (!owed) {
                         editedPlan.Add(newEntry);
-                        await InsertScheduleDb(calculatedPlan.ElementAt(i));
+                        currentRemainingLoan -= newEntry.Principal_Paid;
+                        await InsertScheduleDb(newEntry);
                     } //nothings owed, we can continue normally
                     else {
-                        owed = false; //dug otplacen
+                        
                         newEntry.Monthly_Paid += owedPayment;
+
                         newEntry.Principal_Paid += principalOwed;
                         newEntry.Interest_Paid += interestOwed;
-                        newEntry.Remaining_Loan = currentRemainingLoan - newEntry.Principal_Paid;
+                        currentRemainingLoan -= newEntry.Principal_Paid;
+                        newEntry.Remaining_Loan = currentRemainingLoan;
                         await InsertScheduleDb(newEntry);
                         editedPlan.Add(newEntry);
+                        owed = false; //dug otplacen
+                        owedPayment = 0;
+                        interestOwed = 0;
+                        principalOwed = 0;
                     }
+                    
 
                 }
                 i++;
