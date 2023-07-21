@@ -21,8 +21,10 @@ namespace AmortizationScheduleCalculator.Services
         public async Task<List<Schedule>>  CreateNewCalculation( Request scheduleReq)
         {
             Console.WriteLine("ovo debugujem "+_register.getUserId());
+
             scheduleReq.R_User_Id = Int32.Parse(_register.getUserId());
             //scheduleReq.R_User_Id = 60;
+
             var loanAmount = scheduleReq.Loan_Amount;
             var loanPeriod = scheduleReq.Loan_Period;
             var interestRate = scheduleReq.Interest_Rate / 100;

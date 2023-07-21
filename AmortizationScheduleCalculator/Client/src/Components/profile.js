@@ -8,24 +8,11 @@ class Profile extends React.Component {
     super(props);
     
     this.state = {
-        calculation: {
-        },
-     selectedDate: '',
-      timestamp: '',
+        calculation: { },
+
     };
-   this.handleDateChange = this.handleDateChange.bind(this);
   };
 
-  
-  handleDateChange = (event) => {
-    const selectedDate = event.target.value;
-    this.setState({ selectedDate });
-
-    // Convert the selected date to a timestamp
-    const dateObject = new Date(selectedDate);
-    const timestampInSeconds = Math.floor(dateObject.getTime() / 1000);
-    this.setState({ timestamp: timestampInSeconds });
-  };
 
   QGetTextFromField = (e) => {
     this.setState((prevState) => ({
@@ -36,25 +23,26 @@ class Profile extends React.Component {
   //put the fields
   QPostField=()=>{
       axios.post('https://localhost:7224/CalculateAmortizationPlan', {
-      request_Id:0,
-      request_Name:this.state.calculation.nameFor,
-      loan_Amount:this.state.calculation.amount,
-      loan_Period:this.state.calculation.period,
-      interest_Rate: this.state.calculation.rate,
-      loan_Start_Date: this.state.calculation.date,
-      approval_Cost:this.state.calculation.approval,
-      insurance_Cost:this.state.calculation.insurance,
-      account_Costs:this.state.calculation.account,
-      other_Costs:this.state.calculation.costs,
-      monthly_Payment: 0,
-      total_Interest_Paid: 0,
-      total_Loan_Cost: 0,
-      loan_Payoff_Date: "2023-07-19T07:22:56.004Z",
-      r_User_Id: 0
+
+          request_Id: 0,
+          request_Name: this.state.calculation.nameFor,
+          loan_Amount: this.state.calculation.amount,
+          loan_Period: this.state.calculation.period,
+          interest_Rate: this.state.calculation.rate,
+          loan_Start_Date: this.state.calculation.start,
+          approval_Cost: this.state.calculation.approval,
+          insurance_Cost: this.state.calculation.insurance,
+          account_Costs: this.state.calculation.account,
+          other_Costs: this.state.calculation.costs,
+          monthly_Payment: 0,
+          total_Interest_Paid: 0,
+          total_Loan_Cost: 0,
+          loan_Payoff_Date: "2023-07-19T07:22:56.004Z",
+          r_User_Id: 0
     })
     .then(response=>{
         console.log("Sent to server...")
-       
+        this.props.QIDFromChild({ page: "calculation" })
     })
     .catch(err=>{
       console.log(err)
@@ -92,32 +80,6 @@ class Profile extends React.Component {
               </div> 
 
         <div className="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary" style={{width: "15%", height: "100%"}}>
-          
-          {/*<hr></hr>*/}
-          {/*<ul className="nav nav-pills flex-column mb-auto">
-            
-            <li>
-              <button className="nav-link link-body-emphasis"  onClick={() => this.QSetViewInParent({ page: "Schedule" })}>
-                <svg className="bi pe-none me-2" width="16" height="16"></svg>
-                Schedule
-              </button>
-            </li>
-            </ul>
-    <hr></hr>*/}
-
-        {/*} <div className="dropdown" >
-            <a href="#" className="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-           <i class="bi bi-person"></i>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
-              <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
-            </svg>
-              <strong>User</strong>
-            </a>
-            <ul className="dropdown-menu text-small shadow">
-              <li><a className="dropdown-item" href="#">New calculation</a></li>
-              <li><a className="dropdown-item" href="#" onClick={() => this.QSetViewInParent({ page: "home" })}>Sign out</a></li>
-            </ul>
-    </div>*/}
         
           </div>
 
@@ -148,7 +110,9 @@ class Profile extends React.Component {
             </div>
 
             <div className="form-floating">
+
               <input  onChange={(e) => {this.QGetTextFromField(e)}} type="date" className="form-control" id="floatingDate" placeholder="" name="start" style={{ paddingLeft: '25px' }}></input>
+
               <label>Loan start</label>
             </div>
 

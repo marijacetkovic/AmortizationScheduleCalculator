@@ -24,7 +24,7 @@ class Calculation extends React.Component {
         });
       };
 
-    /*  componentDidMount()
+     componentDidMount()
       {
         axios.get('https://localhost:7224/CalculateAmortizationPlan')
         .then(response=>{
@@ -33,10 +33,19 @@ class Calculation extends React.Component {
             calculation:response.data
           })
         })
-      };*/
+    };
+
+    formatDate = (dateString) => {
+        const dateObject = new Date(dateString);
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return dateObject.toLocaleDateString(undefined, options);
+    };
+
         
     render(){
-        let data=this.state.calculation;
+        let data = this.state.calculation;
+        let lastElement = data.length > 0 ? data[data.length -1] : null;
+      
                 return (
                     <div>
                        <div className="container">
@@ -53,51 +62,53 @@ class Calculation extends React.Component {
                         </div>
                          </header>
                       </div> 
-                      
-                      {data.length > 0 ?
-                         data.map((d)=>{
-                         return(
-                          <div>
-                            
-                            <div style={{overflowX: "auto"}}>
-                                <div style={{width: "60%", margin: "auto", marginTop: "8%"}}>
-                                    <div className="col" style={{ margin: "auto", marginTop: "5%" }}>
-                                    <div className="card" style={{ boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-                                        <div className="card-body">
-                                        <p style={{textAlign:"left", fontWeight:"bolder", fontSize: "20px"}} className="card-text">SUMMARY</p>
-                                        <hr></hr>
-                                        <MDBTable borderless  responsive style={{minWidth: "200px", margin:"auto"}}>
-                                                <MDBTableHead>
-                                                    <tr>
-                                                    <th className="thElement"  scope='col'>Monthly payment</th>
-                                                    <th className="thElement"  scope='col'>Total Interest Paid</th>
-                                                    <th className="thElement"  scope='col'>Total Cost of Loan</th>
-                                                    <th className="thElement"  scope='col'>Payoff date</th>
-                                                    </tr>
-                                                </MDBTableHead>
-                                                <MDBTableBody>
-                                                    <tr>
-                                                    <td className="tdElement" scope='row'>{d.monthly_Payment}<span>€</span></td>
-                                                    <td className="tdElement">{d.total_Interest_Paid}<span>€</span></td>
-                                                    <td className="tdElement">{d.total_Loan_Cost}<span>€</span></td>
-                                                    <td className="tdElement">{d.loan_Payoff_Date}</td>
-                                                </tr>
-                                                
-                                                </MDBTableBody>
-                                                </MDBTable>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                          </div>
-                     </div>
 
-        );
-    })
-    : "Loading.."}
-    </div>
-    );
- }
-}
+                        {lastElement ?
+                         //data.map((d)=>{
+                        //return(
+                                      <div>
+                            
+                                        <div style={{overflowX: "auto"}}>
+                                            <div style={{width: "60%", margin: "auto", marginTop: "8%"}}>
+                                                <div className="col" style={{ margin: "auto", marginTop: "5%" }}>
+                                                <div className="card" style={{ boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+                                                    <div className="card-body">
+                                                    <p style={{textAlign:"left", fontWeight:"bolder", fontSize: "20px"}} className="card-text">SUMMARY</p>
+                                                    <hr></hr>
+                                                    <MDBTable borderless  responsive style={{minWidth: "200px", margin:"auto"}}>
+                                                            <MDBTableHead>
+                                                            <tr>
+                                                                <th className="thElement" scope='col'>Request name</th>
+                                                                <th className="thElement"  scope='col'>Monthly payment</th>
+                                                                <th className="thElement"  scope='col'>Total interest paid</th>
+                                                                <th className="thElement"  scope='col'>Total cost of loan</th>
+                                                                <th className="thElement"  scope='col'>Payoff date</th>
+                                                                </tr>
+                                                            </MDBTableHead>
+                                                            <MDBTableBody>
+                                                            <tr>
+                                                                 <td className="tdElement">{lastElement.request_Name}</td>      
+                                                                 <td className="tdElement">{lastElement.monthly_Payment}<span>€</span></td>
+                                                                 <td className="tdElement">{lastElement.total_Interest_Paid}<span>€</span></td>
+                                                                <td className="tdElement">{lastElement.total_Loan_Cost}<span>€</span></td>
+                                                                <td className="tdElement">{this.formatDate(lastElement.loan_Payoff_Date)}</td>
+                                                            </tr>
+                                                
+                                                            </MDBTableBody>
+                                                            </MDBTable>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                      </div>
+                                 </div>
+
+                           // );
+                        //})
+                    : "Loading.."}
+                    </div>
+                    );
+                 }
+                }
 
 export default Calculation;
