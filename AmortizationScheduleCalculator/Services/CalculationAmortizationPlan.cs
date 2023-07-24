@@ -1,4 +1,5 @@
-﻿using AmortizationScheduleCalculator.Model;
+﻿using AmortizationScheduleCalculator.Exceptions;
+using AmortizationScheduleCalculator.Model;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -20,6 +21,19 @@ namespace AmortizationScheduleCalculator.Services
         }
         public async Task<List<Schedule>>  CreateNewCalculation( Request scheduleReq)
         {
+            if (scheduleReq.Loan_Amount < 1000)
+            {
+                throw new InvalidInputException("Minimal loan amount is 1,000€.");
+            }
+            if (scheduleReq.Loan_Period < 1)
+            {
+                throw new InvalidInputException("Minimal loan period is one year.");
+            }
+            if (scheduleReq.Interest_Rate <0|| scheduleReq.Interest_Rate > 99)
+            {
+                throw new InvalidInputException("Interest rate value must be between 0 and 100.");
+            }
+
             Console.WriteLine("ovo debugujem "+_register.getUserId());
 
             scheduleReq.R_User_Id = Int32.Parse(_register.getUserId());
@@ -110,12 +124,19 @@ namespace AmortizationScheduleCalculator.Services
                     "s_request_id)\r\nvalues (@Current_Date,@Monthly_Paid,@Principal_Paid,@Interest_Paid,@Remaining_Loan,@S_Request_Id)", newSchedule);
         }
 
-        static int count = 0;
+       static int count = 0;
 
-       public async Task<List<Schedule>> ApplyPartialPayments(string reqName, Dictionary<int, decimal> missedPayments) { 
-            
+       public async Task<List<Schedule>> ApplyPartialPayments(string reqName, Dictionary<int, decimal> missedPayments) {
 
-            Request req = await getRequest(reqName);
+            Request req = null;
+            try
+            {
+                req = await getRequest(reqName);
+            }
+            catch
+            {
+                throw new QueryException("There is no request with that name.");
+            }
             List<Schedule> calculatedPlan = await getSchedule(reqName);
             List<Schedule> editedPlan = new List<Schedule>();
 
@@ -130,14 +151,13 @@ namespace AmortizationScheduleCalculator.Services
             int id = await InsertRequestDb(editedRequest);
             count++;
             Console.WriteLine(newName);
-            bool owed = false, missed = false, increased=false;
+            bool owed = false, increased=false;
             int i = 0;
             decimal interestOwed=0, principalOwed=0, owedPayment=0, currentRemainingLoan = req.Loan_Amount;
             while (i<numOfPayments)
             {
                 Schedule newEntry = new Schedule();
                 
-
                 if (!increased) { newEntry = calculatedPlan.ElementAt(i); }
                 currentDate = currentDate.AddMonths(1);
                 newEntry.Current_Date = currentDate;
@@ -145,52 +165,77 @@ namespace AmortizationScheduleCalculator.Services
                 newEntry.S_Request_Id = id;
                 //if a payment nr i is missed then the schedule at that index should be newly made
                 if (missedPayments.ContainsKey(i+1)) {
-                    if(i==numOfPayments-1)
+                    decimal missedPayment = missedPayments[i + 1];
+                    newEntry.Monthly_Paid = missedPayment;
+                    owed = true;
+                    //retreive old entry and apply changes to it
+                    if (!increased)
+                    {
+                        //if not yet increased assumed monthly payment = fixed monthly calculated
+                        //if partial is not 0 then remove that from owed 
+                        owedPayment += monthlyPayment - missedPayment; // + fee
+                    }
+                    else
+                    {
+                        //else assumed monthly is 0 because we increased the list of assumed payments
+                        owedPayment -= missedPayment; // + fee
+                        if (owedPayment == 0) owed = false;
+                        if (owedPayment < 0) throw new InvalidInputException("Partial payment is greater than what is owed.");
+                    }
+                    interestOwed += newEntry.Interest_Paid;
+                    newEntry.Interest_Paid = missedPayment - newEntry.Principal_Paid;
+
+                    if (missedPayment >= principalOwed && increased)
+                    {
+                        newEntry.Principal_Paid = principalOwed;
+                        newEntry.Interest_Paid = missedPayment - newEntry.Principal_Paid;
+                    }
+                    else if (missedPayment <= newEntry.Principal_Paid) {
+                        //covers only principal
+                        newEntry.Principal_Paid = missedPayment;
+                        newEntry.Interest_Paid = 0;
+                    }
+                    else if (missedPayment <= principalOwed && increased) {
+                        newEntry.Principal_Paid = missedPayment;
+                        newEntry.Interest_Paid = 0;
+                    }
+                    interestOwed -= newEntry.Interest_Paid;
+                    currentRemainingLoan -= newEntry.Principal_Paid;
+                    newEntry.Remaining_Loan = currentRemainingLoan;
+                   // if (increased) owedPayment = monthlyPayment-missedPayment;
+                    principalOwed = owedPayment - interestOwed;
+                    editedPlan.Add(newEntry);
+                    await InsertScheduleDb(newEntry);
+                    if (i == numOfPayments - 1 && owed)
                     {
                         numOfPayments++;
                         increased = true;
                     }
-                    owed = true;
-                    missed = true;
-                    //retreive old entry and apply changes to it
-                    decimal missedPayment = missedPayments[i+1];
-                    newEntry.Monthly_Paid = missedPayment;
-                    owedPayment += monthlyPayment - missedPayment; // + fee
-                    
-                    if (newEntry.Principal_Paid >= missedPayment)
-                    {
-                        //we dnt want negative principal
-                        newEntry.Principal_Paid = missedPayment;
-                        interestOwed += newEntry.Interest_Paid;
-                        newEntry.Interest_Paid = 0;
-                    }
-                    else
-                    {
-                        //else everything goes for principal
-                        interestOwed += newEntry.Interest_Paid;
-                        newEntry.Interest_Paid = monthlyPayment - newEntry.Principal_Paid;
-                        interestOwed-= newEntry.Interest_Paid;
-                    }
-                    currentRemainingLoan -= newEntry.Principal_Paid;
-                    newEntry.Remaining_Loan = currentRemainingLoan;
-                    if (increased) owedPayment = monthlyPayment;
-                    principalOwed = owedPayment - interestOwed;
-                    editedPlan.Add(newEntry);
-                    await InsertScheduleDb(newEntry);
 
                 }
                 else
                 {
-                    missed = false;
+                    //missed = false;
                     if (!owed) {
                         editedPlan.Add(newEntry);
                         currentRemainingLoan -= newEntry.Principal_Paid;
                         await InsertScheduleDb(newEntry);
                     } //nothings owed, we can continue normally
+
+                    //if the list was increased this will be the last payment to be made
+                    
+                    else if (increased) {
+                        newEntry.Monthly_Paid = owedPayment;
+                        newEntry.Principal_Paid = principalOwed;
+                        newEntry.Interest_Paid = interestOwed;
+                        currentRemainingLoan -= newEntry.Principal_Paid;
+                        newEntry.Remaining_Loan = currentRemainingLoan;
+                        await InsertScheduleDb(newEntry);
+                        editedPlan.Add(newEntry);
+                    }
                     else {
                         
                         newEntry.Monthly_Paid += owedPayment;
-
                         newEntry.Principal_Paid += principalOwed;
                         newEntry.Interest_Paid += interestOwed;
                         currentRemainingLoan -= newEntry.Principal_Paid;

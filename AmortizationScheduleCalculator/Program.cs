@@ -1,4 +1,5 @@
 using AmortizationScheduleCalculator.Context;
+using AmortizationScheduleCalculator.Middleware;
 using AmortizationScheduleCalculator.Model;
 using AmortizationScheduleCalculator.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -51,6 +52,7 @@ builder.Services.AddAuthentication().AddJwtBearer(options => {
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IDbConnection>(db => DatabaseHelper.CreateConnection());
 builder.Services.AddTransient<ICalculateAmortizationPlan, CalculationAmortizationPlan>();
+builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 builder.Services.AddScoped<IUserRegistration, UserRegistration>();
 var app = builder.Build();
 
@@ -91,6 +93,7 @@ app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
 
 app.Run();
