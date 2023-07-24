@@ -24,15 +24,23 @@ class Calculation extends React.Component {
         });
       };
 
-     componentDidMount()
-      {
-        axios.get('https://localhost:7224/CalculateAmortizationPlan')
-        .then(response=>{
-            console.log(response.data)
-          this.setState({
-            calculation:response.data
-          })
-        })
+    componentDidMount() {
+
+         const token = localStorage.getItem('token');
+         
+            axios.get('https://localhost:7224/CalculateAmortizationPlan', {
+                headers: {
+                    //Authorization: `Bearer ${this.state.token}`
+
+                    Authorization: `Bearer ${token}`
+                }
+            }).then(response => {
+                     //console.log(this.props.token)
+                     console.log(response.data)
+                     this.setState({
+                         calculation: response.data
+                     })
+                 })
     };
 
     formatDate = (dateString) => {
@@ -45,7 +53,8 @@ class Calculation extends React.Component {
     render(){
         let data = this.state.calculation;
         let lastElement = data.length > 0 ? data[data.length -1] : null;
-      
+        const obj = localStorage.getItem('token');
+        console.log("token:" + typeof(obj))
                 return (
                     <div>
                        <div className="container">
@@ -57,7 +66,7 @@ class Calculation extends React.Component {
                         <div id="title">Amortization Calculator </div>
 
                         <div className="col-md-3 text-end">
-                            <button type="button" onClick={() => this.QSetViewInParent({ page: "Schedule" })} className="btn btn-outline me-2">Schedule</button>
+                            <button type="button" onClick={() => this.QSetViewInParent({ page: "history" })} className="btn btn-outline me-2">History</button>
                             <button type="button" onClick={() => this.QSetViewInParent({ page: "login" })} className="btn">Logout</button>
                         </div>
                          </header>
@@ -71,7 +80,7 @@ class Calculation extends React.Component {
                                         <div style={{overflowX: "auto"}}>
                                             <div style={{width: "60%", margin: "auto", marginTop: "8%"}}>
                                                 <div className="col" style={{ margin: "auto", marginTop: "5%" }}>
-                                                <div className="card" style={{ boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+                                            <div className="card" style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)"}}>
                                                     <div className="card-body">
                                                     <p style={{textAlign:"left", fontWeight:"bolder", fontSize: "20px"}} className="card-text">SUMMARY</p>
                                                     <hr></hr>
@@ -88,9 +97,9 @@ class Calculation extends React.Component {
                                                             <MDBTableBody>
                                                             <tr>
                                                                  <td className="tdElement">{lastElement.request_Name}</td>      
-                                                                 <td className="tdElement">{lastElement.monthly_Payment}<span>€</span></td>
-                                                                 <td className="tdElement">{lastElement.total_Interest_Paid}<span>€</span></td>
-                                                                <td className="tdElement">{lastElement.total_Loan_Cost}<span>€</span></td>
+                                                                <td className="tdElement">{lastElement.monthly_Payment}&euro;</td>
+                                                                <td className="tdElement">{lastElement.total_Interest_Paid}&euro; </td>
+                                                                <td className="tdElement">{lastElement.total_Loan_Cost}&euro;</td>
                                                                 <td className="tdElement">{this.formatDate(lastElement.loan_Payoff_Date)}</td>
                                                             </tr>
                                                 

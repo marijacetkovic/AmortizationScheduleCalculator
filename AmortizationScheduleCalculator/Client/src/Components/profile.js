@@ -21,34 +21,41 @@ class Profile extends React.Component {
   };
 
   //put the fields
-  QPostField=()=>{
-      axios.post('https://localhost:7224/CalculateAmortizationPlan', {
+    QPostField = () => {
+        
+        axios.post('https://localhost:7224/CalculateAmortizationPlan',
+            {
+                  request_Id: 0,
+                  request_Name: this.state.calculation.nameFor,
+                  loan_Amount: this.state.calculation.amount,
+                  loan_Period: this.state.calculation.period,
+                  interest_Rate: this.state.calculation.rate,
+                  loan_Start_Date: this.state.calculation.start,
+                  approval_Cost: this.state.calculation.approval,
+                  insurance_Cost: this.state.calculation.insurance,
+                  account_Cost: this.state.calculation.account,
+                  other_Costs: this.state.calculation.costs,
+                  monthly_Payment: 0,
+                  total_Interest_Paid: 0,
+                  total_Loan_Cost: 0,
+                  loan_Payoff_Date: "2023-07-19T07:22:56.004Z",
+                  r_User_Id: 0
+            }, {
+                     headers: {
+                     //Authorization: `Bearer ${this.state.token}`
 
-          request_Id: 0,
-          request_Name: this.state.calculation.nameFor,
-          loan_Amount: this.state.calculation.amount,
-          loan_Period: this.state.calculation.period,
-          interest_Rate: this.state.calculation.rate,
-          loan_Start_Date: this.state.calculation.start,
-          approval_Cost: this.state.calculation.approval,
-          insurance_Cost: this.state.calculation.insurance,
-          account_Costs: this.state.calculation.account,
-          other_Costs: this.state.calculation.costs,
-          monthly_Payment: 0,
-          total_Interest_Paid: 0,
-          total_Loan_Cost: 0,
-          loan_Payoff_Date: "2023-07-19T07:22:56.004Z",
-          r_User_Id: 0
-    })
-    .then(response=>{
-        console.log("Sent to server...")
-        this.props.QIDFromChild({ page: "calculation" })
-    })
-    .catch(err=>{
-      console.log(err)
-    })
-    this.props.QIDFromChild({page: "profile"})
-    };
+                         Authorization: `Bearer ${localStorage.getItem('token')}`
+                     }
+                })
+                    .then(response=>{
+                        console.log("Sent to server...")
+                        this.props.QIDFromChild({ page: "calculation" })
+                    })
+                    .catch(err=>{
+                      console.log(err)
+                    })
+                    this.props.QIDFromChild({page: "profile"})
+            };
     QSetViewInParent = (obj) => {
       this.props.QIDFromChild(obj);
     };
@@ -73,8 +80,8 @@ class Profile extends React.Component {
 
 
                    <div className="col-md-3 text-end">
-                  <button type="button" onClick={() => this.QSetViewInParent({ page: "profile" })} className="btn btn-outline me-2">New calculation</button>
-                  <button type="button" onClick={() => this.QSetViewInParent({ page: "login" })} className="btn">Logout</button>
+                        <button type="button" onClick={() => this.QSetViewInParent({ page: "history" })} className="btn btn-outline me-2">History</button>
+                        <button type="button" onClick={() => { this.QSetViewInParent({ page: "login" }); localStorage.setItem('token', "")}} className="btn">Logout</button>
                </div>
                   </header>
               </div> 

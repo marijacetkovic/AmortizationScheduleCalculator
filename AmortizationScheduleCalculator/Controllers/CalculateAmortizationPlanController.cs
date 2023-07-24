@@ -45,11 +45,11 @@ namespace AmortizationScheduleCalculator.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public List<Request> getAllRequests()
         {
-            //var id = Int32.Parse(_register.getUserId());
-            var id = 1;
+            var id = Int32.Parse(_register.getUserId());
+            //var id = 1;
             return _db.Query<Request>("select * from \"Request\" where r_user_id=@id", new { id = id }).ToList();
 
         }

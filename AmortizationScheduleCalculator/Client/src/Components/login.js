@@ -1,7 +1,6 @@
 import React from 'react';
 import './stylesForm.css';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 
 class LoginForm extends React.Component {
 
@@ -9,8 +8,12 @@ class LoginForm extends React.Component {
 
         super(props);
         this.state = {
-            isActive: false,
             name: "login",
+            email: "",
+            password: "",
+            login: false,
+            store: null,
+            isActive: false,
             user: {
                 email: "",
                 password: ""
@@ -40,6 +43,12 @@ class LoginForm extends React.Component {
       this.props.QUserFromChild(this.state.user);
     };
 
+    QSendUser2Parent = (obj) => {
+        this.props.QUserFromChild(obj)
+    } 
+
+
+
     QPostLogin = () => {
 
         axios.post('https://localhost:7224/UserRegistration/login', {
@@ -47,41 +56,48 @@ class LoginForm extends React.Component {
             password: this.state.user.password
         })
             .then(response => {
+                localStorage.setItem('token', response.data);
                 this.setState({ token: response.data }, () => {
-                     this.QGetCalculation();
-                });
+                    //this.QGetCalculation();
+                }) 
+                    
+                }).catch(err => {
+                     console.log(err)
+                     alert("User does not exist!")
+                })
+
+        this.QSetViewInParent({ page: "profile" });
+    };
+
+  //  QSendUser2Parent = (obj) => {
+  //      this.props.QUserFromChild(obj);
+  //  }
+
+
+  //  QGetCalculation = () => {
+
+   //     axios.get('https://localhost:7224/CalculateAmortizationPlan', {
+    //        headers: {
+                //Authorization: `Bearer ${this.state.token}`
+
+     //           Authorization: `Bearer ${this.state.token}`
+     //       }
+     //   })
+     //       .then(response => {
+     //           this.props.QIDFromChild({ page: "profile" })
                 
-               
-            })
-           
-            .catch(err => {
-                console.log(err)
-                alert("User does not exist!")
-            })
-    };
-  //{ withCredentials: true }
+      //      }).catch(err => {
+               // this.props.QIDFromChild({ page: "login" });
+      //      })
+    //};
 
-    QGetCalculation = () => {
-        axios.get('https://localhost:7224/CalculateAmortizationPlan', {
-            headers: {
-                Authorization: `Bearer ${this.state.token}`
-            
-            }
-        })
-            .then(response => {
-                this.props.QIDFromChild({ page: "profile" })
-            }).catch(err => {
-                this.props.QIDFromChild({ page: "login" });
-            })
-    };
-
- 
 
       render(){
 
         return(
-          <div>
 
+          <div>
+               
             <div className="container">
                   <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
                     <a href="#" className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
@@ -127,13 +143,13 @@ class LoginForm extends React.Component {
                     name="password"
                   />
                 </div>
-                <div className="createAccounta">
-                  <button onClick={() => this.QPostLogin()} className="buttona" type="button">Login</button>
+                            <div className="createAccounta">
+                                <button onClick={() =>  this.QPostLogin()} className="buttona" type="button">Login</button>
                   <a onClick={(e) => this.QSetViewInParent({ page: "registration" })} ><small> Don't have an account?</small></a>
                 </div>
               </form>
             </div>
-          </div> 
+                </div>
       </div>
       
     ) ;      

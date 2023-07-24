@@ -25,7 +25,7 @@ namespace AmortizationScheduleCalculator.Model
         public decimal Total_Loan_Cost { get; set; }
         public DateTime Loan_Payoff_Date { get; set; }
 
-        public List<Schedule> Amortization_Plan { get; set; } = null;
+        
         //foreign key
         public int R_User_Id { get; set; }
 
