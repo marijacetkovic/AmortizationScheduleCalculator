@@ -44,10 +44,8 @@ class App extends React.Component {
                 return <Profile QIDFromChild={this.QSetView} />;
             case "home":
                 return <Home QIDFromChild={this.QSetView} />;
-
             case "login":
                 return <Login QIDFromChild={this.QSetView} />;
-
             case "registration":
                 return <RegForm QIDFromChild={this.QSetView} />;
             case "Schedule":
@@ -62,11 +60,6 @@ class App extends React.Component {
         }
     };
 
-    QSetUser = (obj) => {
-        this.setState({
-            token: { getToken: "!NOT" , user: [obj] }
-        })
-    }
 
 
 
@@ -85,11 +78,11 @@ class App extends React.Component {
     
             <div className="App">
 
-
               <div id="viewer">
                 {this.QGetView(this.state)}
               </div>
-              </div>
+
+             </div>
   );
   }
 }

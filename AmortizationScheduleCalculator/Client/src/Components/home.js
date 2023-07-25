@@ -71,7 +71,7 @@ class Home extends React.Component {
 
   
   render() {
-    const { selectedDate, timestamp } = this.state;
+    //const { selectedDate, timestamp } = this.state;
     return (
     <div>
 
@@ -102,7 +102,7 @@ class Home extends React.Component {
         </div>
 
         <div className="form-floating">
-          <input onChange={(e) => {this.QGetTextFromField(e);this.handleDateChange(e)}} type="date" value={selectedDate} className="form-control" id="floatingDate" placeholder="dd/mm/yyyy" name="start" style={{ paddingLeft: '25px' }}></input>
+          <input onChange={(e) => {this.QGetTextFromField(e);this.handleDateChange(e)}} type="date" /*value={selectedDate}*/ className="form-control" id="floatingDate" placeholder="dd/mm/yyyy" name="start" style={{ paddingLeft: '25px' }}></input>
           <label>Loan start</label>
         </div>
 

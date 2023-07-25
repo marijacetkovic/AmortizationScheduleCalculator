@@ -56,8 +56,12 @@ class LoginForm extends React.Component {
             password: this.state.user.password
         })
             .then(response => {
-                localStorage.setItem('token', response.data);
-                this.setState({ token: response.data }, () => {
+
+                localStorage.setItem('token', response.data[0]);
+                localStorage.setItem('name', response.data[1]);
+                localStorage.setItem('surname', response.data[2]);
+
+                this.setState({ token: response.data[0] }, () => {
                     //this.QGetCalculation();
                 }) 
                     
@@ -65,32 +69,11 @@ class LoginForm extends React.Component {
                      console.log(err)
                      alert("User does not exist!")
                 })
-
-        this.QSetViewInParent({ page: "profile" });
+        setTimeout(() => {
+            this.QSetViewInParent({ page: "profile" });
+        }, 500);
+        
     };
-
-  //  QSendUser2Parent = (obj) => {
-  //      this.props.QUserFromChild(obj);
-  //  }
-
-
-  //  QGetCalculation = () => {
-
-   //     axios.get('https://localhost:7224/CalculateAmortizationPlan', {
-    //        headers: {
-                //Authorization: `Bearer ${this.state.token}`
-
-     //           Authorization: `Bearer ${this.state.token}`
-     //       }
-     //   })
-     //       .then(response => {
-     //           this.props.QIDFromChild({ page: "profile" })
-                
-      //      }).catch(err => {
-               // this.props.QIDFromChild({ page: "login" });
-      //      })
-    //};
-
 
       render(){
 
@@ -104,7 +87,7 @@ class LoginForm extends React.Component {
                       <svg className="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"></svg>
                     </a>
 
-                    <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+                        <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
                             <li>
                                 <button className="uniButton">
                                     <div id="title">Amortization Calculator</div>

@@ -92,7 +92,7 @@ body{
 
 .spanInput{
     position: absolute;
-    left:10px;
+    left:90%;
     top: 64%;
     transform: translateY(-50%);
     font-weight: 300;
@@ -100,7 +100,7 @@ body{
 
 .spanInputPeriod{
     position: absolute;
-    left:85%;
+    left:83%;
     top: 64%;
     transform: translateY(-50%);
     font-weight: 300;
@@ -114,5 +114,10 @@ body{
 .tdElement{
     font-size: 30px;
     font-weight: 700;
+}
+
+.defaultButton {
+    background-color: #FFFFFF;
+    border: none
 }
 
