@@ -8,6 +8,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using static Dapper.SqlMapper;
 using System.Security.Claims;
+using PdfSharpCore;
+using PdfSharpCore.Drawing;
+using PdfSharpCore.Pdf;
+
+
 
 namespace AmortizationScheduleCalculator.Controllers
 {
@@ -82,9 +87,12 @@ namespace AmortizationScheduleCalculator.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                throw ex;
             }
         }
+
+
+        
 
     }
 }

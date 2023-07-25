@@ -47,17 +47,16 @@ namespace AmortizationScheduleCalculator.Services
             decimal monthlyPaymentFixed;
             decimal totalLoanCost;
             decimal totalInterestPaid;
-            decimal additionalCosts;
+            decimal additionalMonthlyCosts;
             DateTime loanPayoffDate;
 
             //calculate
 
             int numOfPayments = loanPeriod * 12;
             double monthlyInterestRate = interestRate / 12;
-            additionalCosts = scheduleReq.Account_Cost + scheduleReq.Approval_Cost + scheduleReq.Insurance_Cost + scheduleReq.Other_Costs;
-            loanAmount += additionalCosts;
+            additionalMonthlyCosts = scheduleReq.Account_Cost + scheduleReq.Approval_Cost + scheduleReq.Insurance_Cost + scheduleReq.Other_Costs;
             //M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1]
-            monthlyPaymentFixed = CalculateMonthly(loanAmount, monthlyInterestRate, numOfPayments);
+            monthlyPaymentFixed = CalculateMonthly(loanAmount, monthlyInterestRate, numOfPayments) + additionalMonthlyCosts;
             
 
             totalLoanCost = monthlyPaymentFixed * numOfPayments;
@@ -137,20 +136,29 @@ namespace AmortizationScheduleCalculator.Services
             {
                 throw new QueryException("There is no request with that name.");
             }
+
+            //get the plan 
             List<Schedule> calculatedPlan = await getSchedule(reqName);
+
+            //start building the edited plan
             List<Schedule> editedPlan = new List<Schedule>();
 
             var monthlyPayment = req.Monthly_Payment;
             var numOfPayments = req.Loan_Period * 12;
             var totalLoanCost = req.Total_Loan_Cost;
             var currentDate = req.Loan_Start_Date.Date;
-
+            //build a new name
             var newName = req.Request_Name + " edit " + count;
+
+            //store the edited request same as before but w new name
             Request editedRequest = req;
             editedRequest.Request_Name = newName;
+
+            //get the new id to link the new entries
             int id = await InsertRequestDb(editedRequest);
             count++;
             Console.WriteLine(newName);
+
             bool owed = false, increased=false;
             int i = 0;
             decimal interestOwed=0, principalOwed=0, owedPayment=0, currentRemainingLoan = req.Loan_Amount;
@@ -180,7 +188,7 @@ namespace AmortizationScheduleCalculator.Services
                         //else assumed monthly is 0 because we increased the list of assumed payments
                         owedPayment -= missedPayment; // + fee
                         if (owedPayment == 0) owed = false;
-                        if (owedPayment < 0) throw new InvalidInputException("Partial payment is greater than what is owed.");
+                        //if (owedPayment < 0) throw new InvalidInputException("Partial payment is greater than what is owed.");
                     }
                     interestOwed += newEntry.Interest_Paid;
                     newEntry.Interest_Paid = missedPayment - newEntry.Principal_Paid;
@@ -215,12 +223,12 @@ namespace AmortizationScheduleCalculator.Services
                 }
                 else
                 {
-                    //missed = false;
                     if (!owed) {
+                        //nothings owed, we can continue normally
                         editedPlan.Add(newEntry);
                         currentRemainingLoan -= newEntry.Principal_Paid;
                         await InsertScheduleDb(newEntry);
-                    } //nothings owed, we can continue normally
+                    }
 
                     //if the list was increased this will be the last payment to be made
                     
@@ -254,6 +262,67 @@ namespace AmortizationScheduleCalculator.Services
             }
             return editedPlan;
            
+        }
+
+
+        public async Task<List<Schedule>> ApplyEarlyPayments(string reqName, Dictionary<int, decimal> earlyPayments)
+        {
+            Request req = null;
+            try
+            {
+                //get the request from db by req name
+                req = await getRequest(reqName);
+            }
+            catch
+            {
+                throw new QueryException("There is no request with that name.");
+            }
+            
+            //get the plan 
+            List<Schedule> calculatedPlan = await getSchedule(reqName);
+            
+            //start building the edited plan
+            List<Schedule> editedPlan = new List<Schedule>();
+
+            var monthlyPayment = req.Monthly_Payment;
+            var numOfPayments = req.Loan_Period * 12;
+            var totalLoanCost = req.Total_Loan_Cost;
+            var currentDate = req.Loan_Start_Date.Date;
+            
+            //build a new name
+            var newName = req.Request_Name + " edit " + count;
+            
+            //store the edited request same as before but w new name
+            Request editedRequest = req;
+            editedRequest.Request_Name = newName;
+            
+            //get the new id to link the new entries
+            int id = await InsertRequestDb(editedRequest);
+            count++;
+            Console.WriteLine(newName);
+
+            int i = 0;
+            while (i < numOfPayments)
+            {
+                Schedule newEntry = new Schedule();
+                currentDate = currentDate.AddMonths(1);
+                newEntry.Current_Date = currentDate;
+
+                newEntry.S_Request_Id = id;
+                //if a payment nr i is missed then the schedule at that index should be newly made
+                if (earlyPayments.ContainsKey(i + 1))
+                {
+                    //get the value of the early payment
+                    decimal earlyPayment = earlyPayments[i + 1];
+                    //if(earlyPayment <= monthlyPayment) throw new InvalidInputException("Early ")
+                    newEntry.Monthly_Paid = earlyPayment;
+                    
+                }
+
+            }
+
+
+            return editedPlan;
         }
 
         public async Task<List<Schedule>> getSchedule(string reqName)
