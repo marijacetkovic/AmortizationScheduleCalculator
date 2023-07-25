@@ -49,7 +49,7 @@ namespace AmortizationScheduleCalculator.Services
 
         }
 
-        public string userLoginValidation(UserInput loginUser)
+        public string[] userLoginValidation(UserInput loginUser)
         {
             //first validate credentials - check password for given email (or username)
             var hashedPassword = _db.Query<string>("SELECT user_password FROM \"User\" WHERE email = @Email", loginUser).First();
@@ -58,16 +58,28 @@ namespace AmortizationScheduleCalculator.Services
             {
                 //when validate generate jwt token
                 int id = _db.Query<int>("SELECT user_id FROM \"User\" WHERE email = @Email", loginUser).First();
+                string name = _db.Query<string>("SELECT name FROM \"User\" WHERE email = @Email", loginUser).First();
+                string surname = _db.Query<string>("SELECT surname FROM \"User\" WHERE email = @Email", loginUser).First();
                 //var user = new User();
                 //user.User_Id = id;
                 string token = CreateToken(id);
-                return token;
+                string[] response = new string[3]
+                    {
+                        token,
+                        name,
+                        surname
+                    };
+                return response;
+
+
 
             }
             else
             {
-                return "wrong mail or password";
+                return null;
             }
+
+
 
         }
 

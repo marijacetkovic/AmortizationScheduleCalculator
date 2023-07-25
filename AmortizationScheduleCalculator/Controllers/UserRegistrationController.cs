@@ -33,7 +33,7 @@ namespace AmortizationScheduleCalculator.Controllers
         }
 
         [HttpPost("login", Name = "Login")]
-        public string userLoginValidation(UserInput user)
+        public string[] userLoginValidation(UserInput user)
         {
             return _register.userLoginValidation(user);
         }
