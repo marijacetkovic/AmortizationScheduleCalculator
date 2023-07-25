@@ -81,18 +81,33 @@ namespace AmortizationScheduleCalculator.Controllers
             List<Schedule> scheduleList;
             try
             {
-                scheduleList = await _calculate.ApplyPartialPayments(reqName,missedPayments);
+                scheduleList = await _calculate.ApplyPartialPayments(reqName, missedPayments);
                 return Ok(scheduleList);
 
             }
             catch (Exception ex)
             {
-                throw ex;
+                return BadRequest(ex.Message);
             }
         }
 
+        [HttpPost("applyearly"), Authorize]
 
-        
+        public async Task<IActionResult> applyEarlyPayment([FromQuery] string reqName, Dictionary<int, decimal> earlyPayments)
+        {
+
+            List<Schedule> scheduleList;
+            try
+            {
+                scheduleList = await _calculate.ApplyEarlyPayments(reqName, earlyPayments);
+                return Ok(scheduleList);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }

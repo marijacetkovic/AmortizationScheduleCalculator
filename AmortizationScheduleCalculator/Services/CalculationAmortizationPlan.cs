@@ -315,6 +315,7 @@ namespace AmortizationScheduleCalculator.Services
             var numOfPayments = req.Loan_Period * 12;
             var totalLoanCost = req.Total_Loan_Cost;
             var currentDate = req.Loan_Start_Date.Date;
+            var monthlyInterestRate = (req.Interest_Rate/100) / 12;
             
             //build a new name
             var newName = req.Request_Name + " edit " + count;
@@ -329,6 +330,7 @@ namespace AmortizationScheduleCalculator.Services
             Console.WriteLine(newName);
 
             decimal advancePayment=0, currentRemainingLoan= req.Loan_Amount; //at beginning equal to total loan amount
+            double interestRatio;
             bool paidInAdvance=false;
             int i = 0;
             while (i < numOfPayments)
@@ -347,37 +349,44 @@ namespace AmortizationScheduleCalculator.Services
                     decimal earlyPayment = earlyPayments[i + 1];
                     //if(earlyPayment <= monthlyPayment) throw new InvalidInputException("Early ")
                     newEntry.Monthly_Paid = earlyPayment;
+                    interestRatio = (double)(newEntry.Interest_Paid / monthlyPayment);
+                    newEntry.Interest_Paid = (decimal)((double)earlyPayment * interestRatio);
+                    newEntry.Principal_Paid = earlyPayment - newEntry.Interest_Paid;
+                    currentRemainingLoan -= newEntry.Principal_Paid;
+                    newEntry.Remaining_Loan = currentRemainingLoan;
 
-                    //this will be subtracted from next month
-                    advancePayment = monthlyPayment - earlyPayment;
+
                     paidInAdvance = true;
+
                 }
                 else {
                     if (!paidInAdvance)
                     {
                         //nothings paid in advance, dont change anything
+                        newEntry.Monthly_Paid = monthlyPayment;
+                        newEntry.Interest_Paid = (decimal)((double)currentRemainingLoan * monthlyInterestRate);
+                        newEntry.Principal_Paid = newEntry.Monthly_Paid - newEntry.Interest_Paid;
                         currentRemainingLoan -= newEntry.Principal_Paid;
+                        newEntry.Remaining_Loan = currentRemainingLoan;
+
                     }
                     //if paid in advance subtract advance payment
                     else
                     {
-                        if (monthlyPayment<=advancePayment)
-                        {
-                            //month can be covered by advance payment and part of it might be transferred to next month/s
-                            newEntry.Monthly_Paid = monthlyPayment;
-                            advancePayment -= monthlyPayment; //gets transferred further
-                        }
-                        else
-                        {
-                            //month cannot be completely covered by advance payment
-                            newEntry.Monthly_Paid = monthlyPayment - advancePayment;
-                        }
-
+                        paidInAdvance = false;
+                        monthlyPayment = CalculateMonthly(currentRemainingLoan, monthlyInterestRate, numOfPayments - i);
+                        newEntry.Monthly_Paid = monthlyPayment;
+                        newEntry.Interest_Paid = (decimal)((double)currentRemainingLoan*monthlyInterestRate);
+                        newEntry.Principal_Paid = newEntry.Monthly_Paid-newEntry.Interest_Paid;
+                        currentRemainingLoan-=newEntry.Principal_Paid;
+                        if(currentRemainingLoan<=0)currentRemainingLoan=0;
+                        newEntry.Remaining_Loan = currentRemainingLoan;
                     }
-                    //add the entry
-                    await InsertScheduleDb(newEntry);
-                    editedPlan.Add(newEntry);
                 }
+                //add the entry
+                await InsertScheduleDb(newEntry);
+                editedPlan.Add(newEntry);
+                i++;
             }
             return editedPlan;
         }

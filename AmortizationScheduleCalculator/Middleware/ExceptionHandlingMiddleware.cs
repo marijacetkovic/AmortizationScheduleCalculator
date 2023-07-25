@@ -14,7 +14,8 @@ namespace AmortizationScheduleCalculator.Middleware
         }
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            try {
+            try
+            {
                 await next(context);
             }
             catch (InvalidInputException e)
@@ -26,6 +27,21 @@ namespace AmortizationScheduleCalculator.Middleware
                     Status = (int)HttpStatusCode.BadRequest,
                     Type = "Invalid input",
                     Title = "Invalid input",
+                    Detail = e.Message
+                };
+
+                var errorResponse = JsonSerializer.Serialize(problem);
+                await context.Response.WriteAsync(errorResponse);
+                context.Response.ContentType = "application/json";
+            }
+            catch (QueryException e) {
+                _logger.LogError(e, e.Message);
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                ProblemDetails problem = new()
+                {
+                    Status = (int)HttpStatusCode.BadRequest,
+                    Type = "Invalid query",
+                    Title = "Invalid query",
                     Detail = e.Message
                 };
 
@@ -46,8 +62,9 @@ namespace AmortizationScheduleCalculator.Middleware
                 };
 
                 var errorResponse = JsonSerializer.Serialize(problem);
+                context.Response.ContentType = "application/json";
+
                 await context.Response.WriteAsync(errorResponse);
-                context.Response.ContentType = "application/json"; 
             }
         }
 
