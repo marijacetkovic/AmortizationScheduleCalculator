@@ -8,8 +8,6 @@ import RegForm from "./Components/RegisForm";
 import Schedule from "./Components/schedule";
 import Calculation from "./Components/calculation";
 import History from "./Components/history";
-import { RequireAuth } from "react-auth-kit";
-import { BrowserRouter as Router } from "react-router-dom";
 
 
 class App extends React.Component {
@@ -22,16 +20,6 @@ class App extends React.Component {
           CurrentPage: "login", token: {getToken: ""}
       };
 
-    }
-
-    setToken = (newToken) => {
-        this.setState({ token: newToken });
-    };
-
-    QSetUser = (obj) => {
-        this.setState({
-            getToken: { logged: true, user: [obj] }
-        })
     };
 
  
@@ -40,10 +28,9 @@ class App extends React.Component {
         let page = state.CurrentPage;
 
         switch (page) {
+            //on profile is calculator
             case "profile":
                 return <Profile QIDFromChild={this.QSetView} />;
-            case "home":
-                return <Home QIDFromChild={this.QSetView} />;
             case "login":
                 return <Login QIDFromChild={this.QSetView} />;
             case "registration":
@@ -60,31 +47,25 @@ class App extends React.Component {
         }
     };
 
-
-
-
       QSetView = (obj) => {
         this.setState({
           CurrentPage: obj.page
         });
       };
 
+      render(){
 
-
-
-  render(){
-
-      return (
+          return (
     
-            <div className="App">
+                <div className="App">
 
-              <div id="viewer">
-                {this.QGetView(this.state)}
-              </div>
+                  <div id="viewer">
+                    {this.QGetView(this.state)}
+                  </div>
 
-             </div>
-  );
-  }
+                 </div>
+            );
+      }
 }
 
 export default App;

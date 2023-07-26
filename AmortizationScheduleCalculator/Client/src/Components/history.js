@@ -2,10 +2,11 @@ import React from 'react';
 import axios from "axios";
 import "./style.css";
 import { MDBTable, MDBTableHead, MDBTableBody } from 'mdb-react-ui-kit';
-
+export const MContext = React.createContext();  //exporting context object
 
 class history extends React.Component {
 
+    //constructor
     constructor(props) {
         super(props);
         this.state = {
@@ -15,6 +16,7 @@ class history extends React.Component {
 
     };
 
+    //function for page
     QSetViewInParent = (obj) => {
         this.props.QIDFromChild(obj);
     };
@@ -26,32 +28,59 @@ class history extends React.Component {
     };
 
     componentDidMount() {
-        axios.get('https://localhost:7224/CalculateAmortizationPlan', {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-        }).then(response => {
-            console.log(response.data)
-            const requestName = response.data.request_Name;
-                this.setState({
-                    calculation: response.data,
-                    request_Name: requestName
-                })
-            })
-    };
+        // Perform both the axios request and dynamic import using Promise.all
+        Promise.all([
+            axios.get('https://localhost:7224/CalculateAmortizationPlan', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }),
+            import("./schedule") // Assuming "./schedule" is the correct path to the 'schedule' component
+        ]).then(([response, module]) => {
+            console.log(response.data);
+            this.setState({
+                calculation: response.data,
+                schedule: module.default // Assuming the default export of 'schedule' is the correct component
+            });
+        }).catch(error => {
+            console.error(error.response); // Log the error response for debugging
+        });
+    }
 
+    //componentDidMount() {
+    //    axios.get('https://localhost:7224/CalculateAmortizationPlan', {
+    //        headers: {
+    //            Authorization: `Bearer ${localStorage.getItem('token')}`
+    //        }
+    //    }).then(response => {
+    //        console.log(response.data)
+    //        //const requestName = response.data.request_Name;
+    //        this.setState({
+    //            calculation: response.data,
+    //        })
+    //    }),
+    //        import("./schedule").then((module) => {
+
+    //            const schedule = module.default;
+    //            this.setState({ schedule });
+    //        });
+    //};
+
+    //function for formatting date
     formatDate = (dateString) => {
         const dateObject = new Date(dateString);
         const options = { year: 'numeric', month: 'short' };
         return dateObject.toLocaleDateString(undefined, options);
     };
 
+    state = { reqName: "" }
 
     render() {
         let data = this.state.calculation;
         //let lastElement = data.length > 0 ? data[data.length - 1] : null;
         const name = localStorage.getItem('name');
         const surname = localStorage.getItem('surname');
+        const {calculaton, schedule } = this.state;
 
         return (
             <div>
@@ -87,8 +116,18 @@ class history extends React.Component {
                                             <div>
                                                 <div style={{ display: "flex" }}>
                                                     <div style={{ marginRight: "auto" }} className="thElement">  Request name: {d.request_Name}  </div>
+                                                    <MContext.Provider value={
+                                                        {
+                                                            state: this.state,
+                                                            setMessage: (value) => this.setState({
+                                                                message: value
+                                                            })
+                                                        }}>
+                                                        {this.props.children}   
+                                                    </MContext.Provider>)
+                                                    {/*{schedule && <schedule request_Name={d.request_Name} />}*/}
                                                     {/* <button onClick={() => this.QSetViewInParent({ page: "Schedule" })} className="defaultButton">*/}
-                                                    <button onClick={() => this.QSetViewInParentSchedule({ requestName: this.state.request_Name,  page: "Schedule" })} className="defaultButton">
+                                                    <button onClick={() => { this.QSetViewInParent({ page: "Schedule" }); context.setMessage("d.request_Name") }} className="defaultButton">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="20"  className="bi bi-calendar-plus" >
                                                             <path d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7z" />
                                                             <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
@@ -115,20 +154,19 @@ class history extends React.Component {
                                                                 <td className="tdElement">{d.total_Loan_Cost}&euro;</td>
                                                                 <td className="tdElement">{this.formatDate(d.loan_Payoff_Date)}</td>
                                                             </tr>
-
-                                                        </MDBTableBody>
+                                                            </MDBTableBody>
                                                     </MDBTable>
                                             </div>
                                          </div>
                                          </div>
                                         </div>
-                        </div>
+                                </div>
                             </div>
                         </div>
 
                      );
                     })
-                    : "Loading.."}
+                 : "Loading.."}
             </div>
         );
     }

@@ -1,7 +1,7 @@
 import React from 'react';
 import  { MDBTable, MDBTableHead, MDBTableBody }  from 'mdb-react-ui-kit';
 import axios from 'axios';
-
+export const MContext = React.createContext();
 class Schedule extends React.Component {
 
     constructor(props) {
@@ -15,15 +15,20 @@ class Schedule extends React.Component {
         this.props.QIDFromChild(obj);
     };
 
-  /*  componentDidMount()
-    {
+   componentDidMount()
+   {
+       <Mcontext.Consumer>
+           {(context) => (
+               <p>{context.state.message}}</p>)}
+       </Mcontext.Consumer>
+        const { reqName } = this.props;
         const token = localStorage.getItem('token');
         axios.get('https://localhost:7224/CalculateAmortizationPlan/schedule', {
             headers: {
                 Authorization: `Bearer ${token}`
             },
             params: {
-                reqName: 'ssss' // Replace 'your_value_here' with the actual value for reqName
+                reqName: reqName
             }
         }).then(response=>{
             console.log(response.data)
@@ -34,9 +39,9 @@ class Schedule extends React.Component {
         }).catch (error => {
             console.error(error.response); // Log the error response for debugging
         });
-    };*/
+    };
 
-    componentDidMount() {
+   /* componentDidMount() {
         this.fetchReqNameFromRequest()
             .then(request_Name => {
                 const token = localStorage.getItem('token');
@@ -71,7 +76,7 @@ class Schedule extends React.Component {
                 }
                 })
                 .then(response => {
-                    resolve(response.data.request_Name);
+                    resolve(response.data[0].request_Name);
                     console.log(response.data.request_Name)
                 })
                 .catch(error => {
@@ -79,7 +84,7 @@ class Schedule extends React.Component {
                 });
              
         });
-    };
+    };*/
 
     formatDate = (dateString) => {
         const dateObject = new Date(dateString);
@@ -87,12 +92,21 @@ class Schedule extends React.Component {
         return dateObject.toLocaleDateString(undefined, options);
     };
         
-
+    state = { message: "" };
     render(){
         let data=this.state.schedule;
 
             return (
                 <div>
+                    <MContext.Provider value={
+                        {
+                            state: this.state,
+                            setMessage: (value) => this.setState({
+                                message: value
+                            })
+                        }}>
+                        {this.props.children}   //this indicates that all the child tags with MyProvider as Parent can access the global store.
+                    </MContext.Provider>)
 
                         <div className="container">
                           <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-3 border-bottom">

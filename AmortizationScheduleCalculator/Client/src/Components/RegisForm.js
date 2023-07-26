@@ -76,7 +76,7 @@ class Forma extends Component {
         break;
       case "user_Password":
         formErrors.user_Password =
-          value.length < 6 ? "minimum 6 characaters required" : "";
+          value.length < 8 ? "minimum 8 characaters required" : "";
         break;
       default:
         break;
