@@ -20,6 +20,13 @@
         public decimal Remaining_Loan { get; set; }
         public int S_Request_Id { get; set; }
 
-
+        public override string ToString()
+        {
+            return $"Current Date: {Current_Date}\n" +
+                   $"Monthly Paid: {Monthly_Paid}\n" +
+                   $"Principal Paid: {Principal_Paid}\n" +
+                   $"Interest Paid: {Interest_Paid}\n" +
+                   $"Remaining Loan: {Remaining_Loan}\n";
+        }
     }
 }

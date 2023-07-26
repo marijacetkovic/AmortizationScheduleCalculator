@@ -347,41 +347,37 @@ namespace AmortizationScheduleCalculator.Services
                 {
                     //get the value of the early payment
                     decimal earlyPayment = earlyPayments[i + 1];
-                    //if(earlyPayment <= monthlyPayment) throw new InvalidInputException("Early ")
+                    if (earlyPayment < monthlyPayment) throw new InvalidInputException("Early payment must be equal to at least one monthly payment.");
+                    if (earlyPayment > currentRemainingLoan) throw new InvalidInputException("Early payment cannot be greater than the remaining loan balance. Remaining balance is "+ Math.Round(currentRemainingLoan,2));
+
+                    //see how many months the early payment covers
+
+                    int monthsCovered = (int)(earlyPayment / monthlyPayment);
+                    if (monthsCovered > numOfPayments - i - 1) throw new InvalidInputException("Early payment covers more payments than what is left.");
                     newEntry.Monthly_Paid = earlyPayment;
+                    
+                    
+                    
                     interestRatio = (double)(newEntry.Interest_Paid / monthlyPayment);
-                    newEntry.Interest_Paid = (decimal)((double)earlyPayment * interestRatio);
-                    newEntry.Principal_Paid = earlyPayment - newEntry.Interest_Paid;
+                    newEntry.Interest_Paid = Math.Round((decimal)((double)earlyPayment * interestRatio), 2);
+                    newEntry.Principal_Paid = Math.Round(earlyPayment - newEntry.Interest_Paid,2);
                     currentRemainingLoan -= newEntry.Principal_Paid;
-                    newEntry.Remaining_Loan = currentRemainingLoan;
-
-
+                    newEntry.Remaining_Loan = Math.Round(currentRemainingLoan,2);
                     paidInAdvance = true;
 
                 }
                 else {
-                    if (!paidInAdvance)
-                    {
-                        //nothings paid in advance, dont change anything
-                        newEntry.Monthly_Paid = monthlyPayment;
-                        newEntry.Interest_Paid = (decimal)((double)currentRemainingLoan * monthlyInterestRate);
-                        newEntry.Principal_Paid = newEntry.Monthly_Paid - newEntry.Interest_Paid;
-                        currentRemainingLoan -= newEntry.Principal_Paid;
-                        newEntry.Remaining_Loan = currentRemainingLoan;
-
-                    }
-                    //if paid in advance subtract advance payment
-                    else
+                    if (paidInAdvance)
                     {
                         paidInAdvance = false;
+                        //if user chose to pay less for the nexts months, recalculate monthly
                         monthlyPayment = CalculateMonthly(currentRemainingLoan, monthlyInterestRate, numOfPayments - i);
-                        newEntry.Monthly_Paid = monthlyPayment;
-                        newEntry.Interest_Paid = (decimal)((double)currentRemainingLoan*monthlyInterestRate);
-                        newEntry.Principal_Paid = newEntry.Monthly_Paid-newEntry.Interest_Paid;
-                        currentRemainingLoan-=newEntry.Principal_Paid;
-                        if(currentRemainingLoan<=0)currentRemainingLoan=0;
-                        newEntry.Remaining_Loan = currentRemainingLoan;
                     }
+                    newEntry.Monthly_Paid = (monthlyPayment);
+                    newEntry.Interest_Paid = Math.Round((decimal)((double)currentRemainingLoan * monthlyInterestRate),2);
+                    newEntry.Principal_Paid = Math.Round(newEntry.Monthly_Paid - newEntry.Interest_Paid,2);
+                    currentRemainingLoan -= newEntry.Principal_Paid;
+                    newEntry.Remaining_Loan = Math.Round(currentRemainingLoan, 2);
                 }
                 //add the entry
                 await InsertScheduleDb(newEntry);

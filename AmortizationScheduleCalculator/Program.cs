@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using QuestPDF.Infrastructure;
 using Swashbuckle.AspNetCore.Filters;
 using System.Data;
 using System.Text;
@@ -49,9 +50,11 @@ builder.Services.AddAuthentication().AddJwtBearer(options => {
     };
 });
 
+QuestPDF.Settings.License = LicenseType.Community;
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IDbConnection>(db => DatabaseHelper.CreateConnection());
 builder.Services.AddTransient<ICalculateAmortizationPlan, CalculationAmortizationPlan>();
+builder.Services.AddTransient<IPdfGenerator, PdfGenerator>();
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 builder.Services.AddScoped<IUserRegistration, UserRegistration>();
 var app = builder.Build();

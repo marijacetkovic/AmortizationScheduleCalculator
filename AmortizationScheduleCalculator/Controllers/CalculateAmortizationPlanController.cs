@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using static Dapper.SqlMapper;
 using System.Security.Claims;
-using PdfSharpCore;
-using PdfSharpCore.Drawing;
-using PdfSharpCore.Pdf;
+using IronPdf;
+using Microsoft.AspNetCore.Html;
+
 
 
 
@@ -23,12 +23,14 @@ namespace AmortizationScheduleCalculator.Controllers
         private readonly IDbConnection _db;
         private ICalculateAmortizationPlan _calculate;
         private readonly IUserRegistration _register;
+        private readonly IPdfGenerator _pdfgenerator;
 
-        public CalculateAmortizationPlanController(IDbConnection db, ICalculateAmortizationPlan calculate, IUserRegistration register)
+        public CalculateAmortizationPlanController(IDbConnection db, ICalculateAmortizationPlan calculate, IUserRegistration register, IPdfGenerator pdfgenerator)
         {
             _db = db;
             _calculate = calculate;
             _register = register;
+            _pdfgenerator = pdfgenerator;
         }
 
 
@@ -107,6 +109,13 @@ namespace AmortizationScheduleCalculator.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpPost("generatepdf"), Authorize]
+
+        public async Task GeneratePdf([FromQuery] string reqName)
+        {
+            await _pdfgenerator.GeneratePdf(reqName);
         }
 
     }
