@@ -39,7 +39,7 @@ namespace AmortizationScheduleCalculator.Controllers
         public async Task<IActionResult> CreateNewCalculation(Request scheduleReq)
         {
 
-            var scheduleList = new List<Schedule>();
+            var scheduleList = new AmortizationPlan();
             try
             {
                 scheduleList = await _calculate.CreateNewCalculation(scheduleReq);
@@ -60,10 +60,10 @@ namespace AmortizationScheduleCalculator.Controllers
 
         }
         [HttpGet("schedule"), Authorize]
-        public async Task<List<Schedule>> getSchedule([FromQuery] string reqName)
+        public async Task<AmortizationPlan> getSchedule([FromQuery] string reqName)
 
         {
-            var amortizationSchedule = new List<Schedule>();
+            var amortizationSchedule = new AmortizationPlan();
             try {
                 amortizationSchedule = await _calculate.getSchedule(reqName);
             }

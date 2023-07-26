@@ -24,7 +24,7 @@ namespace AmortizationScheduleCalculator.Services
 
         public async Task GeneratePdf(string reqName)
         {
-            List<Schedule> schedules = await _calculate.getSchedule(reqName);
+            List<Schedule> schedules = (await _calculate.getSchedule(reqName)).Schedules;
             string htmlContent = "";
             int userId = Int32.Parse(_register.getUserId());
             string user = _register.getCurrentUser(userId);

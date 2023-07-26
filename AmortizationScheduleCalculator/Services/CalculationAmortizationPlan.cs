@@ -3,6 +3,7 @@ using AmortizationScheduleCalculator.Model;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using static QuestPDF.Helpers.Colors;
 
 namespace AmortizationScheduleCalculator.Services
 {
@@ -19,7 +20,7 @@ namespace AmortizationScheduleCalculator.Services
             _register = register; 
             
         }
-        public async Task<List<Schedule>>  CreateNewCalculation( Request scheduleReq)
+        public async Task<AmortizationPlan>  CreateNewCalculation( Request scheduleReq)
         {
             if (scheduleReq.Loan_Amount < 1000)
             {
@@ -65,9 +66,9 @@ namespace AmortizationScheduleCalculator.Services
 
             //update calculations
 
-            scheduleReq.Monthly_Payment = monthlyPaymentFixed;
-            scheduleReq.Total_Interest_Paid = totalInterestPaid;
-            scheduleReq.Total_Loan_Cost = totalLoanCost;
+            scheduleReq.Monthly_Payment = Math.Round(monthlyPaymentFixed,2);
+            scheduleReq.Total_Interest_Paid = Math.Round(totalInterestPaid,2);
+            scheduleReq.Total_Loan_Cost = Math.Round(totalLoanCost,2);
             scheduleReq.Loan_Payoff_Date = loanPayoffDate;
 
             //store to database
@@ -98,7 +99,7 @@ namespace AmortizationScheduleCalculator.Services
                 await InsertScheduleDb(newSchedule);
                 i++;
             }
-            return scheduleList;
+            return new AmortizationPlan { Schedules=scheduleList, Summary = scheduleReq };
         
         }
 
@@ -138,7 +139,7 @@ namespace AmortizationScheduleCalculator.Services
             }
 
             //get the plan 
-            List<Schedule> calculatedPlan = await getSchedule(reqName);
+            List<Schedule> calculatedPlan = (await getSchedule(reqName)).Schedules;
 
             //start building the edited plan
             List<Schedule> editedPlan = new List<Schedule>();
@@ -306,7 +307,7 @@ namespace AmortizationScheduleCalculator.Services
             }
             
             //get the plan 
-            List<Schedule> calculatedPlan = await getSchedule(reqName);
+            List<Schedule> calculatedPlan = (await getSchedule(reqName)).Schedules;
             
             //start building the edited plan
             List<Schedule> editedPlan = new List<Schedule>();
@@ -387,16 +388,22 @@ namespace AmortizationScheduleCalculator.Services
             return editedPlan;
         }
 
-        public async Task<List<Schedule>> getSchedule(string reqName)
+        public async Task<AmortizationPlan> getSchedule(string reqId)
         {
-            return ((await _db.QueryAsync<Schedule>("select * from \"AmortizationSchedule\" where s_request_id = ( " +
-                "select request_id from \"Request\" where request_name=@reqname and r_user_id=@id)",
-                new { reqname = reqName, id = Int32.Parse(_register.getUserId()) })).ToList());
+            var summary = await getRequest(reqId);
+            var scheduleList = (await _db.QueryAsync<Schedule>("select * from \"AmortizationSchedule\" where s_request_id = ( " +
+                "select request_id from \"Request\" where request_id=@reqid and r_user_id=@id)",
+                new { reqid = Int32.Parse(reqId), id = Int32.Parse(_register.getUserId()) })).ToList();
+            return new AmortizationPlan{
+                Summary = summary,
+                Schedules = scheduleList
+            };
         }
-        public async Task<Request> getRequest(string reqName)
+        public async Task<Request> getRequest(string reqId)
         {
-            return ((await _db.QueryAsync<Request>("select * from \"Request\" where request_name = @reqname",
-                new { reqname = reqName})).First());
+            return ((await _db.QueryAsync<Request>("select * from \"Request\" where request_id = @id",
+                new { id = Int32.Parse(reqId)})).First());
         }
+
     }
 }
