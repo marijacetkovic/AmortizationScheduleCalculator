@@ -7,71 +7,65 @@ import Login from './Components/login';
 import RegForm from "./Components/RegisForm";
 import Schedule from "./Components/schedule";
 import Calculation from "./Components/calculation";
-import { BrowserRouter as Router } from "react-router-dom";
+import History from "./Components/history";
 
 
 class App extends React.Component {
 
-  ///The constructor of our app.
-  constructor(props) {
-    super(props);
-    //state is where our "global" variable will be store
+    ///The constructor of our app.
+    constructor(props) {
+        super(props);
+        //state is where our "global" variable will be store
+        this.state = {
+            CurrentPage: "login", token: { getToken: "" }
+        };
 
-    this.state = { CurrentPage: "login", userStatus:{logged:false}};
-
-  }
- 
-  QGetView = (state) => {
-
-    let page = state.CurrentPage;
-
-    switch (page) {
-      case "profile":
-        return <Profile QIDFromChild={this.QSetView}/>;
-      case "home":
-        return <Home QIDFromChild={this.QSetView}/>;
-      case "login":
-          return <Login QIDFromChild={this.QSetView}/>;
-      case "registration":
-            return <RegForm QIDFromChild={this.QSetView}/>;
-      case "Schedule":
-        return <Schedule QIDFromChild={this.QSetView}/>;
-      case "calculation":
-          return <Calculation QIDFromChild={this.QSetView}/>;
-      default:
-          return <Login/>;
-
-    }
-  };
-  QSetView = (obj) => {
-    this.setState({
-      CurrentPage: obj.page
-    });
-  };
+    };
 
 
-  QSetUser=(obj)=>{
-    this.setState({
-      userStatus:{logged:true,user:[obj]}
-    })
-   };
+    QGetView = (state) => {
 
+        let page = state.CurrentPage;
 
-  render(){
+        switch (page) {
+            //on profile is calculator
+            case "profile":
+                return <Profile QIDFromChild={this.QSetView} />;
+            case "login":
+                return <Login QIDFromChild={this.QSetView} />;
+            case "registration":
+                return <RegForm QIDFromChild={this.QSetView} />;
+            case "Schedule":
+                return <Schedule QIDFromChild={this.QSetView} />;
+            case "calculation":
+                return < Calculation QIDFromChild={this.QSetView} />;
+            case "history":
+                return <History QIDFromChild={this.QSetView} />;
+            default:
+                return <Login />;
 
-      return (
-          <Router> 
-    
+        }
+    };
+
+    QSetView = (obj) => {
+        this.setState({
+            CurrentPage: obj.page
+        });
+    };
+
+    render() {
+
+        return (
+
             <div className="App">
 
+                <div id="viewer">
+                    {this.QGetView(this.state)}
+                </div>
 
-              <div id="viewer">
-                {this.QGetView(this.state)}
-              </div>
-              </div>
-          </Router>
-  );
-  }
+            </div>
+        );
+    }
 }
 
 export default App;

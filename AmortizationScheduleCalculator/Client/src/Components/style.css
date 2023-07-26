@@ -1,8 +1,8 @@
-body{
-    background: #F8F9FA;  /* fallback for old browsers */
+body {
+    background: #F8F9FA; /* fallback for old browsers */
 }
 
-.form{
+.form {
     background-color: #F8F9FA;
     border-radius: 5px;
     width: 550px;
@@ -10,57 +10,58 @@ body{
     padding: 20px;
 }
 
-.form-body{
+.form-body {
     text-align: center;
     padding: 20px 10px;
 }
 
-.form-body > *{
-    padding: 5px;
-    text-align: center;
-}
+    .form-body > * {
+        padding: 5px;
+        text-align: center;
+    }
 
-.form__label{
+.form__label {
     width: 40%;
     text-align: left;
 }
 
-.form_input{
+.form_input {
     width: 60%;
 }
 
-.footer{
+.footer {
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.btn{
+.btn {
     border: 000000;
 }
 
 .center {
     text-align: center;
-    position:flex;
+    position: flex;
     margin-top: auto;
     align-items: center;
     justify-content: center;
     margin: auto;
 }
 
-.form-floating{
+.form-floating {
     padding: 4px;
     position: relative;
 }
-.here2{
+
+.here2 {
     border: none;
     background-color: #F8F9FA;
     color: #27374D;
     text-decoration: underline;
-
 }
-.buttona{
+
+.buttona {
     background-color: #526D82;
     color: #fff;
     border: 2px solid #fff;
@@ -73,46 +74,50 @@ body{
     margin-bottom: 0.25em;
 }
 
-.buttona:hover {
-    color: #526D82;
-    background-color: #fff;
-    border: 2px solid #9DB2BF;
-  }
+    .buttona:hover {
+        color: #526D82;
+        background-color: #fff;
+        border: 2px solid #9DB2BF;
+    }
 
-#formH{
+#formH {
     width: 21%;
     min-width: 400px;
 }
 
-.centerDiv{
+.centerDiv {
     text-align: center;
     display: flex;
     justify-content: center;
 }
 
-.spanInput{
+.spanInput {
     position: absolute;
-    left:10px;
+    left: 90%;
     top: 64%;
     transform: translateY(-50%);
     font-weight: 300;
 }
 
-.spanInputPeriod{
+.spanInputPeriod {
     position: absolute;
-    left:85%;
+    left: 83%;
     top: 64%;
     transform: translateY(-50%);
     font-weight: 300;
 }
 
-.thElement{
+.thElement {
     font-size: 20px;
     font-weight: 400;
 }
 
-.tdElement{
+.tdElement {
     font-size: 30px;
     font-weight: 700;
 }
 
+.defaultButton {
+    background-color: #FFFFFF;
+    border: none
+}
