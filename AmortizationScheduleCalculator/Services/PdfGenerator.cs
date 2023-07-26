@@ -26,6 +26,8 @@ namespace AmortizationScheduleCalculator.Services
         {
             List<Schedule> schedules = await _calculate.getSchedule(reqName);
             string htmlContent = "";
+            int userId = Int32.Parse(_register.getUserId());
+            string user = _register.getCurrentUser(userId);
            
             foreach (var schedule in schedules)
             {
@@ -43,7 +45,7 @@ namespace AmortizationScheduleCalculator.Services
 
                     page.Header()
                         .Text("Amortization Schedule Calculated")
-                        .SemiBold().FontSize(12).FontColor(Colors.Blue.Medium);
+                        .SemiBold().FontSize(14).FontColor(Colors.Blue.Medium);
 
                     page.Content()
                         .PaddingVertical(1, Unit.Centimetre)
@@ -59,7 +61,7 @@ namespace AmortizationScheduleCalculator.Services
                                     .PaddingHorizontal(10)
                                     .AlignCenter()
                                     .AlignMiddle()
-                                    .DefaultTextStyle(x => x.FontSize(14));
+                                    .DefaultTextStyle(x => x.FontSize(12));
                             }
 
                             table.ColumnsDefinition(columns =>
@@ -96,7 +98,7 @@ namespace AmortizationScheduleCalculator.Services
 
                                 // inches
                                 var date = schedule.Current_Date;
-                                int month = date.Month;
+                                string month = date.ToString("MMM");
                                 int year = date.Year;
                                 table.Cell().Element(CellStyle).Text(month+" "+year);
                                 table.Cell().Element(CellStyle).Text(schedule.Principal_Paid);
@@ -110,10 +112,15 @@ namespace AmortizationScheduleCalculator.Services
                         });
                     page.Footer()
                         .AlignCenter()
-                        .Text(x =>
+                        .Row(row =>
                         {
-                            x.Span("Page ");
-                            x.CurrentPageNumber();
+                            row.RelativeColumn().Text(x =>
+                            {
+                                x.Span("Page ");
+                                x.CurrentPageNumber();
+                                x.DefaultTextStyle(x => x.FontSize(10));
+                            });
+                            row.RelativeColumn().Text(user);
                         });
                 });
             })

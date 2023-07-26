@@ -113,6 +113,13 @@ namespace AmortizationScheduleCalculator.Services
             }
             return result;
         }
+        public string getCurrentUser(int userId) {
+
+            string name = _db.Query<string>("SELECT name FROM \"User\" WHERE user_id = @id", new { id= userId }).First();
+            string surname = _db.Query<string>("SELECT surname FROM \"User\" WHERE user_id = @id", new { id = userId }).First();
+
+            return name + " " + surname;
+        }
     }
 }
 
