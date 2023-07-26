@@ -17,7 +17,7 @@ class App extends React.Component {
         super(props);
         //state is where our "global" variable will be store
         this.state = {
-            CurrentPage: "login", token: { getToken: "" }
+            CurrentPage: "login", token: { getToken: "" }, calculation: {} , calculation1: []
         };
 
     };
@@ -38,7 +38,7 @@ class App extends React.Component {
             case "Schedule":
                 return <Schedule QIDFromChild={this.QSetView} />;
             case "calculation":
-                return < Calculation QIDFromChild={this.QSetView} />;
+                return < Calculation data={this.state.calculation} schedule={this.state.calculation1} QIDFromChild={this.QSetView}  />;
             case "history":
                 return <History QIDFromChild={this.QSetView} />;
             default:
@@ -49,7 +49,9 @@ class App extends React.Component {
 
     QSetView = (obj) => {
         this.setState({
-            CurrentPage: obj.page
+            CurrentPage: obj.page,
+            calculation: obj.sum || {},
+            calculation1: obj.schedules || []
         });
     };
 

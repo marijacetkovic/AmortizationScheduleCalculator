@@ -48,8 +48,9 @@ class Profile extends React.Component {
                 }
             })
             .then(response => {
+                console.log(response.data.summary)
                 console.log("Sent to server...")
-                this.props.QIDFromChild({ page: "calculation" })
+                this.props.QIDFromChild({ page: "calculation", sum: response.data.summary, schedules: response.data.schedules})
             })
             .catch(err => {
                 console.log(err)
@@ -60,12 +61,12 @@ class Profile extends React.Component {
     QSetViewInParent = (obj) => {
         this.props.QIDFromChild(obj);
     };
+
     QSetView = (obj) => {
         this.setState({
             CurrentPage: obj.page
         });
     };
-
 
     render() {
         const name = localStorage.getItem('name');

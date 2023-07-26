@@ -71,7 +71,7 @@ class LoginForm extends React.Component {
             })
         setTimeout(() => {
             this.QSetViewInParent({ page: "profile" });
-        }, 500);
+        }, 1000);
 
     };
 

@@ -93,15 +93,6 @@ class Schedule extends React.Component {
 
         return (
             <div>
-                <MContext.Provider value={
-                    {
-                        state: this.state,
-                        setMessage: (value) => this.setState({
-                            message: value
-                        })
-                    }}>
-                    {this.props.children}   //this indicates that all the child tags with MyProvider as Parent can access the global store.
-                </MContext.Provider>)
 
                 <div className="container">
                     <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-3 border-bottom">
