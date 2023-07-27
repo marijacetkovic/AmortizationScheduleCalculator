@@ -64,14 +64,14 @@ class LoginForm extends React.Component {
                 this.setState({ token: response.data[0] }, () => {
                     //this.QGetCalculation();
                 })
-
+                setTimeout(() => {
+                    this.QSetViewInParent({ page: "profile" });
+                }, 1000);
             }).catch(err => {
-                console.log(err)
-                alert("User does not exist!")
+                alert(err.response.data)
+                window.location.reload(); //ako postoji bolji nacin pls replace this
+
             })
-        setTimeout(() => {
-            this.QSetViewInParent({ page: "profile" });
-        }, 1000);
 
     };
 

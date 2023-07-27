@@ -17,18 +17,20 @@ class Schedule extends React.Component {
 
     componentDidMount() {
 
+        var idR = this.props.idR;
+        console.log(typeof idR)
         const token = localStorage.getItem('token');
         axios.get('https://localhost:7224/CalculateAmortizationPlan/schedule', {
             headers: {
                 Authorization: `Bearer ${token}`
             },
             params: {
-                reqName: ""
+                reqName: idR
             }
         }).then(response => {
             console.log(response.data)
             this.setState({
-                schedule: response.data
+                schedule: response.data.schedules
 
             })
         }).catch(error => {
@@ -36,59 +38,14 @@ class Schedule extends React.Component {
         });
     };
 
-    /* componentDidMount() {
-         this.fetchReqNameFromRequest()
-             .then(request_Name => {
-                 const token = localStorage.getItem('token');
-                 axios.get('https://localhost:7224/CalculateAmortizationPlan/schedule', {
-                     headers: {
-                         Authorization: `Bearer ${token}`
-                     },
-                     params: {
-                         reqName: request_Name // Use the fetched reqName value
-                     }
-                 }).then(response => {
-                     console.log(response.data);
-                     this.setState({
-                         schedule: response.data
-                     });
-                 }).catch(error => {
-                     console.error(error.response); // Log the error response for debugging
-                 });
-             })
-             .catch(error => {
-                 console.error("Failed to fetch reqName", error);
-             });
-     };
- 
-     fetchReqNameFromRequest() {
-         const token = localStorage.getItem('token');
- 
-         return new Promise((resolve, reject) => {
-             axios.get('https://localhost:7224/CalculateAmortizationPlan', {
-                 headers: {
-                     Authorization: `Bearer ${token}`
-                 }
-                 })
-                 .then(response => {
-                     resolve(response.data[0].request_Name);
-                     console.log(response.data.request_Name)
-                 })
-                 .catch(error => {
-                     reject(error);
-                 });
-              
-         });
-     };*/
-
     formatDate = (dateString) => {
         const dateObject = new Date(dateString);
         const options = { year: 'numeric', month: 'short' };
         return dateObject.toLocaleDateString(undefined, options);
     };
 
-    state = { message: "" };
     render() {
+
         let data = this.state.schedule;
 
         return (
@@ -96,7 +53,7 @@ class Schedule extends React.Component {
 
                 <div className="container">
                     <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-3 border-bottom">
-                        <a href="#" className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+                        <a className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
                             <svg className="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"></svg>
                         </a>
 
@@ -125,7 +82,7 @@ class Schedule extends React.Component {
                             {data.length > 0 ?
                                 data.map((d) => {
                                     return (
-                                        <MDBTableBody>
+                                        <MDBTableBody key={d.schedule_Id}>
                                             <tr>
                                                 <td>{this.formatDate(d.current_Date)}</td>
                                                 <td>{d.monthly_Paid}&euro;</td>

@@ -50,7 +50,7 @@ class Profile extends React.Component {
             .then(response => {
                 console.log(response.data.summary)
                 console.log("Sent to server...")
-                this.props.QIDFromChild({ page: "calculation", sum: response.data.summary, schedules: response.data.schedules})
+                this.props.QIDFromChild({ page: "calculation", sum: response.data.summary, schedules: response.data.schedules, idForSchedule: response.data.summary.request_Id })
             })
             .catch(err => {
                 console.log(err)

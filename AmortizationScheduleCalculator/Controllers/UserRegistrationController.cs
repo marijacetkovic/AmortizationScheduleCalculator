@@ -1,3 +1,4 @@
+using AmortizationScheduleCalculator.Exceptions;
 using AmortizationScheduleCalculator.Model;
 using AmortizationScheduleCalculator.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -33,13 +34,22 @@ namespace AmortizationScheduleCalculator.Controllers
         }
 
         [HttpPost("login", Name = "Login")]
-        public string[] userLoginValidation(UserInput user)
+        public ActionResult<string[]> userLoginValidation(UserInput user)
         {
-            return _register.userLoginValidation(user);
+            try
+            {
+                return Ok(_register.userLoginValidation(user));
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions if needed
+                return BadRequest(ex.Message);
+            }
+
         }
 
-      //  [HttpGet("secretlink", Name = "Secret"), Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-      
+        //  [HttpGet("secretlink", Name = "Secret"), Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
 
     }
 }

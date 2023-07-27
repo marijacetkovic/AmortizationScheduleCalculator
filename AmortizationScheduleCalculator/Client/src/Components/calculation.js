@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import axios from "axios";
 import "./style.css";
 import { MDBTable, MDBTableHead, MDBTableBody } from 'mdb-react-ui-kit';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+
 
 
 class Calculation extends React.Component {
@@ -10,7 +13,8 @@ class Calculation extends React.Component {
         super(props);
         this.state = {
             calculation: {},
-            schedule: [] 
+            schedule: [],
+            useCanvas: false
         };
 
     };
@@ -25,35 +29,33 @@ class Calculation extends React.Component {
         });
     };
 
-    //componentDidMount() {
-
-    //    const token = localStorage.getItem('token');
-
-    //    axios.get('https://localhost:7224/CalculateAmortizationPlan', {
-    //        headers: {
-    //            Authorization: `Bearer ${token}`
-    //        }
-    //    }).then(response => {
-    //        //console.log(this.props.token)
-    //        //console.log(response.data)
-    //        this.setState({
-    //            calculation: response.data[response.data.length - 1],
-    //            schedule: response.data.schedules
-    //        })
-    //    })
-    //};
-
     formatDate = (dateString) => {
         const dateObject = new Date(dateString);
         const options = { year: 'numeric', month: 'short' };
         return dateObject.toLocaleDateString(undefined, options);
     };
 
+    getGraphData = (data) => {
+        var graphData=[];
+        var interest = 0;
+        var principal = 0;
+        for (var i = 0; i < data.length; i++) {
+            interest += data[i].interest_Paid;
+            principal += data[i].principal_Paid;
+            graphData[i] = {
+                Interest:interest,
+                Principal:principal,
+                Balance: data[i].remaining_Loan,
+                Date: data[i].current_Date
+            }
+        }
+        return graphData;
+    }
+
 
     render() {
         const summaryData = this.props.data;
         const schedulesData = this.props.schedule;
-        //const { summaryData } = this.props;
         console.log(schedulesData);
         //let summary = summaryData.sum;
         //let lastElement = data.length > 0 ? data[data.length - 1] : null;
@@ -61,7 +63,7 @@ class Calculation extends React.Component {
         const surname = localStorage.getItem('surname');
 
         return (
-            <div>
+            <div style={{ margin: "auto"} }>
                 <div className="container">
                     <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-3 border-bottom">
                         <div className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
@@ -81,7 +83,7 @@ class Calculation extends React.Component {
                     </header>
                 </div>
 
-                {summaryData ?
+                {summaryData  ?
                     <div>
 
                         <div style={{ overflowX: "auto" }}>
@@ -120,8 +122,73 @@ class Calculation extends React.Component {
                                 </div>
                             </div>
                         </div>
+
+                        <div style={{ marginLeft: "500px" }}>
+                            <LineChart 
+                                width={800}
+                                height={400}
+                                data={this.getGraphData(schedulesData)}
+                                margin={{
+                                    top: 20,
+                                    right: 10,
+                                    left: 10,
+                                    bottom: 5,
+                                }} textAlign={"center"}
+
+                            >
+                                <CartesianGrid strokeDasharray="3 3" />
+                                
+                                <XAxis dataKey="Date" />
+                                <YAxis/>
+                                <Tooltip/>
+                                <Legend/>
+                                <Line type="monotone" dataKey="Principal" stroke="#8884d8" strokeDasharray="3 3" />
+                                <Line type="monotone" dataKey="Interest" stroke="#d990d8" strokeDasharray="3 3" />
+                                <Line type="monotone" dataKey="Balance" stroke="#82ca9d" strokeDasharray="3 3 " />
+                                </LineChart>
+
+                        </div>
+
+
+                        <div>
+
+                            <MDBTable striped hover style={{ maxWidth: "1150px", margin: "auto", marginTop: "60px" }}>
+                                <MDBTableHead >
+                                    <tr>
+                                        <th style={{ backgroundColor: "#526D82" }} scope='col'>Date</th>
+                                        <th style={{ backgroundColor: "#526D82" }} scope='col'>Monthly payment</th>
+                                        <th style={{ backgroundColor: "#526D82" }} scope='col'>Principal</th>
+                                        <th style={{ backgroundColor: "#526D82" }} scope='col'>Interest</th>
+                                        <th style={{ backgroundColor: "#526D82" }} scope='col'>Remaining balance</th>
+                                    </tr>
+                                </MDBTableHead>
+
+                                {schedulesData.length > 0 ?
+                                    schedulesData.map((d) => {
+                                        return (
+                                            <MDBTableBody>
+                                                <tr>
+                                                    <td>{this.formatDate(d.current_Date)}</td>
+                                                    <td>{d.monthly_Paid}&euro;</td>
+                                                    <td>{d.principal_Paid}&euro;</td>
+                                                    <td>{d.interest_Paid}&euro;</td>
+                                                    <td>{d.remaining_Loan}&euro;</td>
+                                                </tr>
+                                            </MDBTableBody>
+
+                                        )
+                                    })
+                                    : "Loading.."}
+                            </MDBTable>
+
+                        </div>
+
                     </div>
                     : "Loading.."}
+
+               
+
+                
             </div>
         );
     }

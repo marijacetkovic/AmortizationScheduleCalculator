@@ -20,34 +20,37 @@ namespace AmortizationScheduleCalculator.Middleware
             }
             catch (InvalidInputException e)
             {
+                Console.WriteLine ("MANJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
                 _logger.LogError(e, e.Message);
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                context.Response.StatusCode = 500;
                 ProblemDetails problem = new()
                 {
-                    Status = (int)HttpStatusCode.BadRequest,
+                    Status = 500,
                     Type = "Invalid input",
                     Title = "Invalid input",
                     Detail = e.Message
                 };
 
                 var errorResponse = JsonSerializer.Serialize(problem);
-                await context.Response.WriteAsync(errorResponse);
                 context.Response.ContentType = "application/json";
+
+                await context.Response.WriteAsync(errorResponse);
             }
             catch (QueryException e) {
                 _logger.LogError(e, e.Message);
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 ProblemDetails problem = new()
                 {
-                    Status = (int)HttpStatusCode.BadRequest,
+                    Status = (int)HttpStatusCode.InternalServerError,
                     Type = "Invalid query",
                     Title = "Invalid query",
                     Detail = e.Message
                 };
 
                 var errorResponse = JsonSerializer.Serialize(problem);
-                await context.Response.WriteAsync(errorResponse);
                 context.Response.ContentType = "application/json";
+
+                await context.Response.WriteAsync(errorResponse);
             }
             catch (Exception e)
             {

@@ -75,7 +75,8 @@ namespace AmortizationScheduleCalculator.Services
             }
             else
             {
-                throw new InvalidInputException("wrong mail or password");
+                throw new InvalidInputException("Wrong mail or password");
+                //return null;
             }
 
         }
