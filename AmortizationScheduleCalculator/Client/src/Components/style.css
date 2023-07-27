@@ -116,7 +116,9 @@ body {
     font-size: 30px;
     font-weight: 700;
 }
-
+.scheduleTd {
+    background-color: #DDE6ED;
+}
 .defaultButton {
     background-color: #FFFFFF;
     border: none

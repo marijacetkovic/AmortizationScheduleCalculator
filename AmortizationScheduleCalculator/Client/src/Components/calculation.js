@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import axios from "axios";
 import "./style.css";
 import { MDBTable, MDBTableHead, MDBTableBody } from 'mdb-react-ui-kit';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 
 
@@ -63,7 +63,15 @@ class Calculation extends React.Component {
         const surname = localStorage.getItem('surname');
 
         return (
-            <div style={{ margin: "auto"} }>
+            <div style={{
+                display: "flex",
+
+                flexDirection: "column",
+
+                alignItems: "center",
+
+                justifyContent: "center"
+            }}>
                 <div className="container">
                     <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-3 border-bottom">
                         <div className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
@@ -87,7 +95,7 @@ class Calculation extends React.Component {
                     <div>
 
                         <div style={{ overflowX: "auto" }}>
-                            <div style={{ width: "60%", margin: "auto", marginTop: "1%" }}>
+                            <div style={{ marginTop: "1%" }}>
                                 <div className="col" style={{ margin: "auto", marginTop: "5%" }}>
                                     <div className="card" style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
                                         <div className="card-body">
@@ -123,7 +131,7 @@ class Calculation extends React.Component {
                             </div>
                         </div>
 
-                        <div style={{ marginLeft: "500px" }}>
+                        <div>
                             <LineChart 
                                 width={800}
                                 height={400}
@@ -136,15 +144,15 @@ class Calculation extends React.Component {
                                 }} textAlign={"center"}
 
                             >
-                                <CartesianGrid strokeDasharray="3 3" />
+                                <CartesianGrid />
                                 
                                 <XAxis dataKey="Date" />
                                 <YAxis/>
                                 <Tooltip/>
                                 <Legend/>
-                                <Line type="monotone" dataKey="Principal" stroke="#8884d8" strokeDasharray="3 3" />
-                                <Line type="monotone" dataKey="Interest" stroke="#d990d8" strokeDasharray="3 3" />
-                                <Line type="monotone" dataKey="Balance" stroke="#82ca9d" strokeDasharray="3 3 " />
+                                <Line type="monotone" dataKey="Principal" stroke="#8884d8" />
+                                <Line type="monotone" dataKey="Interest" stroke="#d990d8"  />
+                                <Line type="monotone" dataKey="Balance" stroke="#82ca9d" />
                                 </LineChart>
 
                         </div>
@@ -155,11 +163,11 @@ class Calculation extends React.Component {
                             <MDBTable striped hover style={{ maxWidth: "1150px", margin: "auto", marginTop: "60px" }}>
                                 <MDBTableHead >
                                     <tr>
-                                        <th style={{ backgroundColor: "#526D82" }} scope='col'>Date</th>
-                                        <th style={{ backgroundColor: "#526D82" }} scope='col'>Monthly payment</th>
-                                        <th style={{ backgroundColor: "#526D82" }} scope='col'>Principal</th>
-                                        <th style={{ backgroundColor: "#526D82" }} scope='col'>Interest</th>
-                                        <th style={{ backgroundColor: "#526D82" }} scope='col'>Remaining balance</th>
+                                        <th style={{ backgroundColor: "#526D82", color:"#DDE6ED" }} scope='col'>Date</th>
+                                        <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Monthly payment</th>
+                                        <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Principal</th>
+                                        <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Interest</th>
+                                        <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Remaining balance</th>
                                     </tr>
                                 </MDBTableHead>
 
@@ -168,7 +176,7 @@ class Calculation extends React.Component {
                                         return (
                                             <MDBTableBody>
                                                 <tr>
-                                                    <td>{this.formatDate(d.current_Date)}</td>
+                                                    <td className="scheduleTd">{this.formatDate(d.current_Date)}</td>
                                                     <td>{d.monthly_Paid}&euro;</td>
                                                     <td>{d.principal_Paid}&euro;</td>
                                                     <td>{d.interest_Paid}&euro;</td>

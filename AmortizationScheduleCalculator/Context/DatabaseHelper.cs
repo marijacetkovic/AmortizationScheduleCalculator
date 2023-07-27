@@ -7,7 +7,7 @@ namespace AmortizationScheduleCalculator.Context
     {
         public static IDbConnection CreateConnection()
         {
-            return new NpgsqlConnection("Server=localhost;Database=postgres;User Id=postgres;Password=admin;Port=5432;");
+            return new NpgsqlConnection("Server=localhost;Database=postgres;User Id=postgres;Password=manjaadmin;Port=5432;");
         }
     }
 }
