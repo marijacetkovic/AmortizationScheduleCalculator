@@ -21,10 +21,10 @@ namespace AmortizationScheduleCalculator.Middleware
             catch (InvalidInputException e)
             {
                 _logger.LogError(e, e.Message);
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 ProblemDetails problem = new()
                 {
-                    Status = (int)HttpStatusCode.BadRequest,
+                    Status = (int)HttpStatusCode.InternalServerError,
                     Type = "Invalid input",
                     Title = "Invalid input",
                     Detail = e.Message
@@ -36,10 +36,10 @@ namespace AmortizationScheduleCalculator.Middleware
             }
             catch (QueryException e) {
                 _logger.LogError(e, e.Message);
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 ProblemDetails problem = new()
                 {
-                    Status = (int)HttpStatusCode.BadRequest,
+                    Status = (int)HttpStatusCode.InternalServerError,
                     Type = "Invalid query",
                     Title = "Invalid query",
                     Detail = e.Message

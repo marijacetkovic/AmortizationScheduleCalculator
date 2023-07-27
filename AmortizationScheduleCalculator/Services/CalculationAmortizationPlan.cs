@@ -70,6 +70,7 @@ namespace AmortizationScheduleCalculator.Services
             scheduleReq.Total_Interest_Paid = Math.Round(totalInterestPaid,2);
             scheduleReq.Total_Loan_Cost = Math.Round(totalLoanCost,2);
             scheduleReq.Loan_Payoff_Date = loanPayoffDate;
+            scheduleReq.Last_Version = true;
 
             //store to database
             int id = await InsertRequestDb(scheduleReq);
@@ -113,9 +114,9 @@ namespace AmortizationScheduleCalculator.Services
         {
            return await _db.QuerySingleAsync<int>("insert into \"Request\" " +
                 "(request_name,loan_amount,loan_period,interest_rate,loan_start_date,approval_cost,insurance_cost, account_cost,other_costs," +
-                "monthly_payment,total_interest_paid,total_loan_cost,loan_payoff_date,r_user_id) " +
+                "monthly_payment,total_interest_paid,total_loan_cost,loan_payoff_date,last_version,r_user_id) " +
                 "values (@Request_Name,@Loan_Amount, @Loan_Period, @Interest_Rate, @Loan_Start_Date, @Approval_Cost, @Insurance_Cost, @Account_Cost, @Other_Costs, " +
-                "@Monthly_Payment, @Total_Interest_Paid, @Total_Loan_Cost, @Loan_Payoff_Date,@R_User_Id )" +
+                "@Monthly_Payment, @Total_Interest_Paid, @Total_Loan_Cost, @Loan_Payoff_Date,@Last_Version,@R_User_Id )" +
                 "RETURNING request_id", newRequest);
         }
         private async Task InsertScheduleDb(Schedule newSchedule)
@@ -148,13 +149,10 @@ namespace AmortizationScheduleCalculator.Services
             var numOfPayments = req.Loan_Period * 12;
             var totalLoanCost = req.Total_Loan_Cost;
             var currentDate = req.Loan_Start_Date.Date;
-            
-            //build a new name
-            var newName = req.Request_Name + " edit " + count;
+            var newName = req.Request_Name;
 
-            //store the edited request same as before but w new name
             Request editedRequest = req;
-            editedRequest.Request_Name = newName;
+            await updateRequest(req.Request_Id.ToString()); //changes display flag to false 
 
             //get the new id to link the new entries
             int id = await InsertRequestDb(editedRequest);
@@ -317,14 +315,11 @@ namespace AmortizationScheduleCalculator.Services
             var totalLoanCost = req.Total_Loan_Cost;
             var currentDate = req.Loan_Start_Date.Date;
             var monthlyInterestRate = (req.Interest_Rate/100) / 12;
+            var newName = req.Request_Name;
             
-            //build a new name
-            var newName = req.Request_Name + " edit " + count;
-            
-            //store the edited request same as before but w new name
             Request editedRequest = req;
-            editedRequest.Request_Name = newName;
-            
+            await updateRequest(req.Request_Id.ToString()); //changes display flag to false 
+
             //get the new id to link the new entries
             int id = await InsertRequestDb(editedRequest);
             count++;
@@ -402,7 +397,13 @@ namespace AmortizationScheduleCalculator.Services
         public async Task<Request> getRequest(string reqId)
         {
             return ((await _db.QueryAsync<Request>("select * from \"Request\" where request_id = @id",
-                new { id = Int32.Parse(reqId)})).First());
+                new { id = Int32.Parse(reqId) })).First());
+        }
+
+        public async Task<Request> updateRequest(string reqId)
+        {
+            return ((await _db.QueryAsync<Request>("UPDATE \"Request\" SET last_version = 'false' WHERE last_version = 'true' and request_name = @id",
+                new { id = Int32.Parse(reqId) })).First());
         }
 
     }
