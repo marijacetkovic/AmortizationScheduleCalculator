@@ -11,6 +11,7 @@ namespace AmortizationScheduleCalculator.Model
         public int Loan_Period { get; set; }
         public double Interest_Rate { get; set; }
         public DateTime Loan_Start_Date { get; set; }
+        public bool Last_Version { get; set; }
 
         //these are optional
         public decimal Approval_Cost { get; set; } = 0;

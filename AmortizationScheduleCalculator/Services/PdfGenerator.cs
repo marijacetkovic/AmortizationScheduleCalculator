@@ -24,7 +24,9 @@ namespace AmortizationScheduleCalculator.Services
 
         public async Task GeneratePdf(string reqName)
         {
-            List<Schedule> schedules = (await _calculate.getSchedule(reqName)).Schedules;
+            var response = await _calculate.getSchedule(reqName);
+            List<Schedule> schedules = response.Schedules;
+            Request summary = response.Summary; 
             string htmlContent = "";
             int userId = Int32.Parse(_register.getUserId());
             string user = _register.getCurrentUser(userId);
@@ -49,67 +51,117 @@ namespace AmortizationScheduleCalculator.Services
 
                     page.Content()
                         .PaddingVertical(1, Unit.Centimetre)
-                        .Table(table =>
-                        {
-                            IContainer DefaultCellStyle(IContainer container, string backgroundColor)
-                            {
-                                return container
-                                    .Border(1)
-                                    .BorderColor(Colors.Grey.Lighten1)
-                                    .Background(backgroundColor)
-                                    .PaddingVertical(5)
-                                    .PaddingHorizontal(10)
-                                    .AlignCenter()
-                                    .AlignMiddle()
-                                    .DefaultTextStyle(x => x.FontSize(12));
-                            }
+                         .Column(col =>
+                         {
+                             col.Item().Table(table => {
 
-                            table.ColumnsDefinition(columns =>
-                            {
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
+                                 IContainer DefaultCellStyle(IContainer container, string backgroundColor)
+                                 {
+                                     return container
+                                         .Border(1)
+                                         .BorderColor(Colors.Grey.Lighten1)
+                                         .Background(backgroundColor)
+                                         .PaddingVertical(5)
+                                         .PaddingHorizontal(10)
+                                         .AlignCenter()
+                                         .AlignMiddle()
+                                         .DefaultTextStyle(x => x.FontSize(12));
+                                 }
 
-                                //columns.ConstantColumn(75);
-                                //columns.ConstantColumn(75);
+                                 table.ColumnsDefinition(columns =>
+                                 {
+                                     columns.RelativeColumn();
+                                     columns.RelativeColumn();
+                                     columns.RelativeColumn();
+                                     columns.RelativeColumn();
+                                 });
 
-                                //columns.ConstantColumn(75);
-                                //columns.ConstantColumn(75);
-                            });
+                                 table.Header(header =>
+                                 {
+                                     // please be sure to call the 'header' handler!
+                                     
+                                     header.Cell().Element(CellStyle).Text("Fixed Monthly Payment");
+                                     header.Cell().Element(CellStyle).Text("Total Interest Amount");
 
-                            table.Header(header =>
-                            {
-                                // please be sure to call the 'header' handler!
+                                     header.Cell().Element(CellStyle).Text("Total Loan Amount");
+                                     header.Cell().Element(CellStyle).Text("Payoff Date");
 
-                                header.Cell().Element(CellStyle).Text("Date");
-                                header.Cell().Element(CellStyle).Text("Principal");
+                                     // you can extend existing styles by creating additional methods
+                                     IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.Grey.Lighten3);
+                                 });
+                                 var payoffDate = summary.Loan_Payoff_Date;
+                                 string pMonth = payoffDate.ToString("MMM").ToUpper().Substring(0, 3);
+                                 int pYear = payoffDate.Year;
+                                 table.Cell().Element(CellStyle).Text(summary.Monthly_Payment);
+                                 table.Cell().Element(CellStyle).Text(summary.Total_Interest_Paid);
 
-                                header.Cell().Element(CellStyle).Text("Interest");
-                                header.Cell().Element(CellStyle).Text("Remaining balance");
+                                 table.Cell().Element(CellStyle).Text(summary.Total_Loan_Cost);
+                                 table.Cell().Element(CellStyle).Text(pMonth+" "+pYear);
 
-                                // you can extend existing styles by creating additional methods
-                                IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.Grey.Lighten3);
-                            });
+                                 IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.White).ShowOnce();
 
-                            foreach (var schedule in schedules)
-                            {
-                                //table.Cell().Element(CellStyle).ExtendHorizontal().AlignLeft().Text(page.name);
+                             });
+                             col.Item().PaddingVertical((float)1.5, Unit.Centimetre);
+                             col.Item().Table(table =>
+                             {
+                                 IContainer DefaultCellStyle(IContainer container, string backgroundColor)
+                                 {
+                                     return container
+                                         .Border(1)
+                                         .BorderColor(Colors.Grey.Lighten1)
+                                         .Background(backgroundColor)
+                                         .PaddingVertical(5)
+                                         .PaddingHorizontal(10)
+                                         .AlignCenter()
+                                         .AlignMiddle()
+                                         .DefaultTextStyle(x => x.FontSize(12));
+                                 }
 
-                                // inches
-                                var date = schedule.Current_Date;
-                                string month = date.ToString("MMM");
-                                int year = date.Year;
-                                table.Cell().Element(CellStyle).Text(month+" "+year);
-                                table.Cell().Element(CellStyle).Text(schedule.Principal_Paid);
+                                 table.ColumnsDefinition(columns =>
+                                 {
+                                     columns.RelativeColumn();
+                                     columns.RelativeColumn();
+                                     columns.RelativeColumn();
+                                     columns.RelativeColumn();
 
-                                // points
-                                table.Cell().Element(CellStyle).Text(schedule.Interest_Paid);
-                                table.Cell().Element(CellStyle).Text(schedule.Remaining_Loan);
+                                     //columns.ConstantColumn(75);
+                                     //columns.ConstantColumn(75);
 
-                                IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.White).ShowOnce();
-                            }
-                        });
+                                     //columns.ConstantColumn(75);
+                                     //columns.ConstantColumn(75);
+                                 });
+
+                                 table.Header(header =>
+                                 {
+                                     // please be sure to call the 'header' handler!
+
+                                     header.Cell().Element(CellStyle).Text("Date");
+                                     header.Cell().Element(CellStyle).Text("Principal");
+
+                                     header.Cell().Element(CellStyle).Text("Interest");
+                                     header.Cell().Element(CellStyle).Text("Remaining balance");
+
+                                     // you can extend existing styles by creating additional methods
+                                     IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.Grey.Lighten3);
+                                 });
+
+                                 foreach (var schedule in schedules)
+                                 {
+                                     //table.Cell().Element(CellStyle).ExtendHorizontal().AlignLeft().Text(page.name);
+
+                                     var date = schedule.Current_Date;
+                                     string month = date.ToString("MMM").ToUpper().Substring(0,3);
+                                     int year = date.Year;
+                                     table.Cell().Element(CellStyle).Text(month + " " + year);
+                                     table.Cell().Element(CellStyle).Text(schedule.Principal_Paid);
+
+                                     table.Cell().Element(CellStyle).Text(schedule.Interest_Paid);
+                                     table.Cell().Element(CellStyle).Text(schedule.Remaining_Loan);
+
+                                     IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.White).ShowOnce();
+                                 }
+                             });
+                         });
                     page.Footer()
                         .AlignCenter()
                         .Row(row =>
@@ -120,7 +172,12 @@ namespace AmortizationScheduleCalculator.Services
                                 x.CurrentPageNumber();
                                 x.DefaultTextStyle(x => x.FontSize(10));
                             });
-                            row.RelativeColumn().Text(user);
+                            row.RelativeColumn().Text(x =>
+                            {
+                                x.Span(user);
+                                x.AlignRight();
+                                x.DefaultTextStyle(x => x.FontSize(10));
+                            });
                         });
                 });
             })

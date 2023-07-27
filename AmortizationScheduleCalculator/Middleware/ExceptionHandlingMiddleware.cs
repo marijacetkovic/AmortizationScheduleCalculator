@@ -19,13 +19,11 @@ namespace AmortizationScheduleCalculator.Middleware
                 await next(context);
             }
             catch (InvalidInputException e)
-            {
-                Console.WriteLine ("MANJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-                _logger.LogError(e, e.Message);
-                context.Response.StatusCode = 500;
+            {                _logger.LogError(e, e.Message);
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 ProblemDetails problem = new()
                 {
-                    Status = 500,
+                    Status = (int)HttpStatusCode.BadRequest,
                     Type = "Invalid input",
                     Title = "Invalid input",
                     Detail = e.Message
