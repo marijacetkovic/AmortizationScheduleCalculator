@@ -52,11 +52,27 @@ namespace AmortizationScheduleCalculator.Controllers
             }
         }
 
-        [HttpGet,Authorize]
+        [HttpGet("getallrequests"), Authorize]
         public List<Request> getAllRequests()
         {
             var id = Int32.Parse(_register.getUserId());
-            return _db.Query<Request>("select * from \"Request\" where r_user_id=@id", new { id = id }).ToList();
+            return _db.Query<Request>("select * from \"Request\" where r_user_id=@id and last_version=@value", new { id = id, value = true }).ToList();
+
+        }
+        [HttpGet("deleterequest"), Authorize]
+        public async Task<ActionResult> deleteRequest([FromQuery] string reqName)
+        {
+            Request req;
+            try
+            {
+                req = await _calculate.updateRequest(reqName);
+                return Ok(req);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
         }
         [HttpGet("schedule"), Authorize]

@@ -396,14 +396,14 @@ namespace AmortizationScheduleCalculator.Services
         }
         public async Task<Request> getRequest(string reqId)
         {
-            return ((await _db.QueryAsync<Request>("select * from \"Request\" where request_id = @id",
-                new { id = Int32.Parse(reqId) })).First());
+            return ((await _db.QueryAsync<Request>("select * from \"Request\" where request_id = @id and last_version=@value",
+                new { id = Int32.Parse(reqId), value=true })).First());
         }
 
         public async Task<Request> updateRequest(string reqId)
         {
-            return ((await _db.QueryAsync<Request>("UPDATE \"Request\" SET last_version = 'false' WHERE last_version = 'true' and request_name = @id",
-                new { id = Int32.Parse(reqId) })).First());
+            return  _db.QueryFirstOrDefault<Request>("UPDATE \"Request\" SET last_version = @value WHERE last_version = @value1 and request_id = @id",
+                new { id = Int32.Parse(reqId),value=false,value1=true });
         }
 
     }
