@@ -49,15 +49,17 @@ namespace AmortizationScheduleCalculator.Services
             decimal totalLoanCost;
             decimal totalInterestPaid;
             decimal additionalMonthlyCosts;
+            decimal otherCostsPayment;
             DateTime loanPayoffDate;
 
             //calculate
 
             int numOfPayments = loanPeriod * 12;
             double monthlyInterestRate = interestRate / 12;
-            additionalMonthlyCosts = scheduleReq.Account_Cost + scheduleReq.Approval_Cost + scheduleReq.Insurance_Cost + scheduleReq.Other_Costs;
+            additionalMonthlyCosts = scheduleReq.Account_Cost + scheduleReq.Insurance_Cost + scheduleReq.Other_Costs;
             //M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1]
             monthlyPaymentFixed = CalculateMonthly(loanAmount, monthlyInterestRate, numOfPayments) + additionalMonthlyCosts;
+            otherCostsPayment = 12 * additionalMonthlyCosts + scheduleReq.Approval_Cost;
             
 
             totalLoanCost = monthlyPaymentFixed * numOfPayments;
@@ -69,10 +71,11 @@ namespace AmortizationScheduleCalculator.Services
             scheduleReq.Monthly_Payment = Math.Round(monthlyPaymentFixed,2);
             scheduleReq.Total_Interest_Paid = Math.Round(totalInterestPaid,2);
             scheduleReq.Total_Loan_Cost = Math.Round(totalLoanCost,2);
+            scheduleReq.Total_Other_Costs = Math.Round(otherCostsPayment, 2);
             scheduleReq.Loan_Payoff_Date = loanPayoffDate;
             scheduleReq.Last_Version = true;
             scheduleReq.Date_Issued = DateTime.Now;
-            scheduleReq.Issuer = _register.getCurrentUser(Int32.Parse(_register.getUserId()));
+            scheduleReq.Issuer = _register.getCurrentUser(Int32.Parse(_register.getUserId())); //or Dinit or whoever issuer is
 
             //store to database
             int id = await InsertRequestDb(scheduleReq);
@@ -86,10 +89,15 @@ namespace AmortizationScheduleCalculator.Services
             int i = 1;
             decimal monthlyPayment = monthlyPaymentFixed;
             while (i<=numOfPayments)
-            {
+            { 
+
                 currentDate = currentDate.AddMonths(1);
                 interestPayment = ((decimal)((double)remainingBalance * monthlyInterestRate));
-                principalPayment = monthlyPaymentFixed - interestPayment;
+                if (i == 1) { 
+                    additionalMonthlyCosts += scheduleReq.Approval_Cost;
+                    monthlyPayment += scheduleReq.Approval_Cost;
+                }
+                principalPayment = monthlyPayment - interestPayment-additionalMonthlyCosts;
                 remainingBalance -= principalPayment;
                 if (Math.Round(remainingBalance,4)<= 0) remainingBalance = 0;
 
@@ -97,9 +105,14 @@ namespace AmortizationScheduleCalculator.Services
                 principalPayment = Math.Round(principalPayment, 2);
                 interestPayment = Math.Round(interestPayment,2);
                 var remainingRounded = Math.Round(remainingBalance,2);
-                Schedule newSchedule = new(currentDate.Date, monthlyRounded, principalPayment, interestPayment, remainingRounded, id);
+                Schedule newSchedule = new(currentDate.Date, monthlyRounded, principalPayment, interestPayment,additionalMonthlyCosts,remainingRounded, id);
                 scheduleList.Add(newSchedule);
                 await InsertScheduleDb(newSchedule);
+                if (i == 1)
+                {
+                    additionalMonthlyCosts -= scheduleReq.Approval_Cost;//reset default monthly costs
+                    monthlyPayment -= scheduleReq.Approval_Cost;
+                }
                 i++;
             }
             return new AmortizationPlan { Schedules=scheduleList, Summary = scheduleReq };
@@ -116,15 +129,15 @@ namespace AmortizationScheduleCalculator.Services
         {
            return await _db.QuerySingleAsync<int>("insert into \"Request\" " +
                 "(request_name,loan_amount,loan_period,interest_rate,loan_start_date,approval_cost,insurance_cost, account_cost,other_costs," +
-                "monthly_payment,total_interest_paid,total_loan_cost,loan_payoff_date,last_version,date_issued, issuer,r_user_id) " +
+                "monthly_payment,total_interest_paid,total_other_costs,total_loan_cost,loan_payoff_date,last_version,date_issued, issuer,r_user_id) " +
                 "values (@Request_Name,@Loan_Amount, @Loan_Period, @Interest_Rate, @Loan_Start_Date, @Approval_Cost, @Insurance_Cost, @Account_Cost, @Other_Costs, " +
-                "@Monthly_Payment, @Total_Interest_Paid, @Total_Loan_Cost, @Loan_Payoff_Date,@Last_Version,@Date_Issued, @Issuer,@R_User_Id )" +
+                "@Monthly_Payment, @Total_Interest_Paid,@Total_Other_Costs, @Total_Loan_Cost, @Loan_Payoff_Date,@Last_Version,@Date_Issued, @Issuer,@R_User_Id )" +
                 "RETURNING request_id", newRequest);
         }
         private async Task InsertScheduleDb(Schedule newSchedule)
         {
-            await _db.ExecuteAsync("insert into \"AmortizationSchedule\" (\"current_date\",monthly_paid,principal_paid,interest_paid,remaining_loan," +
-                    "s_request_id)\r\nvalues (@Current_Date,@Monthly_Paid,@Principal_Paid,@Interest_Paid,@Remaining_Loan,@S_Request_Id)", newSchedule);
+            await _db.ExecuteAsync("insert into \"AmortizationSchedule\" (\"current_date\",monthly_paid,principal_paid,interest_paid,monthly_costs,remaining_loan," +
+                    "s_request_id)\r\nvalues (@Current_Date,@Monthly_Paid,@Principal_Paid,@Interest_Paid,@Monthly_Costs,@Remaining_Loan,@S_Request_Id)", newSchedule);
         }
 
        static int count = 0;

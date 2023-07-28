@@ -9,7 +9,8 @@ class history extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            calculation: []
+            calculation: [],
+            pdfData: null
         };
 
     };
@@ -45,6 +46,7 @@ class history extends React.Component {
     getPdf = (reqid) => {
         console.log(typeof (reqid));
         axios.post('https://localhost:7224/CalculateAmortizationPlan/generatepdf', {}, {
+            responseType: 'arraybuffer',
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             },
@@ -53,12 +55,22 @@ class history extends React.Component {
             }
         })
             .then((response) => {
-                // Handle the response or do any necessary processing here
-                // Redirect to the PDF file once it's generated
-                //window.location.href (`C:/Users/spachemska.DIZ2555/Desktop/ultra/AmortizationScheduleCalculator/AmortizationScheduleCalculator/7.pdf`);
-                <object data="http://africau.edu/images/default/sample.pdf" type="application/pdf" width="100%" height="100%">
-                    <p>Alternative text - include a link <a href="http://africau.edu/images/default/sample.pdf">to the PDF!</a></p>
-                </object>
+                
+                console.log(response)
+                this.setState({ pdfData: response.data }, () => {
+                    // The callback function is executed after the state is updated
+                    const { pdfData } = this.state;
+                    console.log(typeof(pdfData))
+                    // Check if PDF data is available
+                    if (pdfData) {
+                        const blob = new Blob([pdfData], { type: 'application/pdf' });
+                        const pdfUrl = URL.createObjectURL(blob);
+                        console.log(blob)
+
+                        // Open the PDF in a new tab
+                        window.open(pdfUrl, '_blank');
+                    }
+                });
             })
             .catch(error => {
                 console.error(error.response); // Log the error response for debugging

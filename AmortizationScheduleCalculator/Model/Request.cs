@@ -16,16 +16,18 @@ namespace AmortizationScheduleCalculator.Model
         public string Issuer { get; set; }
 
         //these are optional
-        public decimal Approval_Cost { get; set; } = 0;
-        public decimal Insurance_Cost { get; set; } = 0;
-        public decimal Account_Cost { get; set; } = 0;
-        public decimal Other_Costs { get; set; } = 0;
+        public decimal Approval_Cost { get; set; }
+        public decimal Insurance_Cost { get; set; }
+        public decimal Account_Cost { get; set; }
+        public decimal Other_Costs { get; set; }
 
         //these get calculated
         public decimal Monthly_Payment { get; set; }
         public decimal Total_Interest_Paid { get; set; }
+        public decimal Total_Other_Costs { get; set; }
         public decimal Total_Loan_Cost { get; set; }
         public DateTime Loan_Payoff_Date { get; set; }
+
         //foreign key
         public int R_User_Id { get; set; }
 

@@ -2,12 +2,15 @@ import React from "react";
 import './App.css';
 import axios from "axios";
 import Home from './Components/home';
+
 import Profile from './Components/profile';
+import Pdf from './Components/pdf';
 import Login from './Components/login';
 import RegForm from "./Components/RegisForm";
 import Schedule from "./Components/schedule";
 import Calculation from "./Components/calculation";
 import History from "./Components/history";
+
 
 
 class App extends React.Component {
@@ -41,6 +44,8 @@ class App extends React.Component {
                 return < Calculation data={this.state.calculation} schedule={this.state.calculation1} QIDFromChild={this.QSetView}  />;
             case "history":
                 return <History QIDFromChild={this.QSetView} />;
+            case "pdf":
+                return <Pdf QIDFromChild={this.QSetView} />;
             default:
                 return <Login />;
 

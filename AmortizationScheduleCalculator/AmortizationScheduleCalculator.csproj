@@ -27,6 +27,8 @@
     <PackageReference Include="QuestPDF" Version="2023.6.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
+    <PackageReference Include="System-Web-Helpers.dll" Version="1.0.0" />
+    <PackageReference Include="System.Web.Helpers.Crypto" Version="3.2.3" />
   </ItemGroup>
 
   <ItemGroup>
