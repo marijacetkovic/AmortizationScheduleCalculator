@@ -71,6 +71,8 @@ namespace AmortizationScheduleCalculator.Services
             scheduleReq.Total_Loan_Cost = Math.Round(totalLoanCost,2);
             scheduleReq.Loan_Payoff_Date = loanPayoffDate;
             scheduleReq.Last_Version = true;
+            scheduleReq.Date_Issued = DateTime.Now;
+            scheduleReq.Issuer = _register.getCurrentUser(Int32.Parse(_register.getUserId()));
 
             //store to database
             int id = await InsertRequestDb(scheduleReq);
@@ -114,9 +116,9 @@ namespace AmortizationScheduleCalculator.Services
         {
            return await _db.QuerySingleAsync<int>("insert into \"Request\" " +
                 "(request_name,loan_amount,loan_period,interest_rate,loan_start_date,approval_cost,insurance_cost, account_cost,other_costs," +
-                "monthly_payment,total_interest_paid,total_loan_cost,loan_payoff_date,last_version,r_user_id) " +
+                "monthly_payment,total_interest_paid,total_loan_cost,loan_payoff_date,last_version,date_issued, issuer,r_user_id) " +
                 "values (@Request_Name,@Loan_Amount, @Loan_Period, @Interest_Rate, @Loan_Start_Date, @Approval_Cost, @Insurance_Cost, @Account_Cost, @Other_Costs, " +
-                "@Monthly_Payment, @Total_Interest_Paid, @Total_Loan_Cost, @Loan_Payoff_Date,@Last_Version,@R_User_Id )" +
+                "@Monthly_Payment, @Total_Interest_Paid, @Total_Loan_Cost, @Loan_Payoff_Date,@Last_Version,@Date_Issued, @Issuer,@R_User_Id )" +
                 "RETURNING request_id", newRequest);
         }
         private async Task InsertScheduleDb(Schedule newSchedule)
@@ -152,6 +154,7 @@ namespace AmortizationScheduleCalculator.Services
             var newName = req.Request_Name;
 
             Request editedRequest = req;
+            editedRequest.Date_Issued = DateTime.Now;
             await updateRequest(req.Request_Id.ToString()); //changes display flag to false 
 
             //get the new id to link the new entries
@@ -318,6 +321,8 @@ namespace AmortizationScheduleCalculator.Services
             var newName = req.Request_Name;
             
             Request editedRequest = req;
+            editedRequest.Date_Issued = DateTime.Now;
+
             await updateRequest(req.Request_Id.ToString()); //changes display flag to false 
 
             //get the new id to link the new entries
