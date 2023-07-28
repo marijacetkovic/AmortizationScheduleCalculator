@@ -22,8 +22,9 @@ namespace AmortizationScheduleCalculator.Services
             _calculate = calculate;
         }
 
-        public async Task GeneratePdf(string reqName)
+        public async Task<FileStreamResult> GeneratePdf(string reqName)
         {
+            var stream = new MemoryStream();
             var response = await _calculate.getSchedule(reqName);
             List<Schedule> schedules = response.Schedules;
             Request summary = response.Summary; 
@@ -181,7 +182,10 @@ namespace AmortizationScheduleCalculator.Services
                         });
                 });
             })
-            .GeneratePdf(reqName + ".pdf");
+            .GeneratePdf(stream);
+
+            stream.Position = 0;
+            return new FileStreamResult(stream, "application/pdf") { FileDownloadName = "Amort Plan "+reqName };
         }
     }
 }

@@ -4,6 +4,6 @@ namespace AmortizationScheduleCalculator.Services
 {
     public interface IPdfGenerator
     {
-        Task GeneratePdf(string reqName);
+        Task<FileStreamResult> GeneratePdf(string reqName);
     }
 }

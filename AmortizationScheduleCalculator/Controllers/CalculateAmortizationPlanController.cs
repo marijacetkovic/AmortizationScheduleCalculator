@@ -10,9 +10,8 @@ using static Dapper.SqlMapper;
 using System.Security.Claims;
 using IronPdf;
 using Microsoft.AspNetCore.Html;
-
-
-
+using System.Net;
+using MimeMapping;
 
 namespace AmortizationScheduleCalculator.Controllers
 {
@@ -129,10 +128,11 @@ namespace AmortizationScheduleCalculator.Controllers
 
         [HttpPost("generatepdf"), Authorize]
 
-        public async Task GeneratePdf([FromQuery] string reqName)
+        public async Task<FileStreamResult> GeneratePdf([FromQuery] string reqName)
         {
-            await _pdfgenerator.GeneratePdf(reqName);
+           return await _pdfgenerator.GeneratePdf(reqName);
         }
+        
 
     }
 }
