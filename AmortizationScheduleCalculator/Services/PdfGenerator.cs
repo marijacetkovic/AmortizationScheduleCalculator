@@ -22,19 +22,22 @@ namespace AmortizationScheduleCalculator.Services
             _calculate = calculate;
         }
 
-        public async Task GeneratePdf(string reqName)
+        public async Task<FileStreamResult> GeneratePdf(string reqName)
         {
+            var stream = new MemoryStream();
             var response = await _calculate.getSchedule(reqName);
             List<Schedule> schedules = response.Schedules;
-            Request summary = response.Summary; 
+            Request summary = response.Summary;
             string htmlContent = "";
             int userId = Int32.Parse(_register.getUserId());
             string user = _register.getCurrentUser(userId);
-           
+
             foreach (var schedule in schedules)
             {
                 htmlContent += schedule.ToString() + "\n";
             }
+
+
 
             Document.Create(container =>
             {
@@ -45,15 +48,21 @@ namespace AmortizationScheduleCalculator.Services
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(20));
 
+
+
                     page.Header()
                         .Text("Amortization Schedule Calculated")
                         .SemiBold().FontSize(14).FontColor(Colors.Blue.Medium);
+
+
 
                     page.Content()
                         .PaddingVertical(1, Unit.Centimetre)
                          .Column(col =>
                          {
                              col.Item().Table(table => {
+
+
 
                                  IContainer DefaultCellStyle(IContainer container, string backgroundColor)
                                  {
@@ -68,6 +77,8 @@ namespace AmortizationScheduleCalculator.Services
                                          .DefaultTextStyle(x => x.FontSize(12));
                                  }
 
+
+
                                  table.ColumnsDefinition(columns =>
                                  {
                                      columns.RelativeColumn();
@@ -76,15 +87,21 @@ namespace AmortizationScheduleCalculator.Services
                                      columns.RelativeColumn();
                                  });
 
+
+
                                  table.Header(header =>
                                  {
                                      // please be sure to call the 'header' handler!
-                                     
+
                                      header.Cell().Element(CellStyle).Text("Fixed Monthly Payment");
                                      header.Cell().Element(CellStyle).Text("Total Interest Amount");
 
+
+
                                      header.Cell().Element(CellStyle).Text("Total Loan Amount");
                                      header.Cell().Element(CellStyle).Text("Payoff Date");
+
+
 
                                      // you can extend existing styles by creating additional methods
                                      IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.Grey.Lighten3);
@@ -95,10 +112,16 @@ namespace AmortizationScheduleCalculator.Services
                                  table.Cell().Element(CellStyle).Text(summary.Monthly_Payment);
                                  table.Cell().Element(CellStyle).Text(summary.Total_Interest_Paid);
 
+
+
                                  table.Cell().Element(CellStyle).Text(summary.Total_Loan_Cost);
-                                 table.Cell().Element(CellStyle).Text(pMonth+" "+pYear);
+                                 table.Cell().Element(CellStyle).Text(pMonth + " " + pYear);
+
+
 
                                  IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.White).ShowOnce();
+
+
 
                              });
                              col.Item().PaddingVertical((float)1.5, Unit.Centimetre);
@@ -117,6 +140,8 @@ namespace AmortizationScheduleCalculator.Services
                                          .DefaultTextStyle(x => x.FontSize(12));
                                  }
 
+
+
                                  table.ColumnsDefinition(columns =>
                                  {
                                      columns.RelativeColumn();
@@ -124,39 +149,59 @@ namespace AmortizationScheduleCalculator.Services
                                      columns.RelativeColumn();
                                      columns.RelativeColumn();
 
+
+
                                      //columns.ConstantColumn(75);
                                      //columns.ConstantColumn(75);
+
+
 
                                      //columns.ConstantColumn(75);
                                      //columns.ConstantColumn(75);
                                  });
+
+
 
                                  table.Header(header =>
                                  {
                                      // please be sure to call the 'header' handler!
 
+
+
                                      header.Cell().Element(CellStyle).Text("Date");
                                      header.Cell().Element(CellStyle).Text("Principal");
 
+
+
                                      header.Cell().Element(CellStyle).Text("Interest");
                                      header.Cell().Element(CellStyle).Text("Remaining balance");
+
+
 
                                      // you can extend existing styles by creating additional methods
                                      IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.Grey.Lighten3);
                                  });
 
+
+
                                  foreach (var schedule in schedules)
                                  {
                                      //table.Cell().Element(CellStyle).ExtendHorizontal().AlignLeft().Text(page.name);
 
+
+
                                      var date = schedule.Current_Date;
-                                     string month = date.ToString("MMM").ToUpper().Substring(0,3);
+                                     string month = date.ToString("MMM").ToUpper().Substring(0, 3);
                                      int year = date.Year;
                                      table.Cell().Element(CellStyle).Text(month + " " + year);
                                      table.Cell().Element(CellStyle).Text(schedule.Principal_Paid);
 
+
+
                                      table.Cell().Element(CellStyle).Text(schedule.Interest_Paid);
                                      table.Cell().Element(CellStyle).Text(schedule.Remaining_Loan);
+
+
 
                                      IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.White).ShowOnce();
                                  }
@@ -181,7 +226,12 @@ namespace AmortizationScheduleCalculator.Services
                         });
                 });
             })
-            .GeneratePdf(reqName + ".pdf");
+            .GeneratePdf(stream);
+
+
+
+            stream.Position = 0;
+            return new FileStreamResult(stream, "application/pdf") { FileDownloadName = "Amort Plan " + reqName };
         }
     }
 }
