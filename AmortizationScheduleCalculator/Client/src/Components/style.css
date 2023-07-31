@@ -123,3 +123,31 @@ body {
     background-color: #FFFFFF;
     border: none
 }
+.calculationCenter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center
+}
+.thSchedule {
+    background-color: #526D82;
+    color: #fafdff
+}
+.tdSchedule {
+    background-color: #eef3f6
+}
+
+.inputEl {
+    font-size: 1vw;
+    text-align: center;
+    padding: 10px 10px;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    background-color: #FFFFFF
+}
+
+    .inputEl::placeholder {
+        font-weight: 400;
+        color: #000000
+    }

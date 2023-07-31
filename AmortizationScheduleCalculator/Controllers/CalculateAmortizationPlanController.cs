@@ -131,6 +131,7 @@ namespace AmortizationScheduleCalculator.Controllers
         public async Task<FileStreamResult> GeneratePdf([FromQuery] string reqName)
         {
           return await _pdfgenerator.GeneratePdf(reqName);
+
         }
         
 
