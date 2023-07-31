@@ -59,7 +59,7 @@ namespace AmortizationScheduleCalculator.Services
             additionalMonthlyCosts = scheduleReq.Account_Cost + scheduleReq.Insurance_Cost + scheduleReq.Other_Costs;
             //M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1]
             monthlyPaymentFixed = CalculateMonthly(loanAmount, monthlyInterestRate, numOfPayments) + additionalMonthlyCosts;
-            otherCostsPayment = 12 * additionalMonthlyCosts + scheduleReq.Approval_Cost;
+            otherCostsPayment = numOfPayments* additionalMonthlyCosts + scheduleReq.Approval_Cost;
             
 
             totalLoanCost = monthlyPaymentFixed * numOfPayments;
@@ -81,7 +81,10 @@ namespace AmortizationScheduleCalculator.Services
             int id = await InsertRequestDb(scheduleReq);
             Console.WriteLine("\n SADdsa asddsa as dads das asd sda \n");
             Console.WriteLine(id);
-            
+            scheduleReq.Request_Id = id;
+
+            await updateAuditHistory(id.ToString(), id.ToString()); //first entry in audit history
+
             var currentDate = loanStartDate.Date;
             decimal interestPayment, remainingBalance = loanAmount, principalPayment;
             var scheduleList = new List<Schedule>();
@@ -142,7 +145,7 @@ namespace AmortizationScheduleCalculator.Services
 
        static int count = 0;
 
-       public async Task<List<Schedule>> ApplyPartialPayments(string reqName, Dictionary<int, decimal> missedPayments) {
+       public async Task<AmortizationPlan> ApplyPartialPayments(string reqName, Dictionary<int, decimal> missedPayments) {
 
             Request req = null;
             try
@@ -165,19 +168,27 @@ namespace AmortizationScheduleCalculator.Services
             var totalLoanCost = req.Total_Loan_Cost;
             var currentDate = req.Loan_Start_Date.Date;
             var newName = req.Request_Name;
-
+            var additionalMonthlyCosts = req.Account_Cost + req.Insurance_Cost + req.Other_Costs;
+            Console.WriteLine("THIS SHOULD BE THE CHILD " + req.Request_Id);
+            int childId = req.Request_Id;
             Request editedRequest = req;
             editedRequest.Date_Issued = DateTime.Now;
-            await updateRequest(req.Request_Id.ToString()); //changes display flag to false 
+            //await updateRequest(req.Request_Id.ToString()); //changes display flag to false 
 
             //get the new id to link the new entries
             int id = await InsertRequestDb(editedRequest);
+            Console.WriteLine(id);
+
+            editedRequest.Request_Id = id;
             count++;
             Console.WriteLine(newName);
+            int parentId = await getParentId(childId);
+            Console.WriteLine(parentId);
+            await updateAuditHistory(id.ToString(), parentId.ToString());
 
             bool owed = false, increased=false;
             int i = 0;
-            decimal interestOwed=0, principalOwed=0, owedPayment=0, currentRemainingLoan = req.Loan_Amount;
+            decimal interestOwed=0, principalOwed=0, owedPayment=0, currentRemainingLoan = req.Loan_Amount, otherCostsOwed=0;
             while (i<numOfPayments)
             {
                 Schedule newEntry = new Schedule();
@@ -212,9 +223,12 @@ namespace AmortizationScheduleCalculator.Services
                     }
                     //add assumed interest to owed
                     interestOwed += newEntry.Interest_Paid;
+                    if (i == 0) otherCostsOwed += additionalMonthlyCosts + req.Approval_Cost;
+                    else otherCostsOwed += additionalMonthlyCosts;
                     
                     //new interest calculated (default case for when ifs below dont happen)
-                    newEntry.Interest_Paid = missedPayment - newEntry.Principal_Paid;
+                    if(i==0) newEntry.Interest_Paid = missedPayment - newEntry.Principal_Paid - additionalMonthlyCosts-req.Approval_Cost;
+                    else newEntry.Interest_Paid = missedPayment - newEntry.Principal_Paid - additionalMonthlyCosts;
 
                     //if theres not enough money in missed payment to cover interest and principal even partly, missed payment goes to principal first
 
@@ -223,30 +237,42 @@ namespace AmortizationScheduleCalculator.Services
                     {
                         //principal will be exactly what is owed bcs missed can cover it
                         newEntry.Principal_Paid = principalOwed;
-                        //interest is whole missed minus principal
-                        newEntry.Interest_Paid = missedPayment - newEntry.Principal_Paid;
+                        if (missedPayment - principalOwed >= interestOwed) {//can also cover whole interest
+                            newEntry.Interest_Paid = interestOwed;
+                            newEntry.Monthly_Costs = missedPayment - principalOwed - interestOwed;
+                        }
+                        else
+                        {
+                            newEntry.Interest_Paid = missedPayment - newEntry.Principal_Paid;
+                            newEntry.Monthly_Costs = 0;
+
+                        }
                     }
                     //if missed covers only principal nothing goes for interest
                     else if (missedPayment <= newEntry.Principal_Paid) {
                         newEntry.Principal_Paid = missedPayment;
                         newEntry.Interest_Paid = 0;
+                        newEntry.Monthly_Costs = 0;
                     }
                     //could collapse these two else ifs into one
                     //same logic for increased list payments, but comparing with principalOwed since assumed principal is 0 for those
                     else if (missedPayment <= principalOwed && increased) {
                         newEntry.Principal_Paid = missedPayment;
                         newEntry.Interest_Paid = 0;
+                        newEntry.Monthly_Costs = 0;
+
                     }
 
                     //in case some interest was paid subtract that from owed
                     interestOwed -= newEntry.Interest_Paid;
+                    otherCostsOwed -= newEntry.Monthly_Costs;
 
                     //update current remaining loan and store to new entry
                     currentRemainingLoan -= newEntry.Principal_Paid;
                     newEntry.Remaining_Loan = currentRemainingLoan;
                     
                     //principal is owed altogether minus interest owed
-                    principalOwed = owedPayment - interestOwed;
+                    principalOwed = owedPayment - interestOwed-otherCostsOwed;
                     
                     
                     //add the new entry to the db
@@ -274,6 +300,7 @@ namespace AmortizationScheduleCalculator.Services
                         newEntry.Monthly_Paid = owedPayment;
                         newEntry.Principal_Paid = principalOwed;
                         newEntry.Interest_Paid = interestOwed;
+                        newEntry.Monthly_Costs = otherCostsOwed;
                        
                         //subtract principal
                         currentRemainingLoan -= newEntry.Principal_Paid;
@@ -287,6 +314,7 @@ namespace AmortizationScheduleCalculator.Services
                         newEntry.Monthly_Paid += owedPayment;
                         newEntry.Principal_Paid += principalOwed;
                         newEntry.Interest_Paid += interestOwed;
+                        newEntry.Monthly_Costs += otherCostsOwed;
                         
                         //update remaining loan
                         currentRemainingLoan -= newEntry.Principal_Paid;
@@ -296,6 +324,7 @@ namespace AmortizationScheduleCalculator.Services
                         owedPayment = 0;
                         interestOwed = 0;
                         principalOwed = 0;
+                        otherCostsOwed = 0;
                     }
                     //add the entry
                     await InsertScheduleDb(newEntry);
@@ -303,11 +332,11 @@ namespace AmortizationScheduleCalculator.Services
                 }
                 i++;
             }
-            return editedPlan;
+            return new AmortizationPlan { Schedules = editedPlan, Summary = editedRequest };
         }
 
 
-        public async Task<List<Schedule>> ApplyEarlyPayments(string reqName, Dictionary<int, decimal> earlyPayments)
+        public async Task<AmortizationPlan> ApplyEarlyPayments(string reqName, Dictionary<int, decimal> earlyPayments)
         {
             Request req = null;
             try
@@ -332,7 +361,7 @@ namespace AmortizationScheduleCalculator.Services
             var currentDate = req.Loan_Start_Date.Date;
             var monthlyInterestRate = (req.Interest_Rate/100) / 12;
             var newName = req.Request_Name;
-            
+            var childId = req.Request_Id;
             Request editedRequest = req;
             editedRequest.Date_Issued = DateTime.Now;
 
@@ -340,8 +369,11 @@ namespace AmortizationScheduleCalculator.Services
 
             //get the new id to link the new entries
             int id = await InsertRequestDb(editedRequest);
+            editedRequest.Request_Id = id;
             count++;
             Console.WriteLine(newName);
+            int parentId = await getParentId(childId);
+            await updateAuditHistory(id.ToString(), parentId.ToString());
 
             decimal advancePayment=0, currentRemainingLoan= req.Loan_Amount; //at beginning equal to total loan amount
             double interestRatio;
@@ -398,7 +430,7 @@ namespace AmortizationScheduleCalculator.Services
                 editedPlan.Add(newEntry);
                 i++;
             }
-            return editedPlan;
+            return new AmortizationPlan { Schedules = editedPlan, Summary = editedRequest };
         }
 
         public async Task<AmortizationPlan> getSchedule(string reqId)
@@ -414,14 +446,48 @@ namespace AmortizationScheduleCalculator.Services
         }
         public async Task<Request> getRequest(string reqId)
         {
-            return ((await _db.QueryAsync<Request>("select * from \"Request\" where request_id = @id and last_version=@value",
-                new { id = Int32.Parse(reqId), value=true })).First());
+            return ((await _db.QueryAsync<Request>("select * from \"Request\" where request_id = @id",
+                new { id = Int32.Parse(reqId)})).First());
         }
 
         public async Task<Request> updateRequest(string reqId)
         {
             return  _db.QueryFirstOrDefault<Request>("UPDATE \"Request\" SET last_version = @value WHERE last_version = @value1 and request_id = @id",
                 new { id = Int32.Parse(reqId),value=false,value1=true });
+        }
+
+        public async Task<int> getParentId(int childId) {
+            var parentId = ( _db.QueryFirstOrDefault<int>("select parent_request_id from audithistory where child_request_id=@childId",
+                new { childId = childId }));
+            return parentId;
+        }
+
+        public async Task updateAuditHistory(string childReqId, string parentReqId)
+        {
+            Request childReq = await getRequest(childReqId);
+            var auditEntry = new AuditHistoryEntry();
+            auditEntry.Issuer = childReq.Issuer;
+            auditEntry.Date_Issued = childReq.Date_Issued;
+            auditEntry.Child_Request_Id = childReq.Request_Id;
+            auditEntry.Parent_Request_Id = Int32.Parse(parentReqId);
+            await _db.ExecuteAsync("insert into \"audithistory\" (issuer,date_issued,child_request_id,parent_request_id) " +
+                   "\r\nvalues (@Issuer,@Date_Issued,@Child_Request_Id,@Parent_Request_Id)", auditEntry);
+
+        }
+
+        public async Task<List<Request>> getAuditHistory(string parentReqId)
+        {
+            var childrenRequestIds = (await _db.QueryAsync<int>("select child_request_id from \"audithistory\" where parent_request_id=@parentId", 
+                new { parentId = Int32.Parse(parentReqId)})).ToList();
+
+            string childIds = string.Join(",", childrenRequestIds);
+            Console.WriteLine("child ids "+childIds);
+            string sqlQuery = $"SELECT * FROM Request WHERE RequestID IN ({childIds})";
+
+            var childRequests = (await _db.QueryAsync<Request>("SELECT * FROM \"Request\" WHERE request_id = ANY(@childIds)", new {childIds= childrenRequestIds.ToArray() })).ToList();
+
+            return childRequests;
+
         }
 
     }
