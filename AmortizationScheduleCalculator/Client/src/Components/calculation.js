@@ -63,21 +63,19 @@ class Calculation extends React.Component {
         return graphData;
     };
 
-     formatDate1 = (inputDate) => {
-        const dateParts = inputDate.split(' ')[0].split('-');
-        const day = dateParts[2];
-        const month = dateParts[1];
-        const year = dateParts[0];
-
-        return `${day}/${month}/${year}`;
-    };
+    //formatDate1 = (inputDate) => {
+    //    const [datePart, monthPart, yearPart] = inputDate.split(/[T/]/);
+    //    const day = datePart.slice(0, 2);
+    //    const month = monthPart.padStart(2, '0');
+    //    const year = yearPart;
+    //    const formattedDate = `${day}/${month}/${year}`;
+    //    this.setState({ formattedDate });
+    //};
 
 
     render() {
         const summaryData = this.props.data;
         const schedulesData = this.props.schedule;
-
-        const { editable, inputValue } = this.state;
 
         let loanAm = this.props.amount;
         let loanP = this.props.period;
@@ -109,6 +107,13 @@ class Calculation extends React.Component {
             }}>
                 <div className="container">
                     <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-3 border-bottom">
+                        <div>
+                            <button className="uniButton" onClick={() => this.QSetViewInParent({ page: "profile" })}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left" viewBox="0 0 16 16">
+                                    <path fillRule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z" />
+                                </svg>
+                            </button>
+                        </div>
                         <div className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-person" viewBox="0 0 16 16">
                                 <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
@@ -172,7 +177,7 @@ class Calculation extends React.Component {
                                                 <input type="number" className="inputEl" disabled={(this.state.disabled) ? "disabled" : ""} placeholder={loanP} />
                                             </td>
                                             <td className="tdElement">
-                                                <input className="inputEl" disabled={(this.state.disabled) ? "disabled" : ""} placeholder={this.formatDate1(loanS)}  />
+                                                <input type="date" className="inputEl" disabled={(this.state.disabled) ? "disabled" : ""} placeholder={loanS}  />
                                             </td>
                                             <td className="tdElement">
                                                 <input type="number" className="inputEl" disabled={(this.state.disabled) ? "disabled" : ""} placeholder={rate} />
