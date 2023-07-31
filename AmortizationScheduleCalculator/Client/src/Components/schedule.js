@@ -66,7 +66,6 @@ class Schedule extends React.Component {
 
 
     render() {
-
         let data = this.state.schedule;
         const name = localStorage.getItem('name');
         const surname = localStorage.getItem('surname');
@@ -139,6 +138,7 @@ class Schedule extends React.Component {
                                     <th className="thSchedule" style={{ backgroundColor: "#526D82", color: "#fafdff" }} scope='col'>Monthly payment</th>
                                     <th className="thSchedule" style={{ backgroundColor: "#526D82", color: "#fafdff" }} scope='col'>Principal</th>
                                     <th className="thSchedule" style={{ backgroundColor: "#526D82", color: "#fafdff" }} scope='col'>Interest</th>
+                                    <th className="thSchedule" style={{ backgroundColor: "#526D82", color: "#fafdff" }} scope='col'>Monthly costs</th>
                                     <th className="thSchedule" style={{ backgroundColor: "#526D82", color: "#fafdff" }} scope='col'>Remaining balance</th>
                                 </tr>
                             </MDBTableHead>
@@ -152,6 +152,7 @@ class Schedule extends React.Component {
                                                 <td style={{ backgroundColor: "#eef3f6" }}>{d.monthly_Paid}&euro;</td>
                                                 <td style={{ backgroundColor: "#eef3f6" }}>{d.principal_Paid}&euro;</td>
                                                 <td style={{ backgroundColor: "#eef3f6" }}>{d.interest_Paid}&euro;</td>
+                                                <td style={{ backgroundColor: "#eef3f6" }}>{d.monthly_Costs}&euro;</td>
                                                 <td style={{ backgroundColor: "#eef3f6" }}>{d.remaining_Loan}&euro;</td>
                                             </tr>
                                         </MDBTableBody>

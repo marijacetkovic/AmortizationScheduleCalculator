@@ -106,10 +106,8 @@ class history extends React.Component {
     };
 
     render() {
-        //this.setState({ render: false })
 
         let data = this.state.calculation;
-        //let lastElement = data.length > 0 ? data[data.length - 1] : null;
         const name = localStorage.getItem('name');
         const surname = localStorage.getItem('surname');
 

@@ -3,11 +3,11 @@ import axios from "axios";
 import "./style.css";
 import { MDBTable, MDBTableHead, MDBTableBody } from 'mdb-react-ui-kit';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import "./style.css";
 
 
 
-
-class Calculation extends React.Component {
+class editCalculation extends React.Component {
 
     constructor(props) {
         super(props);
@@ -23,8 +23,8 @@ class Calculation extends React.Component {
     };
 
     handleClik() {
-        this.setState({ disabled: !this.state.disabled , placeholder1: ""})
-    } 
+        this.setState({ disabled: !this.state.disabled, placeholder1: "" })
+    }
 
     handleP() {
         this.setState({ placeholder1: this.props.amount })
@@ -108,21 +108,9 @@ class Calculation extends React.Component {
 
 
     render() {
-        const summaryData = this.props.data;
+        const summaryData = this.props.editCalSummary;
         console.log(summaryData)
-        const schedulesData = this.props.schedule;
-
-        //let loanAm = this.props.amount;
-        //let loanP = this.props.period;
-        //let loanS = this.props.start;
-        //let rate = this.props.rate;
-        //let app = this.props.approval;
-        //let ins = this.props.insuren;
-        //let other = this.props.other;
-        //let account = this.props.loanaccount;
-
-        console.log(this.props.data)
-
+        const schedulesData = this.props.editCalSchedule;
         console.log(schedulesData);
 
 
@@ -165,68 +153,9 @@ class Calculation extends React.Component {
                     </header>
                 </div>
 
-                {/*<div>*/}
-                    {/*<div className="card"  style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>*/}
-                    {/*    <div className="card-body">*/}
-                    {/*        <div>*/}
-                    {/*            <div style={{ display: "flex", minWidth: "600px" }}>*/}
-                    {/*                <div style={{ marginRight: "auto" }} className="thElement">  Input </div>*/}
-                    {/*                <div className="thElement">  </div>*/}
+                <div>edit calculation</div>
 
-                    {/*                <button onClick={() => this.getPdf(summaryData.request_Id)} className="defaultButton">*/}
-                    {/*                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="18" fill="currentColor" className="bi bi-filetype-pdf" viewBox="0 0 16 16">*/}
-                    {/*                        <path fillRule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM1.6 11.85H0v3.999h.791v-1.342h.803c.287 0 .531-.057.732-.173.203-.117.358-.275.463-.474a1.42 1.42 0 0 0 .161-.677c0-.25-.053-.476-.158-.677a1.176 1.176 0 0 0-.46-.477c-.2-.12-.443-.179-.732-.179Zm.545 1.333a.795.795 0 0 1-.085.38.574.574 0 0 1-.238.241.794.794 0 0 1-.375.082H.788V12.48h.66c.218 0 .389.06.512.181.123.122.185.296.185.522Zm1.217-1.333v3.999h1.46c.401 0 .734-.08.998-.237a1.45 1.45 0 0 0 .595-.689c.13-.3.196-.662.196-1.084 0-.42-.065-.778-.196-1.075a1.426 1.426 0 0 0-.589-.68c-.264-.156-.599-.234-1.005-.234H3.362Zm.791.645h.563c.248 0 .45.05.609.152a.89.89 0 0 1 .354.454c.079.201.118.452.118.753a2.3 2.3 0 0 1-.068.592 1.14 1.14 0 0 1-.196.422.8.8 0 0 1-.334.252 1.298 1.298 0 0 1-.483.082h-.563v-2.707Zm3.743 1.763v1.591h-.79V11.85h2.548v.653H7.896v1.117h1.606v.638H7.896Z" />*/}
-                    {/*                    </svg>*/}
-                    {/*                </button>*/}
-
-                    {/*                <button onClick={this.handleClik.bind(this)} className="defaultButton">*/}
-                    {/*                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">*/}
-                    {/*                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />*/}
-                    {/*                        <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />*/}
-                    {/*                    </svg>*/}
-                    {/*                </button>*/}
-
-
-                    {/*            </div>*/}
-                    {/*            <hr></hr>*/}
-                    {/*            <MDBTable borderless responsive style={{ minWidth: "600px", margin: "auto" }}>*/}
-                    {/*                <MDBTableHead >*/}
-                    {/*                    <tr>*/}
-                    {/*                        <th className="thElement" scope='col'> Loan amount</th>*/}
-                    {/*                        <th className="thElement" scope='col'> Loan period</th>*/}
-                    {/*                        <th className="thElement" scope='col'> Loan start</th>*/}
-                    {/*                        <th className="thElement" scope='col'> Loan interest rate</th>*/}
-                    {/*                        */}{/*<th className="thElement" scope='col'> Approval</th>*/}
-                    {/*                        */}{/*<th className="thElement" scope='col'> Insurence</th>*/}
-                    {/*                        */}{/*<th className="thElement" scope='col'> Account</th>*/}
-                    {/*                        */}{/*<th className="thElement" scope='col'> Other costs</th>*/}
-                    {/*                    </tr>*/}
-                    {/*                </MDBTableHead>*/}
-                    {/*                <MDBTableBody >*/}
-                    {/*                    <tr>*/}
-                    {/*                        <td className="tdElement">*/}
-                    {/*                            <input type="number" className="inputEl" disabled={(this.state.disabled) ? "disabled" : ""} placeholder={loanAm} /> */}
-                    {/*                        </td>*/}
-                    {/*                        <td className="tdElement">*/}
-                    {/*                            <input type="number" className="inputEl" disabled={(this.state.disabled) ? "disabled" : ""} placeholder={loanP} />*/}
-                    {/*                        </td>*/}
-                    {/*                        <td className="tdElement">*/}
-                    {/*                            <input type="date" className="inputEl" disabled={(this.state.disabled) ? "disabled" : ""} placeholder={loanS}  />*/}
-                    {/*                        </td>*/}
-                    {/*                        <td className="tdElement">*/}
-                    {/*                            <input type="number" className="inputEl" disabled={(this.state.disabled) ? "disabled" : ""} placeholder={rate} />*/}
-                    {/*                        </td>*/}
-                    {/*                    </tr>*/}
-                    {/*                </MDBTableBody>*/}
-                    {/*            </MDBTable>*/}
-
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
-                {/*</div>*/}
-                    
-
-                {summaryData  ?
+                {summaryData ?
                     <div>
 
                         <div style={{ overflowX: "auto" }}>
@@ -234,18 +163,18 @@ class Calculation extends React.Component {
                                 <div className="col" style={{ margin: "auto", marginTop: "5%" }}>
                                     <div className="card" style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
                                         <div className="card-body">
-                                            <div style={{ display: "flex"}}>
+                                            <div style={{ display: "flex" }}>
                                                 <p style={{ marginRight: "auto", fontWeight: "bolder", fontSize: "20px" }} className="card-text">SUMMARY</p>
                                                 <button onClick={() => this.getPdf(summaryData.request_Id)} className="defaultButton">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="18" fill="currentColor" className="bi bi-filetype-pdf" viewBox="0 0 16 16">
-                                                         <path fillRule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM1.6 11.85H0v3.999h.791v-1.342h.803c.287 0 .531-.057.732-.173.203-.117.358-.275.463-.474a1.42 1.42 0 0 0 .161-.677c0-.25-.053-.476-.158-.677a1.176 1.176 0 0 0-.46-.477c-.2-.12-.443-.179-.732-.179Zm.545 1.333a.795.795 0 0 1-.085.38.574.574 0 0 1-.238.241.794.794 0 0 1-.375.082H.788V12.48h.66c.218 0 .389.06.512.181.123.122.185.296.185.522Zm1.217-1.333v3.999h1.46c.401 0 .734-.08.998-.237a1.45 1.45 0 0 0 .595-.689c.13-.3.196-.662.196-1.084 0-.42-.065-.778-.196-1.075a1.426 1.426 0 0 0-.589-.68c-.264-.156-.599-.234-1.005-.234H3.362Zm.791.645h.563c.248 0 .45.05.609.152a.89.89 0 0 1 .354.454c.079.201.118.452.118.753a2.3 2.3 0 0 1-.068.592 1.14 1.14 0 0 1-.196.422.8.8 0 0 1-.334.252 1.298 1.298 0 0 1-.483.082h-.563v-2.707Zm3.743 1.763v1.591h-.79V11.85h2.548v.653H7.896v1.117h1.606v.638H7.896Z" />
+                                                        <path fillRule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM1.6 11.85H0v3.999h.791v-1.342h.803c.287 0 .531-.057.732-.173.203-.117.358-.275.463-.474a1.42 1.42 0 0 0 .161-.677c0-.25-.053-.476-.158-.677a1.176 1.176 0 0 0-.46-.477c-.2-.12-.443-.179-.732-.179Zm.545 1.333a.795.795 0 0 1-.085.38.574.574 0 0 1-.238.241.794.794 0 0 1-.375.082H.788V12.48h.66c.218 0 .389.06.512.181.123.122.185.296.185.522Zm1.217-1.333v3.999h1.46c.401 0 .734-.08.998-.237a1.45 1.45 0 0 0 .595-.689c.13-.3.196-.662.196-1.084 0-.42-.065-.778-.196-1.075a1.426 1.426 0 0 0-.589-.68c-.264-.156-.599-.234-1.005-.234H3.362Zm.791.645h.563c.248 0 .45.05.609.152a.89.89 0 0 1 .354.454c.079.201.118.452.118.753a2.3 2.3 0 0 1-.068.592 1.14 1.14 0 0 1-.196.422.8.8 0 0 1-.334.252 1.298 1.298 0 0 1-.483.082h-.563v-2.707Zm3.743 1.763v1.591h-.79V11.85h2.548v.653H7.896v1.117h1.606v.638H7.896Z" />
                                                     </svg>
                                                 </button>
                                                 <button onClick={() => this.QSetViewInParent({ page: "editschedule", editnew: summaryData })} className="defaultButton">
-                                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
-                                                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                                                          <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
-                                                     </svg>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
+                                                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                                        <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                                                    </svg>
                                                 </button>
                                             </div>
 
@@ -281,7 +210,7 @@ class Calculation extends React.Component {
                         <br></br>
 
                         <div>
-                            <LineChart 
+                            <LineChart
                                 width={900}
                                 height={400}
                                 data={this.getGraphData(schedulesData)}
@@ -294,15 +223,15 @@ class Calculation extends React.Component {
 
                             >
                                 <CartesianGrid />
-                                
+
                                 <XAxis dataKey="Date" />
-                                <YAxis/>
-                                <Tooltip/>
-                                <Legend/>
+                                <YAxis />
+                                <Tooltip />
+                                <Legend />
                                 <Line type="monotone" dataKey="Principal" stroke="#8884d8" />
-                                <Line type="monotone" dataKey="Interest" stroke="#d990d8"  />
+                                <Line type="monotone" dataKey="Interest" stroke="#d990d8" />
                                 <Line type="monotone" dataKey="Balance" stroke="#82ca9d" />
-                                </LineChart>
+                            </LineChart>
 
                         </div>
 
@@ -311,7 +240,7 @@ class Calculation extends React.Component {
                             <MDBTable striped hover style={{ maxWidth: "1150px", margin: "auto", marginTop: "60px" }}>
                                 <MDBTableHead >
                                     <tr>
-                                        <th style={{ backgroundColor: "#526D82", color:"#DDE6ED" }} scope='col'>Date</th>
+                                        <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Date</th>
                                         <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Monthly payment</th>
                                         <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Principal</th>
                                         <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Interest</th>
@@ -344,12 +273,12 @@ class Calculation extends React.Component {
                     </div>
                     : "Loading.."}
 
-               
 
-                
+
+
             </div>
         );
     }
 }
 
-export default Calculation;
+export default editCalculation;

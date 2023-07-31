@@ -95,11 +95,6 @@ class Profile extends React.Component {
             .catch(err => {
                 console.log(err)
                 console.log(err.response.data);
-                 //const errorMessage = err.response?.data?.message; // Access the error message from the response data
-                 //if (err.response.data === "Minimal loan amount is 1,000€.") {
-                 //    alert("Minimal loan amount is 1,000€.")
-                 //    return;
-                 //}
                 alert(err.response.data)
 
             })
@@ -120,11 +115,10 @@ class Profile extends React.Component {
         const { errorMessages } = this.state;
         const name = localStorage.getItem('name');
         const surname = localStorage.getItem('surname');
-        const edited = this.props.editSchedule;
+        //const edited = this.props.editSchedule;
 
-        console.log(edited)
 
-       // if (edited === []) {
+       // if (edited === {}) {
 
             return (
                 <div>
@@ -237,11 +231,10 @@ class Profile extends React.Component {
 
                 </div>
             );
-       // }
-
+       //}
         //else {
 
-        //    return (
+        //   return (
         //        <div>
 
         //            <div className="container">
@@ -249,7 +242,7 @@ class Profile extends React.Component {
         //                    <div className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
         //                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-person" viewBox="0 0 16 16">
         //                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
-        //                        </svg>
+        //                       </svg>
         //                        <div>{name} {" "} {surname}</div>
 
         //                    </div>
@@ -274,7 +267,7 @@ class Profile extends React.Component {
 
 
         //                    <div className="form-floating">
-        //                        <input onChange={(e) => this.QGetTextFromField(e)} type="text" className="form-control" id="floatingInput" placeholder="" name="nameFor" style={{ paddingLeft: '25px' }} value={this.props.editSchedule.request_Name} ></input>
+        //                       <input onChange={(e) => this.QGetTextFromField(e)} type="text" className="form-control" id="floatingInput" placeholder="" name="nameFor" style={{ paddingLeft: '25px' }} value={edited.request_Name }></input>
 
         //                        <label>Request name</label>
         //                    </div>
@@ -302,7 +295,7 @@ class Profile extends React.Component {
         //                        <label>Loan start</label>
         //                    </div>
 
-        //                    <div className="form-floating">
+        //                   <div className="form-floating">
         //                        <span className="spanInput"
         //                        >
         //                            %
@@ -313,7 +306,7 @@ class Profile extends React.Component {
 
         //                    <div className="form-floating">
         //                        <span className="spanInput">
-        //                            €
+        //                           €
         //                        </span>
         //                        <input onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingApproval" placeholder="" name="approval" style={{ paddingLeft: '25px' }} min={1}></input>
         //                        <label>Approval</label>
@@ -342,7 +335,6 @@ class Profile extends React.Component {
         //                        <input onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingCosts" placeholder="" name="costs" style={{ paddingLeft: '25px' }} min={1}></input>
         //                        <label>Other costs</label>
         //                    </div>
-
         //                    <br></br>
 
         //                    <button onClick={() => this.QPostField()} className="buttona" type="button">Calculate</button>
@@ -352,7 +344,7 @@ class Profile extends React.Component {
 
         //        </div>
         //    );
-        //};
+      //  };
     }
 
 }

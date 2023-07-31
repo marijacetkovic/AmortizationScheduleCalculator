@@ -20,7 +20,7 @@ namespace AmortizationScheduleCalculator.Services
             _register = register; 
             
         }
-        public async Task<AmortizationPlan>  CreateNewCalculation( Request scheduleReq)
+        public async Task<AmortizationPlan>  CreateNewCalculation(Request scheduleReq)
         {
             if (scheduleReq.Loan_Amount < 1000)
             {
@@ -59,7 +59,7 @@ namespace AmortizationScheduleCalculator.Services
             additionalMonthlyCosts = scheduleReq.Account_Cost + scheduleReq.Insurance_Cost + scheduleReq.Other_Costs;
             //M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1]
             monthlyPaymentFixed = CalculateMonthly(loanAmount, monthlyInterestRate, numOfPayments) + additionalMonthlyCosts;
-            otherCostsPayment = 12 * additionalMonthlyCosts + scheduleReq.Approval_Cost;
+            otherCostsPayment =numOfPayments * additionalMonthlyCosts + scheduleReq.Approval_Cost;
             
 
             totalLoanCost = monthlyPaymentFixed * numOfPayments;
@@ -81,6 +81,7 @@ namespace AmortizationScheduleCalculator.Services
             int id = await InsertRequestDb(scheduleReq);
             Console.WriteLine("\n SADdsa asddsa as dads das asd sda \n");
             Console.WriteLine(id);
+            scheduleReq.Request_Id = id;
             
             var currentDate = loanStartDate.Date;
             decimal interestPayment, remainingBalance = loanAmount, principalPayment;
