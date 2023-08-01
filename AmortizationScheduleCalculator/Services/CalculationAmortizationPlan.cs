@@ -20,7 +20,16 @@ namespace AmortizationScheduleCalculator.Services
             _register = register; 
             
         }
-        public async Task<AmortizationPlan>  CreateNewCalculation( Request scheduleReq)
+        public async Task<AmortizationPlan> EditCalculation(Request scheduleReq,string originalId)
+        {
+            //set original to not visible 
+            await updateRequest(originalId);
+            //create new calculation
+            var resReq = await CreateNewCalculation(scheduleReq);
+            return resReq;
+        }
+
+        public async Task<AmortizationPlan>  CreateNewCalculation(Request scheduleReq)
         {
             if (scheduleReq.Loan_Amount < 1000)
             {
@@ -173,7 +182,7 @@ namespace AmortizationScheduleCalculator.Services
             int childId = req.Request_Id;
             Request editedRequest = req;
             editedRequest.Date_Issued = DateTime.Now;
-            //await updateRequest(req.Request_Id.ToString()); //changes display flag to false 
+            await updateRequest(req.Request_Id.ToString()); //changes display flag to false 
 
             //get the new id to link the new entries
             int id = await InsertRequestDb(editedRequest);
@@ -375,7 +384,7 @@ namespace AmortizationScheduleCalculator.Services
             int parentId = await getParentId(childId);
             await updateAuditHistory(id.ToString(), parentId.ToString());
 
-            decimal advancePayment=0, currentRemainingLoan= req.Loan_Amount; //at beginning equal to total loan amount
+            decimal currentRemainingLoan= req.Loan_Amount; //at beginning equal to total loan amount
             double interestRatio;
             bool paidInAdvance=false;
             int i = 0;
@@ -475,12 +484,12 @@ namespace AmortizationScheduleCalculator.Services
 
         }
 
-        public async Task<List<Request>> getAuditHistory(string parentReqId)
+        public async Task<List<Request>> getAuditHistory(string lastChildID)
         {
+            var parentReqId = await getParentId(Int32.Parse(lastChildID));
             var childrenRequestIds = (await _db.QueryAsync<int>("select child_request_id from \"audithistory\" where parent_request_id=@parentId", 
-                new { parentId = Int32.Parse(parentReqId)})).ToList();
+                new { parentId = parentReqId})).ToList();
             var childRequests = (await _db.QueryAsync<Request>("SELECT * FROM \"Request\" WHERE request_id = ANY(@childIds)", new {childIds= childrenRequestIds.ToArray() })).ToList();
-
             return childRequests;
 
         }

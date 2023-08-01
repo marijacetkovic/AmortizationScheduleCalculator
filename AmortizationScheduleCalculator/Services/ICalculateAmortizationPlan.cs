@@ -5,6 +5,8 @@ namespace AmortizationScheduleCalculator.Services
     public interface ICalculateAmortizationPlan
     {
         Task<AmortizationPlan> CreateNewCalculation(Request request);
+        Task<AmortizationPlan> EditCalculation(Request scheduleReq, string originalId);
+
         Task<AmortizationPlan> ApplyPartialPayments(string reqName, Dictionary<int, decimal> missedPayments);
         Task<AmortizationPlan> ApplyEarlyPayments(string reqName, Dictionary<int, decimal> earlyPayments);
         Task<AmortizationPlan> getSchedule(string reqName);
