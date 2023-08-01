@@ -16,8 +16,6 @@ class EditSchedule extends React.Component {
                 period: "",
                 start: "",
                 rate: "",
-                
-
             },
             showPartialPaymentFields: false,
             partialPayments: [],
@@ -30,6 +28,7 @@ class EditSchedule extends React.Component {
             const updatedPartialPayments = prevState.partialPayments.map((payment, i) =>
                 i === index ? { value } : payment
             );
+            console.log(updatedPartialPayments)
             return { partialPayments: updatedPartialPayments };
         });
     };
@@ -67,47 +66,55 @@ class EditSchedule extends React.Component {
                         />
                         <label>Fee</label>
                     </div>
-                    {partialPayments.map((payment, index) => (
+
+                    {partialPayments.map((numMonth, payment, index) => (
                         <div style={{ display: "flex", flexDirection: "row" }}>
 
-                            <div key={index} className="form-floating">
-                            <input
-                                onChange={(e) => this.handlePartialPaymentChange(index, e.target.value)}
-                                type="number"
-                                className="form-control"
-                                id={`floatingPartialPayment${index}`}
-                                placeholder=""
-                                name="partialPayment"
-                                style={{ paddingLeft: '25px' }}
-                                min={1}
-                                value={payment.value}
-                            />
-                                <label>Number of payment </label>
-                            </div>
+                            <div key={index}>
+                                <div className="form-floating">
 
-                            <div className="form-floating">
-                                <span className="spanInput">&euro;</span>
-                                <input
-                                    onChange={(e) => this.handlePartialPaymentChange(index, e.target.value)}
-                                    type="number"
-                                    className="form-control"
-                                    id={`floatingPartialPayment${index}`}
-                                    placeholder=""
-                                    name="partialPayment"
-                                    style={{ paddingLeft: '25px' }}
-                                    min={1}
-                                    value={payment.value}
-                                />
-                                <label>Amount</label>
+                                    <input
+                                        onChange={(e) => this.handlePartialPaymentChange(index, e.target.value)}
+                                        type="number"
+                                        className="form-control"
+                                        id={`floatingPartialPayment${index}`}
+                                        placeholder=""
+                                        name="partialPaymentNum"
+                                        style={{ paddingLeft: '25px' }}
+                                        min={1}
+                                        //value={numMonth.value}
+                                    />
+                                    <label>Number of payment </label>
+                                </div>
+
+                                <div className="form-floating">
+
+                                        <span className="spanInput">&euro;</span>
+                                        <input
+                                            onChange={(e) => this.handlePartialPaymentChange(index, e.target.value)}
+                                            type="number"
+                                            className="form-control"
+                                            id={`floatingPartialPayment${index}`}
+                                            placeholder=""
+                                            name="partialPaymentAmount"
+                                            style={{ paddingLeft: '25px' }}
+                                            min={1}
+                                            //value={payment.value}
+                                        />
+                                        <label>Amount</label>
+                                </div>
                             </div>
 
                         </div>
                     ))}
-                    <button onClick={this.handleAddOneMoreField} style={{ backgroundColor: "#526D82", borderRadius: "60px" , border: "none"}}  >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="25" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <br></br>
+                    <div style={{ textAlign: "right" }}>
+                    <button onClick={this.handleAddOneMoreField} style={{ backgroundColor: "#526D82", borderRadius: "60px", border: "none", textAlign: "right" }}  >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="25"  class="bi bi-plus" viewBox="0 0 16 16">
                             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
                         </svg>
-                    </button>
+                        </button>
+                    </div>
                 </>
             );
         }
@@ -127,8 +134,6 @@ class EditSchedule extends React.Component {
             errorMessages.error = 'Required fields cannot be empty.';
         }
 
-        // Add validations for other input fields if needed...
-
         this.setState({ errorMessages });
 
         // Return true if all fields are valid, otherwise return false
@@ -138,17 +143,19 @@ class EditSchedule extends React.Component {
     //put the fields
     QPostField = () => {
 
+        console.log(this.props.editSchedule)
         const edited = this.props.editSchedule;
+       
 
         const isValid = this.validateInput();
-        console.log(isValid)
+
+        console.log(isValid);
+
         if (!isValid) {
-            // Handle form validation errors
-            //alert('Please fill in all required fields correctly.');
             return;
         }
 
-        axios.post('https://localhost:7224/CalculateAmortizationPlan',
+        axios.post('https://localhost:7224/CalculateAmortizationPlan/edit',
             {
                 request_Id: 0,
                 request_Name: edited.request_Name,
@@ -171,25 +178,66 @@ class EditSchedule extends React.Component {
             },
             {
                 headers: {
-
                     Authorization: `Bearer ${localStorage.getItem('token')}`
+                },
+                params: {
+                    reqId: edited.request_Id + ""
                 }
             })
             .then(response => {
-                console.log(response.data)
+                console.log(response.data.summary)
                 console.log("Sent to server...")
+
                 this.props.QIDFromChild({
-                    page: "editcalculation", editSum: response.data.summary, editSchedules: response.data.schedules
-                })
-            })
-            .catch(err => {
+                    page: "editcalculation", editSum: response.data.summary, editSchedules: response.data.schedules })
+
+                //const partialPaymentsValues = this.state.partialPayments.map(payment => payment.value);
+
+                //axios.post('https://localhost:7224/CalculateAmortizationPlan/applypartial',
+                //    {
+                //        //additionalProp1: 0,
+                //        //additionalProp2: 0,
+                //        //additionalProp3: 0,
+                //        //...partialPaymentsValues.reduce((obj, value, index) => {
+                //        //    obj[`additionalProp${index + 1}`] = value;
+                //        //    return obj;
+                //        //}, {}),
+                //    },
+                //    {
+                //        headers: {
+                //            Authorization: `Bearer ${localStorage.getItem('token')}`
+                //        },
+                //        params:
+                //        {
+                //            reqName: response.data //promeni
+                //        }
+                //    }).then(secondResponse => {
+                //        console.log('Second POST request successful:', secondResponse.data);
+
+                //        this.props.QIDFromChild({
+                //            page: "editcalculation", editSum: response.data.summary, editSchedules: response.data.schedules
+
+                //        }).catch(err => {
+                //            console.log('Error in second POST request:', err);
+                //        });
+
+                //    })
+                //    .catch(err => {
+                //        console.log(err)
+                //        console.log(err.response.data);
+                //        alert(err.response.data)
+
+                //    })
+
+            }).catch(err => {
                 console.log(err)
                 console.log(err.response.data);
                 alert(err.response.data)
 
             })
-        //this.props.QIDFromChild({ page: "editcalculation" })
-    };
+
+    }
+    
 
     QSetViewInParent = (obj) => {
         this.props.QIDFromChild(obj);
@@ -208,7 +256,7 @@ class EditSchedule extends React.Component {
         const edited = this.props.editSchedule;
         const { showPartialPaymentFields } = this.state;
 
-        console.log(edited)
+        console.log(edited.request_Id)
 
         return (
             <div>
@@ -314,19 +362,8 @@ class EditSchedule extends React.Component {
                         {errorMessages.error && <div style={{ color: 'red' }}>{errorMessages.error}</div>}
 
                         <br></br>
-                        {/*<div>*/}
-                        {/*    <button onClick={this.togglePartialPaymentFields} className="btn btn-outline-primary">*/}
-                        {/*        {showPartialPaymentFields ? 'Hide' : 'Partially Payments'}*/}
-                        {/*    </button>*/}
-                        {/*</div>*/}
 
-                        {/*{this.renderPartialPaymentFields()}*/}
-
-                        {/*<button onClick={() => this.QPostField()} className="buttona" type="button">Calculate</button>*/}
-
-
-                    
-                    <div>
+                        <div >
                             <button onClick={this.togglePartialPaymentFields} className="btn btn-outline-primary">
                             {showPartialPaymentFields ? 'Hide' : 'Partial Payments'}
                         </button>

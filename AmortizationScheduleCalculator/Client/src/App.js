@@ -28,7 +28,12 @@ class App extends React.Component {
             loanAp:  0,
             loanIc:  0,
             loanOc: 0,
-            editCalculation: [], editCalculation1:[]
+            editCalculation: [], editCalculation1: [],
+            redIdEdit: 0,
+            sumEdit: {},
+            schedulesEdit: [],
+            auditHid: 0
+
         };
 
     };
@@ -49,17 +54,17 @@ class App extends React.Component {
             case "Schedule":
                 return <Schedule idR={this.state.idReq} QIDFromChild={this.QSetView} />;
             case "calculation":
-                return < Calculation data={this.state.calculation} schedule={this.state.calculation1} QIDFromChild={this.QSetView} />;
+                return <Calculation data={this.state.calculation} schedule={this.state.calculation1} QIDFromChild={this.QSetView} />;
             case "history":
                 return <History QIDFromChild={this.QSetView} />;
             case "pdf":
                 return <Pdf QIDFromChild={this.QSetView} />;
             case "editschedule":
-                return <EditSchedule editSchedule={this.state.edited} QIDFromChild={this.QSetView} />;
+                return <EditSchedule reqIdEdit={this.state.redIdEdit} editSchedule={this.state.edited} QIDFromChild={this.QSetView} />;
             case "editcalculation":
                 return <EditCalculation editCalSummary={this.state.editCalculation} editCalSchedule={this.state.editCalculation1} QIDFromChild={this.QSetView} />;
             case "auditHistory":
-                return <AuditHistory QIDFromChild={this.QSetView} />;
+                return <AuditHistory redId={this.state.auditHid } QIDFromChild={this.QSetView} />;
             default:
                 return <Login />;
 
@@ -75,6 +80,10 @@ class App extends React.Component {
             edited: obj.editnew || {},
             editCalculation: obj.editSum || {},
             editCalculation1: obj.editSchedules || [],
+            redIdEdit: obj.req_id || 0,
+            sumEdit: obj.sumEdit || {},
+            schedulesedit: obj.schedulesEdit || [],
+            auditHid: obj.auditreqId || 0
             
         });
     };

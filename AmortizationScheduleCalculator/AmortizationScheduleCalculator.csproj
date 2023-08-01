@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="ceTe.DynamicPDF.CoreSuite.NET" Version="12.8.0" />
     <PackageReference Include="Dapper" Version="2.0.143" />
     <PackageReference Include="HtmlRenderer.PdfSharp.NetStandard2" Version="1.5.1.1" />
     <PackageReference Include="IronPDF" Version="2023.7.4" />

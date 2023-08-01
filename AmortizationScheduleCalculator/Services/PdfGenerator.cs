@@ -4,11 +4,8 @@ using System.Data;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using System;
 using Microcharts;
 using SkiaSharp;
-using System.Collections.Generic;
-using System.Web.Helpers;
 
 
 namespace AmortizationScheduleCalculator.Services
@@ -194,7 +191,7 @@ namespace AmortizationScheduleCalculator.Services
 
 
 
-                             });
+                             });                             
                              col.Item().PaddingVertical(1, Unit.Centimetre);
                              col.Item()
                                 .Border((float)0).BorderColor(Colors.Blue.Lighten3)

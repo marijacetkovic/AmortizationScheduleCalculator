@@ -51,6 +51,27 @@ namespace AmortizationScheduleCalculator.Controllers
             }
         }
 
+        [HttpPost("edit"), Authorize]
+        public async Task<IActionResult> EditCalculation(Request scheduleReq, [FromQuery] string reqId)
+        {
+
+
+
+            var scheduleList = new AmortizationPlan();
+            try
+            {
+                scheduleList = await _calculate.EditCalculation(scheduleReq, reqId);
+                return Ok(scheduleList);
+
+
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("getallrequests"), Authorize]
         public List<Request> getAllRequests()
         {
@@ -95,11 +116,11 @@ namespace AmortizationScheduleCalculator.Controllers
         public async Task<IActionResult> applyPartialPayment([FromQuery] string reqName, Dictionary<int, decimal> missedPayments)
         {
 
-            List<Schedule> scheduleList;
+            var amortizationSchedule = new AmortizationPlan();
             try
             {
-                scheduleList = await _calculate.ApplyPartialPayments(reqName, missedPayments);
-                return Ok(scheduleList);
+                amortizationSchedule = await _calculate.ApplyPartialPayments(reqName, missedPayments);
+                return Ok(amortizationSchedule);
 
             }
             catch (Exception ex)
@@ -113,11 +134,11 @@ namespace AmortizationScheduleCalculator.Controllers
         public async Task<IActionResult> applyEarlyPayment([FromQuery] string reqName, Dictionary<int, decimal> earlyPayments)
         {
 
-            List<Schedule> scheduleList;
+            var amortizationSchedule = new AmortizationPlan();
             try
             {
-                scheduleList = await _calculate.ApplyEarlyPayments(reqName, earlyPayments);
-                return Ok(scheduleList);
+                amortizationSchedule = await _calculate.ApplyEarlyPayments(reqName, earlyPayments);
+                return Ok(amortizationSchedule);
 
             }
             catch (Exception ex)
@@ -132,6 +153,13 @@ namespace AmortizationScheduleCalculator.Controllers
         {
           return await _pdfgenerator.GeneratePdf(reqName);
 
+        }
+
+        [HttpGet("audithistory"), Authorize]
+
+        public async Task<List<Request>> getAuditHistory([FromQuery] string parentReqName)
+        {
+            return (await _calculate.getAuditHistory(parentReqName));
         }
         
 
