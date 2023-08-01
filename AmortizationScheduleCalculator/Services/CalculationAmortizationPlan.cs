@@ -479,11 +479,6 @@ namespace AmortizationScheduleCalculator.Services
         {
             var childrenRequestIds = (await _db.QueryAsync<int>("select child_request_id from \"audithistory\" where parent_request_id=@parentId", 
                 new { parentId = Int32.Parse(parentReqId)})).ToList();
-
-            string childIds = string.Join(",", childrenRequestIds);
-            Console.WriteLine("child ids "+childIds);
-            string sqlQuery = $"SELECT * FROM Request WHERE RequestID IN ({childIds})";
-
             var childRequests = (await _db.QueryAsync<Request>("SELECT * FROM \"Request\" WHERE request_id = ANY(@childIds)", new {childIds= childrenRequestIds.ToArray() })).ToList();
 
             return childRequests;
