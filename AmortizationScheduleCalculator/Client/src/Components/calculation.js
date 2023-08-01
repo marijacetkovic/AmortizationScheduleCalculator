@@ -3,6 +3,8 @@ import axios from "axios";
 import "./style.css";
 import { MDBTable, MDBTableHead, MDBTableBody } from 'mdb-react-ui-kit';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
+
 
 
 
@@ -46,6 +48,9 @@ class Calculation extends React.Component {
         return dateObject.toLocaleDateString(undefined, options);
     };
 
+    round = (num) => {
+        return Math.round(num * 100) / 100;}
+
     getGraphData = (data) => {
         var graphData = [];
         var interest = 0;
@@ -54,8 +59,8 @@ class Calculation extends React.Component {
             interest += data[i].interest_Paid;
             principal += data[i].principal_Paid;
             graphData[i] = {
-                Interest: interest,
-                Principal: principal,
+                Interest: this.round(interest),
+                Principal: this.round(principal),
                 Balance: data[i].remaining_Loan,
                 Date: this.formatDate(data[i].current_Date)
             }
@@ -94,6 +99,12 @@ class Calculation extends React.Component {
 
         const name = localStorage.getItem('name');
         const surname = localStorage.getItem('surname');
+
+        const pieChart = [
+            { name: 'Principal Paid', value: loanAm },
+            { name: 'Interest Paid', value: summaryData.total_Interest_Paid },
+            { name: 'Other costs', value: summaryData.total_Other_Costs }
+        ];
 
         return (
             <div style={{
@@ -233,31 +244,40 @@ class Calculation extends React.Component {
                         </div>
                         <br></br>
 
-                        <div>
-                            <LineChart 
-                                width={900}
-                                height={400}
-                                data={this.getGraphData(schedulesData)}
-                                margin={{
-                                    top: 20,
-                                    right: 40,
-                                    left: -10,
-                                    bottom: -10,
-                                }}
-
-                            >
-                                <CartesianGrid />
-                                
-                                <XAxis dataKey="Date" />
-                                <YAxis/>
-                                <Tooltip/>
-                                <Legend/>
-                                <Line type="monotone" dataKey="Principal" stroke="#8884d8" />
-                                <Line type="monotone" dataKey="Interest" stroke="#d990d8"  />
-                                <Line type="monotone" dataKey="Balance" stroke="#82ca9d" />
+                        <div style={{ display: 'flex', width: '90%' }}>
+                            <div style={{ width: '60%', marginRight: '50px' }}>
+                                <LineChart
+                                    width={900}
+                                    height={400}
+                                    data={this.getGraphData(schedulesData)}
+                                    margin={{
+                                        top: 20,
+                                        right: 40,
+                                        left: -10,
+                                        bottom: -10,
+                                    }}
+                                >
+                                    <CartesianGrid />
+                                    <XAxis dataKey="Date" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" dataKey="Principal" stroke="#27374D" />
+                                    <Line type="monotone" dataKey="Interest" stroke="#526D82" />
+                                    <Line type="monotone" dataKey="Balance" stroke="#9DB2BF" />
                                 </LineChart>
+                            </div>
 
+                            <div style={{ width: '50%' }}>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <PieChart>
+                                        <Pie data={pieChart} dataKey="value" cx="50%" cy="50%" outerRadius={80} fill="#27374D" />
+                                        <Pie data={pieChart} dataKey="value" cx="50%" cy="50%" innerRadius={90} outerRadius={120} fill="#9DB2BF" label />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
                         </div>
+
 
                         <div>
 

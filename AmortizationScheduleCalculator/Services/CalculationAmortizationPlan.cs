@@ -26,6 +26,8 @@ namespace AmortizationScheduleCalculator.Services
             await updateRequest(originalId);
             //create new calculation
             var resReq = await CreateNewCalculation(scheduleReq);
+            int parentId = await getParentId(Int32.Parse(originalId));
+            await updateAuditHistory(resReq.Summary.Request_Id.ToString(), parentId.ToString());
             return resReq;
         }
 
@@ -483,9 +485,10 @@ namespace AmortizationScheduleCalculator.Services
         public async Task<List<Request>> getAuditHistory(string lastChildID)
         {
             var parentReqId = await getParentId(Int32.Parse(lastChildID));
+            var id = Int32.Parse(_register.getUserId());
             var childrenRequestIds = (await _db.QueryAsync<int>("select child_request_id from \"audithistory\" where parent_request_id=@parentId", 
                 new { parentId = parentReqId})).ToList();
-            var childRequests = (await _db.QueryAsync<Request>("SELECT * FROM \"Request\" WHERE request_id = ANY(@childIds)", new {childIds= childrenRequestIds.ToArray() })).ToList();
+            var childRequests = (await _db.QueryAsync<Request>("SELECT * FROM \"Request\" WHERE request_id = ANY(@childIds) AND r_user_id=@id", new {childIds= childrenRequestIds.ToArray(), id=id })).ToList();
             return childRequests;
 
         }

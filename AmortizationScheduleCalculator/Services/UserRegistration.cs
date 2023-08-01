@@ -34,6 +34,14 @@ namespace AmortizationScheduleCalculator.Services
 
         public async Task<int> RegistrateUser(User user)
         {
+            if (!IsValidEmail(user.Email))
+            {
+                throw new InvalidInputException("Invalid email address.");
+            }
+            if (user.User_Password.Length < 8) {
+                throw new InvalidInputException("Password too short. Minimum 8 characters allowed.");
+
+            }
             user.User_Password = BCrypt.Net.BCrypt.HashPassword(user.User_Password);
             try
             {
@@ -48,6 +56,19 @@ namespace AmortizationScheduleCalculator.Services
             }
             
 
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public string[] userLoginValidation(UserInput loginUser)
@@ -97,7 +118,7 @@ namespace AmortizationScheduleCalculator.Services
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(45),
+                expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds
                 );
             
