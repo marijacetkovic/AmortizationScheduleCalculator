@@ -178,7 +178,6 @@ namespace AmortizationScheduleCalculator.Services
             var currentDate = req.Loan_Start_Date.Date;
             var newName = req.Request_Name;
             var additionalMonthlyCosts = req.Account_Cost + req.Insurance_Cost + req.Other_Costs;
-            Console.WriteLine("THIS SHOULD BE THE CHILD " + req.Request_Id);
             int childId = req.Request_Id;
             Request editedRequest = req;
             editedRequest.Date_Issued = DateTime.Now;
@@ -426,7 +425,7 @@ namespace AmortizationScheduleCalculator.Services
                         //if user chose to pay less for the nexts months, recalculate monthly
                         monthlyPayment = CalculateMonthly(currentRemainingLoan, monthlyInterestRate, numOfPayments - i);
                     }
-                    newEntry.Monthly_Paid = (monthlyPayment);
+                   // newEntry.Monthly_Paid = (monthlyPayment);
                     newEntry.Interest_Paid = Math.Round((decimal)((double)currentRemainingLoan * monthlyInterestRate),2);
                     newEntry.Principal_Paid = Math.Round(newEntry.Monthly_Paid - newEntry.Interest_Paid,2);
                     currentRemainingLoan -= newEntry.Principal_Paid;
