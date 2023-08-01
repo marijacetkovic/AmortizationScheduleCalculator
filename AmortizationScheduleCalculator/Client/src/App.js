@@ -1,7 +1,6 @@
 import React from "react";
 import './App.css';
 import axios from "axios";
-import Home from './Components/home';
 import Profile from './Components/profile';
 import Pdf from './Components/pdf';
 import Login from './Components/login';
@@ -11,7 +10,7 @@ import Calculation from "./Components/calculation";
 import History from "./Components/history";
 import EditSchedule from "./Components/edited";
 import EditCalculation from "./Components/editcalculation";
-
+import AuditHistory from "./Components/auditHistory";
 
 
 class App extends React.Component {
@@ -58,7 +57,9 @@ class App extends React.Component {
             case "editschedule":
                 return <EditSchedule editSchedule={this.state.edited} QIDFromChild={this.QSetView} />;
             case "editcalculation":
-                return <EditCalculation editCalSummary={this.state.editCalculation} editCalSchedule={this.state.editCalculation1 } QIDFromChild={this.QSetView} />;
+                return <EditCalculation editCalSummary={this.state.editCalculation} editCalSchedule={this.state.editCalculation1} QIDFromChild={this.QSetView} />;
+            case "auditHistory":
+                return <AuditHistory QIDFromChild={this.QSetView} />;
             default:
                 return <Login />;
 
