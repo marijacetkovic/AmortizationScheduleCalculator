@@ -152,8 +152,6 @@ namespace AmortizationScheduleCalculator.Services
                     "s_request_id)\r\nvalues (@Current_Date,@Monthly_Paid,@Principal_Paid,@Interest_Paid,@Monthly_Costs,@Remaining_Loan,@S_Request_Id)", newSchedule);
         }
 
-       static int count = 0;
-
        public async Task<AmortizationPlan> ApplyPartialPayments(string reqName, Dictionary<int, decimal> missedPayments) {
 
             Request req = null;
@@ -189,7 +187,6 @@ namespace AmortizationScheduleCalculator.Services
             Console.WriteLine(id);
 
             editedRequest.Request_Id = id;
-            count++;
             Console.WriteLine(newName);
             int parentId = await getParentId(childId);
             Console.WriteLine(parentId);
@@ -379,7 +376,6 @@ namespace AmortizationScheduleCalculator.Services
             //get the new id to link the new entries
             int id = await InsertRequestDb(editedRequest);
             editedRequest.Request_Id = id;
-            count++;
             Console.WriteLine(newName);
             int parentId = await getParentId(childId);
             await updateAuditHistory(id.ToString(), parentId.ToString());
