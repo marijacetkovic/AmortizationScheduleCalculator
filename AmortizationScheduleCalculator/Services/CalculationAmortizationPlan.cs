@@ -20,8 +20,8 @@ namespace AmortizationScheduleCalculator.Services
             _register = register; 
             
         }
-
         public async Task<AmortizationPlan> EditCalculation(Request scheduleReq, string originalId)
+
         {
             //set original to not visible 
             await updateRequest(originalId);
@@ -31,6 +31,7 @@ namespace AmortizationScheduleCalculator.Services
             await updateAuditHistory(resReq.Summary.Request_Id.ToString(), parentId.ToString());
             return resReq;
         }
+
         public async Task<AmortizationPlan>  CreateNewCalculation(Request scheduleReq)
         {
             if (scheduleReq.Loan_Amount < 1000)
@@ -120,13 +121,17 @@ namespace AmortizationScheduleCalculator.Services
                 var remainingRounded = Math.Round(remainingBalance,2);
                 Schedule newSchedule = new(currentDate.Date, monthlyRounded, principalPayment, interestPayment,additionalMonthlyCosts,remainingRounded, id);
                 scheduleList.Add(newSchedule);
-                await InsertScheduleDb(newSchedule);
+                //await InsertScheduleDb(newSchedule);
                 if (i == 1)
                 {
                     additionalMonthlyCosts -= scheduleReq.Approval_Cost;//reset default monthly costs
                     monthlyPayment -= scheduleReq.Approval_Cost;
                 }
                 i++;
+            }
+            foreach (var entry in scheduleList)
+            {
+                await InsertScheduleDb(entry);
             }
             return new AmortizationPlan { Schedules=scheduleList, Summary = scheduleReq };
         
@@ -153,9 +158,7 @@ namespace AmortizationScheduleCalculator.Services
                     "s_request_id)\r\nvalues (@Current_Date,@Monthly_Paid,@Principal_Paid,@Interest_Paid,@Monthly_Costs,@Remaining_Loan,@S_Request_Id)", newSchedule);
         }
 
-       static int count = 0;
-
-       public async Task<AmortizationPlan> ApplyPartialPayments(string reqName, Dictionary<int, decimal> missedPayments) {
+       public async Task<AmortizationPlan> ApplyPartialPayments(string reqName, Dictionary<int, decimal> missedPayments, decimal fee) {
 
             Request req = null;
             try
@@ -168,7 +171,11 @@ namespace AmortizationScheduleCalculator.Services
             }
 
             //get the plan 
-            List<Schedule> calculatedPlan = (await getSchedule(reqName)).Schedules;
+            var calculatedPlan = await getSchedule(reqName);
+            if (missedPayments.Count == 0) {
+                return calculatedPlan; //nothing to do 
+            }
+            List<Schedule> calculatedSchedule = calculatedPlan.Schedules;
 
             //start building the edited plan
             List<Schedule> editedPlan = new List<Schedule>();
@@ -179,24 +186,23 @@ namespace AmortizationScheduleCalculator.Services
             var currentDate = req.Loan_Start_Date.Date;
             var newName = req.Request_Name;
             var additionalMonthlyCosts = req.Account_Cost + req.Insurance_Cost + req.Other_Costs;
-            Console.WriteLine("THIS SHOULD BE THE CHILD " + req.Request_Id);
             int childId = req.Request_Id;
             Request editedRequest = req;
             editedRequest.Date_Issued = DateTime.Now;
-            await updateRequest(req.Request_Id.ToString()); //changes display flag to false 
+
+            await updateRequest(childId.ToString()); //changes display flag to false 
 
             //get the new id to link the new entries
             int id = await InsertRequestDb(editedRequest);
             Console.WriteLine(id);
 
             editedRequest.Request_Id = id;
-            count++;
             Console.WriteLine(newName);
             int parentId = await getParentId(childId);
             Console.WriteLine(parentId);
-            await updateAuditHistory(id.ToString(), parentId.ToString());
+            //await updateAuditHistory(id.ToString(), parentId.ToString());
 
-            bool owed = false, increased=false;
+            bool owed = false, increased=false,early=false;
             int i = 0;
             decimal interestOwed=0, principalOwed=0, owedPayment=0, currentRemainingLoan = req.Loan_Amount, otherCostsOwed=0;
             while (i<numOfPayments)
@@ -204,7 +210,11 @@ namespace AmortizationScheduleCalculator.Services
                 Schedule newEntry = new Schedule();
 
                 //to retreive assumed principal and interest values before overriding them 
-                if (!increased) newEntry = calculatedPlan.ElementAt(i);
+                if (!increased) { 
+                    newEntry = calculatedSchedule.ElementAt(i);
+                    if (monthlyPayment < newEntry.Monthly_Paid) early = true;
+                    monthlyPayment = newEntry.Monthly_Paid; //retreive monthly payment in case it changes due to early payments
+                }
                 
                 //update date and add the db retreived id to link entries to request 
                 currentDate = currentDate.AddMonths(1);
@@ -216,18 +226,20 @@ namespace AmortizationScheduleCalculator.Services
                     decimal missedPayment = missedPayments[i + 1];
                     newEntry.Monthly_Paid = missedPayment;
                     owed = true;
+                    if (early) throw new InvalidInputException("Cannot apply partial to early payment.");
+                    if (monthlyPayment < missedPayment) throw new InvalidInputException("Partial payment cannot be bigger than assumed monthly payment.");
                     //retreive old entry and apply changes to it
                     if (!increased)
                     {
                         //if list of payments not yet increased assumed monthly payment = fixed monthly calculated
                         //subtract partial payment from assumed monthly
-                        owedPayment += monthlyPayment - missedPayment; // + late payment fee
+                        owedPayment += monthlyPayment + fee - missedPayment; // + late payment fee
                     }
                     else
                     {
                         //else assumed monthly is 0 bcs we increased the list of assumed payments
                         //subtract just the missed (partial) payment
-                        owedPayment -= missedPayment; // + late payment fee
+                        owedPayment -= missedPayment + fee; // + late payment fee
                         if (owedPayment == 0) owed = false;
                         if (owedPayment < 0) throw new InvalidInputException("Partial payment is greater than what is owed.");
                     }
@@ -282,7 +294,7 @@ namespace AmortizationScheduleCalculator.Services
                     newEntry.Remaining_Loan = currentRemainingLoan;
                     
                     //principal is owed altogether minus interest owed
-                    principalOwed = owedPayment - interestOwed-otherCostsOwed;
+                    principalOwed = owedPayment - interestOwed-otherCostsOwed-fee;
                     
                     
                     //add the new entry to the db
@@ -337,11 +349,17 @@ namespace AmortizationScheduleCalculator.Services
                         otherCostsOwed = 0;
                     }
                     //add the entry
-                    await InsertScheduleDb(newEntry);
+                    //await InsertScheduleDb(newEntry);
                     editedPlan.Add(newEntry);
                 }
                 i++;
+                early = false;
             }
+            foreach (var entry in editedPlan)
+            {
+                await InsertScheduleDb(entry);
+            }
+            await updateAuditHistory(id.ToString(), parentId.ToString());
             return new AmortizationPlan { Schedules = editedPlan, Summary = editedRequest };
         }
 
@@ -358,10 +376,15 @@ namespace AmortizationScheduleCalculator.Services
             {
                 throw new QueryException("There is no request with that name.");
             }
-            
+
             //get the plan 
-            List<Schedule> calculatedPlan = (await getSchedule(reqName)).Schedules;
-            
+            var calculatedPlan = await getSchedule(reqName);
+            if (earlyPayments.Count == 0)
+            {
+                return calculatedPlan; //nothing to do 
+            }
+            List<Schedule> calculatedSchedule = calculatedPlan.Schedules;
+
             //start building the edited plan
             List<Schedule> editedPlan = new List<Schedule>();
 
@@ -375,17 +398,17 @@ namespace AmortizationScheduleCalculator.Services
             Request editedRequest = req;
             editedRequest.Date_Issued = DateTime.Now;
 
-            await updateRequest(req.Request_Id.ToString()); //changes display flag to false 
+            await updateRequest(childId.ToString()); //changes display flag to false 
 
             //get the new id to link the new entries
             int id = await InsertRequestDb(editedRequest);
             editedRequest.Request_Id = id;
-            count++;
             Console.WriteLine(newName);
             int parentId = await getParentId(childId);
-            await updateAuditHistory(id.ToString(), parentId.ToString());
+            //await updateAuditHistory(id.ToString(), parentId.ToString());
 
-            decimal advancePayment=0, currentRemainingLoan= req.Loan_Amount; //at beginning equal to total loan amount
+            decimal currentRemainingLoan= req.Loan_Amount; //at beginning equal to total loan amount
+            decimal additionalMonthlyCosts = req.Account_Cost + req.Insurance_Cost + req.Other_Costs;
             double interestRatio;
             bool paidInAdvance=false;
             int i = 0;
@@ -393,7 +416,7 @@ namespace AmortizationScheduleCalculator.Services
             {
                 Schedule newEntry = new Schedule();
 
-                newEntry = calculatedPlan.ElementAt(i);//retreive old values of assumed principal, interest
+                newEntry = calculatedSchedule.ElementAt(i);//retreive old values of assumed principal, interest
                 currentDate = currentDate.AddMonths(1);
                 newEntry.Current_Date = currentDate;
 
@@ -429,17 +452,24 @@ namespace AmortizationScheduleCalculator.Services
                         //if user chose to pay less for the nexts months, recalculate monthly
                         monthlyPayment = CalculateMonthly(currentRemainingLoan, monthlyInterestRate, numOfPayments - i);
                     }
-                    newEntry.Monthly_Paid = (monthlyPayment);
-                    newEntry.Interest_Paid = Math.Round((decimal)((double)currentRemainingLoan * monthlyInterestRate),2);
-                    newEntry.Principal_Paid = Math.Round(newEntry.Monthly_Paid - newEntry.Interest_Paid,2);
+                    newEntry.Monthly_Paid = monthlyPayment;
+                    newEntry.Interest_Paid = (decimal)((double)currentRemainingLoan * monthlyInterestRate);
+                    newEntry.Principal_Paid = newEntry.Monthly_Paid- newEntry.Interest_Paid;
                     currentRemainingLoan -= newEntry.Principal_Paid;
+                    newEntry.Monthly_Paid = Math.Round(newEntry.Monthly_Paid,2);
+                    newEntry.Interest_Paid = Math.Round(newEntry.Interest_Paid, 2);
+                    newEntry.Principal_Paid = Math.Round(newEntry.Principal_Paid, 2);
                     newEntry.Remaining_Loan = Math.Round(currentRemainingLoan, 2);
                 }
                 //add the entry
-                await InsertScheduleDb(newEntry);
+               // await InsertScheduleDb(newEntry);
                 editedPlan.Add(newEntry);
                 i++;
             }
+            foreach (var entry in editedPlan) {
+                await InsertScheduleDb(entry);
+            }
+            await updateAuditHistory(id.ToString(), parentId.ToString());
             return new AmortizationPlan { Schedules = editedPlan, Summary = editedRequest };
         }
 
@@ -488,9 +518,11 @@ namespace AmortizationScheduleCalculator.Services
         public async Task<List<Request>> getAuditHistory(string lastChildID)
         {
             var parentReqId = await getParentId(Int32.Parse(lastChildID));
-            var childrenRequestIds = (await _db.QueryAsync<int>("select child_request_id from \"audithistory\" where parent_request_id=@parentId",
-                new { parentId = parentReqId })).ToList();
-            var childRequests = (await _db.QueryAsync<Request>("SELECT * FROM \"Request\" WHERE request_id = ANY(@childIds)", new { childIds = childrenRequestIds.ToArray() })).ToList();
+
+            var id = Int32.Parse(_register.getUserId());
+            var childrenRequestIds = (await _db.QueryAsync<int>("select child_request_id from \"audithistory\" where parent_request_id=@parentId", 
+                new { parentId = parentReqId})).ToList();
+            var childRequests = (await _db.QueryAsync<Request>("SELECT * FROM \"Request\" WHERE request_id = ANY(@childIds) AND r_user_id=@id", new {childIds= childrenRequestIds.ToArray(), id=id })).ToList();
             return childRequests;
 
 

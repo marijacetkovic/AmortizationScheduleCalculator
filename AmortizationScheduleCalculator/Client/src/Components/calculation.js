@@ -7,7 +7,6 @@ import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
 
 
 
-
 class Calculation extends React.Component {
 
     constructor(props) {
@@ -48,8 +47,8 @@ class Calculation extends React.Component {
     };
 
     round = (num) => {
-        return Math.round(num * 100) / 100;
-    }
+
+        return Math.round(num * 100) / 100;}
 
     getGraphData = (data) => {
         var graphData = [];
@@ -116,6 +115,12 @@ class Calculation extends React.Component {
         const surname = localStorage.getItem('surname');
         const pieChart = [
             { name: 'Principal Paid', value: summaryData.loan_Amount },
+            { name: 'Interest Paid', value: summaryData.total_Interest_Paid },
+            { name: 'Other costs', value: summaryData.total_Other_Costs }
+        ];
+
+        const pieChart = [
+            { name: 'Principal Paid', value: loanAm },
             { name: 'Interest Paid', value: summaryData.total_Interest_Paid },
             { name: 'Other costs', value: summaryData.total_Other_Costs }
         ];
@@ -211,6 +216,7 @@ class Calculation extends React.Component {
                             <div style={{ width: '60%', marginRight: '50px' }}>
                                 <LineChart
                                     width={750}
+
                                     height={400}
                                     data={this.getGraphData(schedulesData)}
                                     margin={{
@@ -235,6 +241,7 @@ class Calculation extends React.Component {
 
                             <div style={{ width: '60%', marginRight: "-160px" }}>
                                 <ResponsiveContainer width="100%" height={400}>
+
                                     <PieChart>
                                         <Pie data={pieChart} dataKey="value" cx="50%" cy="50%" outerRadius={80} fill="#27374D" />
                                         <Pie data={pieChart} dataKey="value" cx="50%" cy="50%" innerRadius={90} outerRadius={120} fill="#9DB2BF" label />
@@ -242,6 +249,7 @@ class Calculation extends React.Component {
                                 </ResponsiveContainer>
                             </div>
                         </div>
+
 
                         <div>
 

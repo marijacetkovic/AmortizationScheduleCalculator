@@ -19,11 +19,6 @@ namespace AmortizationScheduleCalculator.Controllers
             _register = register;
         }
 
-        [HttpGet("register", Name = "Register")]
-        public async Task<ActionResult<List<User>>> GetAllUsers()
-        {
-            return Ok(await _register.GetAllUsers());
-        }
 
         [HttpPost("register", Name = "Register")]
         public async Task<ActionResult<List<User>>> AddUser(User user)

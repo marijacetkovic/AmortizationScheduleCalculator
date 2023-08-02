@@ -38,19 +38,16 @@ namespace AmortizationScheduleCalculator.Controllers
         public async Task<IActionResult> CreateNewCalculation(Request scheduleReq)
         {
 
-            var scheduleList = new AmortizationPlan();
-            try
-            {
-                scheduleList = await _calculate.CreateNewCalculation(scheduleReq);
-                var id = scheduleList.Summary.Request_Id;
-                await _calculate.updateAuditHistory(id.ToString(), id.ToString()); //first entry in audit history
-                return Ok(scheduleList);
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+          var scheduleList = await _calculate.CreateNewCalculation(scheduleReq);
+          var id = scheduleList.Summary.Request_Id;
+          await _calculate.updateAuditHistory(id.ToString(), id.ToString()); //first entry in audit history
+          return Ok(scheduleList);
+        }
+        [HttpPost("edit"), Authorize]
+        public async Task<IActionResult> EditCalculation(Request scheduleReq, string reqId)
+        {   
+           var scheduleList = await _calculate.EditCalculation(scheduleReq,reqId);
+           return Ok(scheduleList);
         }
 
         [HttpPost("edit"), Authorize]
@@ -84,69 +81,34 @@ namespace AmortizationScheduleCalculator.Controllers
         [HttpGet("deleterequest"), Authorize]
         public async Task<ActionResult> deleteRequest([FromQuery] string reqName)
         {
-            Request req;
-            try
-            {
-                req = await _calculate.updateRequest(reqName);
-                return Ok(req);
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var req = await _calculate.updateRequest(reqName);
+            return Ok(req);
 
         }
         [HttpGet("schedule"), Authorize]
-        public async Task<AmortizationPlan> getSchedule([FromQuery] string reqName)
+        public async Task<IActionResult> getSchedule([FromQuery] string reqName)
 
         {
-            var amortizationSchedule = new AmortizationPlan();
-            try {
-                amortizationSchedule = await _calculate.getSchedule(reqName);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return amortizationSchedule;
+            var amortizationSchedule = await _calculate.getSchedule(reqName);
+            return Ok(amortizationSchedule);
 
         }
 
         [HttpPost("applypartial"), Authorize]
 
-        public async Task<IActionResult> applyPartialPayment([FromQuery] string reqName, Dictionary<int, decimal> missedPayments)
+        public async Task<IActionResult> applyPartialPayment([FromQuery] string reqName, Dictionary<int, decimal> missedPayments,decimal fee)
         {
 
-            var amortizationSchedule = new AmortizationPlan();
-            try
-            {
-                amortizationSchedule = await _calculate.ApplyPartialPayments(reqName, missedPayments);
+                var amortizationSchedule = await _calculate.ApplyPartialPayments(reqName, missedPayments,fee);
                 return Ok(amortizationSchedule);
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         [HttpPost("applyearly"), Authorize]
 
         public async Task<IActionResult> applyEarlyPayment([FromQuery] string reqName, Dictionary<int, decimal> earlyPayments)
         {
-
-            var amortizationSchedule = new AmortizationPlan();
-            try
-            {
-                amortizationSchedule = await _calculate.ApplyEarlyPayments(reqName, earlyPayments);
-                return Ok(amortizationSchedule);
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+               var amortizationSchedule = await _calculate.ApplyEarlyPayments(reqName, earlyPayments);
+                return Ok(amortizationSchedule); 
         }
 
         [HttpPost("generatepdf"), Authorize]
