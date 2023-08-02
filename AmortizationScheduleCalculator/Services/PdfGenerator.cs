@@ -41,23 +41,29 @@ namespace AmortizationScheduleCalculator.Services
 
                    var entries = new[]
                 {
+                    new ChartEntry((float)summary.Total_Other_Costs)
+                    {
+                        Label = "Total Other Costs",
+                        ValueLabel = (float)summary.Total_Other_Costs+"€",
+                        Color = SKColor.Parse("#c1d3e6")
+                    },
                     new ChartEntry((float)summary.Total_Interest_Paid)
                     {
                         Label = "Total Interest Paid",
                         ValueLabel = (float)summary.Total_Interest_Paid+"€",
-                        Color = SKColor.Parse("#c1d3e6")
+                        Color = SKColor.Parse("#7393B3")
                     },
                     new ChartEntry((float)summary.Loan_Amount)
                     {
                         Label = "Total Principal Paid",
                         ValueLabel = (float)summary.Loan_Amount+"€",
-                        Color = SKColor.Parse("#7393B3")
+                        Color = SKColor.Parse("#35608c")
                     },
                     new ChartEntry((float)summary.Total_Loan_Cost)
                     {
                         Label = "Total Amount Paid",
                         ValueLabel = (float)summary.Total_Loan_Cost+"€",
-                        Color = SKColor.Parse("#35608c")
+                        Color = SKColor.Parse("#1F3954")
                     }
                 };
 
@@ -72,9 +78,9 @@ namespace AmortizationScheduleCalculator.Services
 
 
 
-                    page.Header()
+                    page.Header().AlignCenter()
                         .Text("Amortization Schedule calculated for request " + summary.Request_Name)
-                        .SemiBold().FontSize(16).FontColor(Colors.Blue.Medium);
+                        .SemiBold().FontSize(16).FontColor(Colors.Blue.Lighten1);
 
 
 
@@ -96,7 +102,7 @@ namespace AmortizationScheduleCalculator.Services
                                          .PaddingHorizontal(10)
                                          .AlignCenter()
                                          .AlignMiddle()
-                                         .DefaultTextStyle(x => x.FontSize(12));
+                                         .DefaultTextStyle(x => x.FontSize(10));
                                  }
 
                                  table.ColumnsDefinition(columns =>
@@ -113,7 +119,6 @@ namespace AmortizationScheduleCalculator.Services
 
                                      header.Cell().Element(CellStyle).Text("Loan Amount");
                                      header.Cell().Element(CellStyle).Text("Loan Period");
-
                                      header.Cell().Element(CellStyle).Text("Interest Rate");
                                      header.Cell().Element(CellStyle).Text("Loan Start Date");
 
@@ -125,9 +130,55 @@ namespace AmortizationScheduleCalculator.Services
                                  int pYear = payoffDate.Year;
                                  table.Cell().Element(CellStyle).Text(summary.Loan_Amount + "€");
                                  table.Cell().Element(CellStyle).Text(summary.Loan_Period + " year/s");
-
                                  table.Cell().Element(CellStyle).Text(summary.Interest_Rate + "%");
                                  table.Cell().Element(CellStyle).Text(pMonth + " " + pYear);
+
+                                 IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.White).ShowOnce();
+
+                             });
+                             col.Item().PaddingVertical((float)0.5, Unit.Centimetre);
+                             col.Item().Table(table => {
+
+
+
+                                 IContainer DefaultCellStyle(IContainer container, string backgroundColor)
+                                 {
+                                     return container
+                                         .Border(1)
+                                         .BorderColor(Colors.Blue.Lighten3)
+                                         .Background(backgroundColor)
+                                         .PaddingVertical(5)
+                                         .PaddingHorizontal(10)
+                                         .AlignCenter()
+                                         .AlignMiddle()
+                                         .DefaultTextStyle(x => x.FontSize(10));
+                                 }
+
+                                 table.ColumnsDefinition(columns =>
+                                 {
+                                     columns.RelativeColumn();
+                                     columns.RelativeColumn();
+                                     columns.RelativeColumn();
+                                     columns.RelativeColumn();
+                                 });
+
+                                 table.Header(header =>
+                                 {
+                                     // please be sure to call the 'header' handler!
+
+                                     header.Cell().Element(CellStyle).Text("Approval Cost");
+                                     header.Cell().Element(CellStyle).Text("Insurance Cost");
+                                     header.Cell().Element(CellStyle).Text("Account Cost");
+                                     header.Cell().Element(CellStyle).Text("Other Costs");
+
+                                     // you can extend existing styles by creating additional methods
+                                     IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.Blue.Lighten4);
+                                 });
+                              
+                                 table.Cell().Element(CellStyle).Text(summary.Approval_Cost + "€");
+                                 table.Cell().Element(CellStyle).Text(summary.Insurance_Cost + "€");
+                                 table.Cell().Element(CellStyle).Text(summary.Account_Cost + "€");
+                                 table.Cell().Element(CellStyle).Text(summary.Other_Costs + "€");
 
                                  IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.White).ShowOnce();
 
@@ -145,13 +196,14 @@ namespace AmortizationScheduleCalculator.Services
                                          .PaddingHorizontal(10)
                                          .AlignCenter()
                                          .AlignMiddle()
-                                         .DefaultTextStyle(x => x.FontSize(12));
+                                         .DefaultTextStyle(x => x.FontSize(10));
                                  }
 
 
 
                                  table.ColumnsDefinition(columns =>
                                  {
+                                     columns.RelativeColumn();
                                      columns.RelativeColumn();
                                      columns.RelativeColumn();
                                      columns.RelativeColumn();
@@ -166,9 +218,7 @@ namespace AmortizationScheduleCalculator.Services
 
                                      header.Cell().Element(CellStyle).Text("Fixed Monthly Payment");
                                      header.Cell().Element(CellStyle).Text("Total Interest Amount");
-
-
-
+                                     header.Cell().Element(CellStyle).Text("Total Other Costs");
                                      header.Cell().Element(CellStyle).Text("Total Loan Amount");
                                      header.Cell().Element(CellStyle).Text("Payoff Date");
 
@@ -182,8 +232,7 @@ namespace AmortizationScheduleCalculator.Services
                                  int pYear = payoffDate.Year;
                                  table.Cell().Element(CellStyle).Text(summary.Monthly_Payment + "€");
                                  table.Cell().Element(CellStyle).Text(summary.Total_Interest_Paid + "€");
-
-
+                                 table.Cell().Element(CellStyle).Text(summary.Total_Other_Costs + "€");
                                  table.Cell().Element(CellStyle).Text(summary.Total_Loan_Cost + "€");
                                  table.Cell().Element(CellStyle).Text(pMonth + " " + pYear);
 
@@ -209,11 +258,11 @@ namespace AmortizationScheduleCalculator.Services
 
                                         IsAnimated = false,
                                     };
-                                    chart.LabelTextSize = 12;
+                                    chart.LabelTextSize = 10;
 
                                     chart.DrawContent(canvas, (int)size.Width, (int)size.Height);
                                 });
-                             col.Item().PaddingVertical(1, Unit.Centimetre);
+                             col.Item().PaddingVertical((float)0.5, Unit.Centimetre);
                              col.Item().Table(table =>
                              {
                                  IContainer DefaultCellStyle(IContainer container, string backgroundColor)
@@ -226,10 +275,8 @@ namespace AmortizationScheduleCalculator.Services
                                          .PaddingHorizontal(10)
                                          .AlignCenter()
                                          .AlignMiddle()
-                                         .DefaultTextStyle(x => x.FontSize(12));
+                                         .DefaultTextStyle(x => x.FontSize(10));
                                  }
-
-
 
                                  table.ColumnsDefinition(columns =>
                                  {
@@ -237,63 +284,36 @@ namespace AmortizationScheduleCalculator.Services
                                      columns.RelativeColumn();
                                      columns.RelativeColumn();
                                      columns.RelativeColumn();
-
-
-
-                                     //columns.ConstantColumn(75);
-                                     //columns.ConstantColumn(75);
-
-
-
-                                     //columns.ConstantColumn(75);
-                                     //columns.ConstantColumn(75);
+                                     columns.RelativeColumn();
                                  });
-
-
-
                                  table.Header(header =>
                                  {
-                                     // please be sure to call the 'header' handler!
-
-
-
                                      header.Cell().Element(CellStyle).Text("Date");
                                      header.Cell().Element(CellStyle).Text("Principal");
-
-
-
                                      header.Cell().Element(CellStyle).Text("Interest");
+                                     header.Cell().Element(CellStyle).Text("Other Costs");
                                      header.Cell().Element(CellStyle).Text("Remaining balance");
-
-
-
-                                     // you can extend existing styles by creating additional methods
                                      IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.Blue.Lighten5);
                                  });
-
-
 
                                  foreach (var schedule in schedules)
                                  {
                                      //table.Cell().Element(CellStyle).ExtendHorizontal().AlignLeft().Text(page.name);
-
-
 
                                      var date = schedule.Current_Date;
                                      string month = date.ToString("MMM").ToUpper().Substring(0, 3);
                                      int year = date.Year;
                                      table.Cell().Element(CellStyle).Text(month + " " + year);
                                      table.Cell().Element(CellStyle).Text(schedule.Principal_Paid + "€");
-                       table.Cell().Element(CellStyle).Text(schedule.Interest_Paid + "€");
+                                     table.Cell().Element(CellStyle).Text(schedule.Interest_Paid + "€");
+                                     table.Cell().Element(CellStyle).Text(schedule.Monthly_Costs + "€");
                                      table.Cell().Element(CellStyle).Text(schedule.Remaining_Loan + "€");
-
-
 
                                      IContainer CellStyle(IContainer container) => DefaultCellStyle(container, Colors.White).ShowOnce();
                                  }
                              });
                          });
-                    page.Footer()
+                        page.Footer()
                         .AlignCenter()
                         .Row(row =>
                         {
@@ -307,6 +327,7 @@ namespace AmortizationScheduleCalculator.Services
                             {
                                 x.Line("Issuer:" + summary.Issuer);
                                 x.Line("Date Issued: " + summary.Date_Issued);
+                                x.AlignRight();
                                 x.DefaultTextStyle(x => x.FontSize(10));
                             });
                         });

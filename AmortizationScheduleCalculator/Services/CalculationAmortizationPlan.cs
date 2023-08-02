@@ -119,13 +119,17 @@ namespace AmortizationScheduleCalculator.Services
                 var remainingRounded = Math.Round(remainingBalance,2);
                 Schedule newSchedule = new(currentDate.Date, monthlyRounded, principalPayment, interestPayment,additionalMonthlyCosts,remainingRounded, id);
                 scheduleList.Add(newSchedule);
-                await InsertScheduleDb(newSchedule);
+                //await InsertScheduleDb(newSchedule);
                 if (i == 1)
                 {
                     additionalMonthlyCosts -= scheduleReq.Approval_Cost;//reset default monthly costs
                     monthlyPayment -= scheduleReq.Approval_Cost;
                 }
                 i++;
+            }
+            foreach (var entry in scheduleList)
+            {
+                await InsertScheduleDb(entry);
             }
             return new AmortizationPlan { Schedules=scheduleList, Summary = scheduleReq };
         
@@ -165,7 +169,11 @@ namespace AmortizationScheduleCalculator.Services
             }
 
             //get the plan 
-            List<Schedule> calculatedPlan = (await getSchedule(reqName)).Schedules;
+            var calculatedPlan = await getSchedule(reqName);
+            if (missedPayments.Count == 0) {
+                return calculatedPlan; //nothing to do 
+            }
+            List<Schedule> calculatedSchedule = calculatedPlan.Schedules;
 
             //start building the edited plan
             List<Schedule> editedPlan = new List<Schedule>();
@@ -200,7 +208,7 @@ namespace AmortizationScheduleCalculator.Services
 
                 //to retreive assumed principal and interest values before overriding them 
                 if (!increased) { 
-                    newEntry = calculatedPlan.ElementAt(i);
+                    newEntry = calculatedSchedule.ElementAt(i);
                     if (monthlyPayment < newEntry.Monthly_Paid) early = true;
                     monthlyPayment = newEntry.Monthly_Paid; //retreive monthly payment in case it changes due to early payments
                 }
@@ -338,11 +346,15 @@ namespace AmortizationScheduleCalculator.Services
                         otherCostsOwed = 0;
                     }
                     //add the entry
-                    await InsertScheduleDb(newEntry);
+                    //await InsertScheduleDb(newEntry);
                     editedPlan.Add(newEntry);
                 }
                 i++;
                 early = false;
+            }
+            foreach (var entry in editedPlan)
+            {
+                await InsertScheduleDb(entry);
             }
             await updateAuditHistory(id.ToString(), parentId.ToString());
             return new AmortizationPlan { Schedules = editedPlan, Summary = editedRequest };
@@ -361,10 +373,15 @@ namespace AmortizationScheduleCalculator.Services
             {
                 throw new QueryException("There is no request with that name.");
             }
-            
+
             //get the plan 
-            List<Schedule> calculatedPlan = (await getSchedule(reqName)).Schedules;
-            
+            var calculatedPlan = await getSchedule(reqName);
+            if (earlyPayments.Count == 0)
+            {
+                return calculatedPlan; //nothing to do 
+            }
+            List<Schedule> calculatedSchedule = calculatedPlan.Schedules;
+
             //start building the edited plan
             List<Schedule> editedPlan = new List<Schedule>();
 
@@ -388,6 +405,7 @@ namespace AmortizationScheduleCalculator.Services
             //await updateAuditHistory(id.ToString(), parentId.ToString());
 
             decimal currentRemainingLoan= req.Loan_Amount; //at beginning equal to total loan amount
+            decimal additionalMonthlyCosts = req.Account_Cost + req.Insurance_Cost + req.Other_Costs;
             double interestRatio;
             bool paidInAdvance=false;
             int i = 0;
@@ -395,7 +413,7 @@ namespace AmortizationScheduleCalculator.Services
             {
                 Schedule newEntry = new Schedule();
 
-                newEntry = calculatedPlan.ElementAt(i);//retreive old values of assumed principal, interest
+                newEntry = calculatedSchedule.ElementAt(i);//retreive old values of assumed principal, interest
                 currentDate = currentDate.AddMonths(1);
                 newEntry.Current_Date = currentDate;
 
@@ -441,9 +459,12 @@ namespace AmortizationScheduleCalculator.Services
                     newEntry.Remaining_Loan = Math.Round(currentRemainingLoan, 2);
                 }
                 //add the entry
-                await InsertScheduleDb(newEntry);
+               // await InsertScheduleDb(newEntry);
                 editedPlan.Add(newEntry);
                 i++;
+            }
+            foreach (var entry in editedPlan) {
+                await InsertScheduleDb(entry);
             }
             await updateAuditHistory(id.ToString(), parentId.ToString());
             return new AmortizationPlan { Schedules = editedPlan, Summary = editedRequest };
