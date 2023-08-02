@@ -232,7 +232,7 @@ class Calculation extends React.Component {
                         <div style={{ display: 'flex', width: '90%' }}>
                             <div style={{ width: '60%', marginRight: '50px' }}>
                                 <LineChart
-                                    width={900}
+                                    width={750}
                                     height={400}
                                     data={this.getGraphData(schedulesData)}
                                     margin={{
@@ -255,8 +255,8 @@ class Calculation extends React.Component {
 
 
 
-                            <div style={{ width: '50%' }}>
-                                <ResponsiveContainer width="100%" height={300}>
+                            <div style={{ width: '60%', marginRight: "-160px" }}>
+                                <ResponsiveContainer width="100%" height={400}>
                                     <PieChart>
                                         <Pie data={pieChart} dataKey="value" cx="50%" cy="50%" outerRadius={80} fill="#27374D" />
                                         <Pie data={pieChart} dataKey="value" cx="50%" cy="50%" innerRadius={90} outerRadius={120} fill="#9DB2BF" label />
