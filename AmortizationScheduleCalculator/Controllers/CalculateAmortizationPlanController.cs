@@ -50,27 +50,6 @@ namespace AmortizationScheduleCalculator.Controllers
            return Ok(scheduleList);
         }
 
-        [HttpPost("edit"), Authorize]
-        public async Task<IActionResult> EditCalculation(Request scheduleReq, [FromQuery] string reqId)
-        {
-
-
-
-            var scheduleList = new AmortizationPlan();
-            try
-            {
-                scheduleList = await _calculate.EditCalculation(scheduleReq, reqId);
-                return Ok(scheduleList);
-
-
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
         [HttpGet("getallrequests"), Authorize]
         public List<Request> getAllRequests()
         {
