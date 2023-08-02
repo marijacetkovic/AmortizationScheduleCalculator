@@ -23,6 +23,7 @@ class EditSchedule extends React.Component {
             keyValueStore: {},
             showEarlyPaymentFields: false,
             formDataEarly: [{ key: '', value: '' }, { key: '', value: '' }],
+            fee: {}
 
         };
     };
@@ -69,6 +70,13 @@ class EditSchedule extends React.Component {
         }));
     };
 
+    QGetTextFromFieldFee = (e) => {
+        this.setState((prevState) => ({
+            fee: { ...prevState.fee, [e.target.name]: e.target.value }
+        }));
+    };
+
+
 
     renderPartialPaymentFields = () => {
         const { showPartialPaymentFields} = this.state;
@@ -80,12 +88,12 @@ class EditSchedule extends React.Component {
                     <div className="form-floating">
                         <span className="spanInput">&euro;</span>
                         <input
-                            onChange={(e) => this.QGetTextFromField(e)}
+                            onChange={(e) => this.QGetTextFromFieldFee(e)}
                             type="number"
                             className="form-control"
                             id="floatingPartialPayment"
                             placeholder=""
-                            name="partialPayment"
+                            name="fee"
                             style={{ paddingLeft: '25px' }}
                             min={1}
                         />
@@ -288,6 +296,7 @@ class EditSchedule extends React.Component {
                 this.state.formDataEarly.forEach((item) => {
                     parameterDataEarly[item.key] = parseFloat(item.value);
                 });
+                console.log(parameterDataEarly)
 
                 axios.post('https://localhost:7224/CalculateAmortizationPlan/applyearly', parameterDataEarly,{
                     headers: {
@@ -303,20 +312,21 @@ class EditSchedule extends React.Component {
                     this.state.formData.forEach((item) => {
                     parameterData[item.key] = parseFloat(item.value);
                     });
+                    console.log(parameterData)
 
                     axios.post('https://localhost:7224/CalculateAmortizationPlan/applypartial', parameterData, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     },
                     params: {
-                        reqName: sndRes.data.summary.request_Id
+                        reqName: sndRes.data.summary.request_Id,
+                        fee: parseFloat( this.state.fee.fee )
                     }
                     }).then(rdRes => {
                     console.log(rdRes.data)
                     console.log("Sent to server...")
                     this.props.QIDFromChild({
-                     page: "editcalculation", editSum: response.data.summary, editSchedules: response.data.schedules
-                        })
+                        page: "editcalculation", editSum: rdRes.data.summary, editSchedules: rdRes.data.schedules})
                    
 
                 })
@@ -350,8 +360,9 @@ class EditSchedule extends React.Component {
         const { showPartialPaymentFields } = this.state;
         const { showEarlyPaymentFields } = this.state;
 
+        console.log(typeof(this.state.fee.fee))
+
         console.log(edited.loan_Amount)
-        const amount = edited.loan_Amount;
         
         console.log(this.state.formData);
         console.log(this.state.formDataEarly);

@@ -119,12 +119,6 @@ class Calculation extends React.Component {
             { name: 'Other costs', value: summaryData.total_Other_Costs }
         ];
 
-        const pieChart = [
-            { name: 'Principal Paid', value: loanAm },
-            { name: 'Interest Paid', value: summaryData.total_Interest_Paid },
-            { name: 'Other costs', value: summaryData.total_Other_Costs }
-        ];
-
         return (
             <div style={{
                 display: "flex",
