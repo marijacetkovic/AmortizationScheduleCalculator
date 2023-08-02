@@ -19,7 +19,7 @@ namespace AmortizationScheduleCalculator.Middleware
                 await next(context);
             }
             catch (InvalidInputException e)
-            {                _logger.LogError(e, e.Message);
+            {   _logger.LogError(e, e.Message);
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 ProblemDetails problem = new()
                 {
