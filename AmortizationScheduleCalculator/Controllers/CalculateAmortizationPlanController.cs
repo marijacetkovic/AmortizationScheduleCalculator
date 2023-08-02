@@ -37,6 +37,7 @@ namespace AmortizationScheduleCalculator.Controllers
         [HttpPost, Authorize]
         public async Task<IActionResult> CreateNewCalculation(Request scheduleReq)
         {
+
           var scheduleList = await _calculate.CreateNewCalculation(scheduleReq);
           var id = scheduleList.Summary.Request_Id;
           await _calculate.updateAuditHistory(id.ToString(), id.ToString()); //first entry in audit history
@@ -47,6 +48,27 @@ namespace AmortizationScheduleCalculator.Controllers
         {   
            var scheduleList = await _calculate.EditCalculation(scheduleReq,reqId);
            return Ok(scheduleList);
+        }
+
+        [HttpPost("edit"), Authorize]
+        public async Task<IActionResult> EditCalculation(Request scheduleReq, [FromQuery] string reqId)
+        {
+
+
+
+            var scheduleList = new AmortizationPlan();
+            try
+            {
+                scheduleList = await _calculate.EditCalculation(scheduleReq, reqId);
+                return Ok(scheduleList);
+
+
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("getallrequests"), Authorize]

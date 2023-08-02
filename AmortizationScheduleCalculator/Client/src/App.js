@@ -1,8 +1,6 @@
 import React from "react";
 import './App.css';
 import axios from "axios";
-import Home from './Components/home';
-
 import Profile from './Components/profile';
 import Pdf from './Components/pdf';
 import Login from './Components/login';
@@ -10,7 +8,9 @@ import RegForm from "./Components/RegisForm";
 import Schedule from "./Components/schedule";
 import Calculation from "./Components/calculation";
 import History from "./Components/history";
-
+import EditSchedule from "./Components/edited";
+import EditCalculation from "./Components/editcalculation";
+import AuditHistory from "./Components/auditHistory";
 
 
 class App extends React.Component {
@@ -20,14 +20,20 @@ class App extends React.Component {
         super(props);
         //state is where our "global" variable will be store
         this.state = {
-            CurrentPage: "login", token: "", calculation: {}, calculation1: [], idReq: 1, reqNameEdit: {},
+            CurrentPage: "login", token: "", calculation: {}, calculation1: [], idReq: 1, edited: {},
             loanA: 0,
             loanP: 0,
             loanS:  0,
             loanR:  0,
             loanAp:  0,
             loanIc:  0,
-            loanOc:  0 
+            loanOc: 0,
+            editCalculation: [], editCalculation1: [],
+            redIdEdit: 0,
+            sumEdit: {},
+            schedulesEdit: [],
+            auditHid: 0
+
         };
 
     };
@@ -38,9 +44,9 @@ class App extends React.Component {
         let page = state.CurrentPage;
 
         switch (page) {
-            //on profile is calculator
+            // profile is the calculator
             case "profile":
-                return <Profile editSchedule={ this.state.reqNameEdit} QIDFromChild={this.QSetView} />;
+                return <Profile editSchedule={this.state.edited} QIDFromChild={this.QSetView} />;
             case "login":
                 return <Login QIDFromChild={this.QSetView} />;
             case "registration":
@@ -48,11 +54,17 @@ class App extends React.Component {
             case "Schedule":
                 return <Schedule idR={this.state.idReq} QIDFromChild={this.QSetView} />;
             case "calculation":
-                return < Calculation amount={this.state.loanA} period={this.state.loanP} start={this.state.loanS} rate={this.state.loanR} approval={this.state.loanAp} loanaccount={ this.state.loanAp} insuren={this.state.loanIc} other={this.state.loanOc} data={this.state.calculation} schedule={this.state.calculation1} QIDFromChild={this.QSetView} />;
+                return <Calculation data={this.state.calculation} schedule={this.state.calculation1} QIDFromChild={this.QSetView} />;
             case "history":
                 return <History QIDFromChild={this.QSetView} />;
             case "pdf":
                 return <Pdf QIDFromChild={this.QSetView} />;
+            case "editschedule":
+                return <EditSchedule reqIdEdit={this.state.redIdEdit} editSchedule={this.state.edited} QIDFromChild={this.QSetView} />;
+            case "editcalculation":
+                return <EditCalculation editCalSummary={this.state.editCalculation} editCalSchedule={this.state.editCalculation1} QIDFromChild={this.QSetView} />;
+            case "auditHistory":
+                return <AuditHistory redId={this.state.auditHid } QIDFromChild={this.QSetView} />;
             default:
                 return <Login />;
 
@@ -65,14 +77,14 @@ class App extends React.Component {
             calculation: obj.sum || {},
             calculation1: obj.schedules || [],
             idReq: obj.idForSchedule || 0,
-            reqNameEdit: obj.reqNameSame || [],
-            loanA: obj.loan || 0,
-            loanP: obj.loanperiod || 0,
-            loanS: obj.loanStart || 0,
-            loanR: obj.interestR || 0,
-            loanAp: obj.appC || 0,
-            loanIc: obj.insC || 0,
-            loanOc: obj.otherC || 0 
+            edited: obj.editnew || {},
+            editCalculation: obj.editSum || {},
+            editCalculation1: obj.editSchedules || [],
+            redIdEdit: obj.req_id || 0,
+            sumEdit: obj.sumEdit || {},
+            schedulesedit: obj.schedulesEdit || [],
+            auditHid: obj.auditreqId || 0
+            
         });
     };
 

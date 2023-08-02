@@ -20,7 +20,8 @@ namespace AmortizationScheduleCalculator.Services
             _register = register; 
             
         }
-        public async Task<AmortizationPlan> EditCalculation(Request scheduleReq,string originalId)
+        public async Task<AmortizationPlan> EditCalculation(Request scheduleReq, string originalId)
+
         {
             //set original to not visible 
             await updateRequest(originalId);
@@ -70,6 +71,7 @@ namespace AmortizationScheduleCalculator.Services
             additionalMonthlyCosts = scheduleReq.Account_Cost + scheduleReq.Insurance_Cost + scheduleReq.Other_Costs;
             //M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1]
             monthlyPaymentFixed = CalculateMonthly(loanAmount, monthlyInterestRate, numOfPayments) + additionalMonthlyCosts;
+
             otherCostsPayment = numOfPayments* additionalMonthlyCosts + scheduleReq.Approval_Cost;
             
 
@@ -187,6 +189,7 @@ namespace AmortizationScheduleCalculator.Services
             int childId = req.Request_Id;
             Request editedRequest = req;
             editedRequest.Date_Issued = DateTime.Now;
+
             await updateRequest(childId.ToString()); //changes display flag to false 
 
             //get the new id to link the new entries
@@ -515,11 +518,14 @@ namespace AmortizationScheduleCalculator.Services
         public async Task<List<Request>> getAuditHistory(string lastChildID)
         {
             var parentReqId = await getParentId(Int32.Parse(lastChildID));
+
             var id = Int32.Parse(_register.getUserId());
             var childrenRequestIds = (await _db.QueryAsync<int>("select child_request_id from \"audithistory\" where parent_request_id=@parentId", 
                 new { parentId = parentReqId})).ToList();
             var childRequests = (await _db.QueryAsync<Request>("SELECT * FROM \"Request\" WHERE request_id = ANY(@childIds) AND r_user_id=@id", new {childIds= childrenRequestIds.ToArray(), id=id })).ToList();
             return childRequests;
+
+
 
         }
 
