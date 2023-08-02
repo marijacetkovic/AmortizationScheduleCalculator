@@ -95,8 +95,6 @@ namespace AmortizationScheduleCalculator.Services
             Console.WriteLine(id);
             scheduleReq.Request_Id = id;
 
-            await updateAuditHistory(id.ToString(), id.ToString()); //first entry in audit history
-
             var currentDate = loanStartDate.Date;
             decimal interestPayment, remainingBalance = loanAmount, principalPayment;
             var scheduleList = new List<Schedule>();

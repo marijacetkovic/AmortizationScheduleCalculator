@@ -19,39 +19,58 @@ class EditSchedule extends React.Component {
             },
             showPartialPaymentFields: false,
             partialPayments: [],
+            formData: [{ key: '', value: '' }, { key: '', value: '' }],
+            keyValueStore: {}
+
         };
     };
 
-    handlePartialPaymentChange = (index, value) => {
-        // Update the value for the corresponding partial payment in the state array
+    handleInputChange = (e, index) => {
+        const { name, value } = e.target;
         this.setState((prevState) => {
-            const updatedPartialPayments = prevState.partialPayments.map((payment, i) =>
-                i === index ? { value } : payment
-            );
-            console.log(updatedPartialPayments)
-            return { partialPayments: updatedPartialPayments };
+            const updatedFormData = [...prevState.formData];
+            updatedFormData[index] = { ...updatedFormData[index], [name]: value };
+            return { formData: updatedFormData };
         });
     };
+
+
+    handleSubmit = (e) => {
+        e.preventDefault();
+        const { key, value } = this.state.formData;
+        if (key && value) {
+            this.setState((prevState) => ({
+                keyValueStore: { ...prevState.keyValueStore, [key]: value },
+                formData: { key: '', value: '' }, // Clear the input fields after submission
+            }));
+        }
+    };
+
+    //handlePartialPaymentChange = (index, value) => {
+    //    // Update the value for the corresponding partial payment in the state array
+    //    this.setState((prevState) => {
+    //        const updatedPartialPayments = prevState.partialPayments.map((payment, i) =>
+    //            i === index ? { value } : payment
+    //        );
+    //        console.log(updatedPartialPayments)
+    //        return { partialPayments: updatedPartialPayments };
+    //    });
+    //};
 
     togglePartialPaymentFields = () => {
         this.setState((prevState) => ({
             showPartialPaymentFields: !prevState.showPartialPaymentFields,
-        }));
+       }));
     };
 
-    handleAddOneMoreField = () => {
-        // Create a new empty partial payment object and add it to the state array
-        this.setState((prevState) => ({
-            partialPayments: [...prevState.partialPayments, { value: '' }],
-        }));
-    };
 
     renderPartialPaymentFields = () => {
         const { showPartialPaymentFields, partialPayments } = this.state;
 
         if (showPartialPaymentFields) {
             return (
-                <>
+                //<>
+                <div>
                     <div className="form-floating">
                         <span className="spanInput">&euro;</span>
                         <input
@@ -67,58 +86,190 @@ class EditSchedule extends React.Component {
                         <label>Fee</label>
                     </div>
 
-                    {partialPayments.map((numMonth, payment, index) => (
-                        <div style={{ display: "flex", flexDirection: "row" }}>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
 
+                        {this.state.formData.map((data, index) => (
                             <div key={index}>
                                 <div className="form-floating">
-
                                     <input
-                                        onChange={(e) => this.handlePartialPaymentChange(index, e.target.value)}
+                                        onChange={(e) => this.handleInputChange(e, index)}
                                         type="number"
                                         className="form-control"
                                         id={`floatingPartialPayment${index}`}
                                         placeholder=""
-                                        name="partialPaymentNum"
+                                        name="key"
                                         style={{ paddingLeft: '25px' }}
                                         min={1}
-                                        //value={numMonth.value}
+                                        value={data.key}
                                     />
                                     <label>Number of payment </label>
                                 </div>
 
                                 <div className="form-floating">
-
-                                        <span className="spanInput">&euro;</span>
-                                        <input
-                                            onChange={(e) => this.handlePartialPaymentChange(index, e.target.value)}
-                                            type="number"
-                                            className="form-control"
-                                            id={`floatingPartialPayment${index}`}
-                                            placeholder=""
-                                            name="partialPaymentAmount"
-                                            style={{ paddingLeft: '25px' }}
-                                            min={1}
-                                            //value={payment.value}
-                                        />
-                                        <label>Amount</label>
+                                    <span className="spanInput">&euro;</span>
+                                    <input
+                                        onChange={(e) => this.handleInputChange(e, index)}
+                                        type="number"
+                                        className="form-control"
+                                        id={`floatingPartialPayment${index}`}
+                                        placeholder=""
+                                        name="value"
+                                        style={{ paddingLeft: '25px' }}
+                                        min={1}
+                                        value={data.value}
+                                    />
+                                    <label>Amount</label>
                                 </div>
+
                             </div>
 
-                        </div>
-                    ))}
-                    <br></br>
-                    <div style={{ textAlign: "right" }}>
-                    <button onClick={this.handleAddOneMoreField} style={{ backgroundColor: "#526D82", borderRadius: "60px", border: "none", textAlign: "right" }}  >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="25"  class="bi bi-plus" viewBox="0 0 16 16">
-                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
-                        </svg>
-                        </button>
+                           
+
+                        ))}
+
+                        {/*<div>*/}
+                        {/*    <div className="form-floating">*/}
+
+                        {/*        <input*/}
+                        {/*            onChange={this.handleInputChange}*/}
+                        {/*            type="number"*/}
+                        {/*            className="form-control"*/}
+                        {/*            id={`floatingPartialPayment`}*/}
+                        {/*            placeholder=""*/}
+                        {/*            name="key"*/}
+                        {/*            style={{ paddingLeft: '25px' }}*/}
+                        {/*            min={1}*/}
+                        {/*            value={this.state.formData.key}*/}
+                        {/*        />*/}
+                        {/*        <label>Number of payment </label>*/}
+                        {/*    </div>*/}
+
+                        {/*    <div className="form-floating">*/}
+
+                        {/*        <span className="spanInput">&euro;</span>*/}
+                        {/*        <input*/}
+                        {/*            onChange={this.handleInputChange}*/}
+                        {/*            type="number"*/}
+                        {/*            className="form-control"*/}
+                        {/*            id={`floatingPartialPayment`}*/}
+                        {/*            placeholder=""*/}
+                        {/*            name="value"*/}
+                        {/*            style={{ paddingLeft: '25px' }}*/}
+                        {/*            min={1}*/}
+                        {/*            value={this.state.formData.value}*/}
+                        {/*        />*/}
+                        {/*        <label>Amount</label>*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
+
+                        {/*<div>*/}
+                        {/*    <div className="form-floating">*/}
+
+                        {/*        <input*/}
+                        {/*            onChange={this.handleInputChange}*/}
+                        {/*            type="number"*/}
+                        {/*            className="form-control"*/}
+                        {/*            id={`floatingPartialPayment`}*/}
+                        {/*            placeholder=""*/}
+                        {/*            name="key"*/}
+                        {/*            style={{ paddingLeft: '25px' }}*/}
+                        {/*            min={1}*/}
+                        {/*            value={this.state.formData.key}*/}
+                        {/*        />*/}
+                        {/*        <label>Number of payment </label>*/}
+                        {/*    </div>*/}
+
+                        {/*    <div className="form-floating">*/}
+
+                        {/*        <span className="spanInput">&euro;</span>*/}
+                        {/*        <input*/}
+                        {/*            onChange={this.handleInputChange}*/}
+                        {/*            type="number"*/}
+                        {/*            className="form-control"*/}
+                        {/*            id={`floatingPartialPayment`}*/}
+                        {/*            placeholder=""*/}
+                        {/*            name="value"*/}
+                        {/*            style={{ paddingLeft: '25px' }}*/}
+                        {/*            min={1}*/}
+                        {/*            value={this.state.formData.value}*/}
+                        {/*        />*/}
+                        {/*        <label>Amount</label>*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
+
+                        {/*<h2>Key-Value Store</h2>*/}
+                        {/*<ul>*/}
+                        {/*    {Object.entries(this.state.keyValueStore).map(([key, value]) => (*/}
+                        {/*        <li key={key}>*/}
+                        {/*            <strong>{key}:</strong> {value}*/}
+                        {/*        </li>*/}
+                        {/*    ))}*/}
+                        {/*</ul>*/}
+
+
+
                     </div>
-                </>
+
+
+                    {/*{partialPayments.map((numMonth, payment, index) => (*/}
+               {/*     //    <div style={{ display: "flex", flexDirection: "row" }}>*/}
+
+               {/*     //        <div key={index}>*/}
+               {/*     //            <div className="form-floating">*/}
+
+               {/*     //                <input*/}
+               {/*     //                    onChange={(e) => this.handlePartialPaymentChange(index, e.target.value)}*/}
+               {/*     //                    type="number"*/}
+               {/*     //                    className="form-control"*/}
+               {/*     //                    id={`floatingPartialPayment${index}`}*/}
+               {/*     //                    placeholder=""*/}
+               {/*     //                    name="partialPaymentNum"*/}
+               {/*     //                    style={{ paddingLeft: '25px' }}*/}
+               {/*     //                    min={1}*/}
+               {/*     //                    //value={numMonth.value}*/}
+               {/*     //                />*/}
+               {/*     //                <label>Number of payment </label>*/}
+               {/*     //            </div>*/}
+
+               {/*     //            <div className="form-floating">*/}
+
+               {/*     //                    <span className="spanInput">&euro;</span>*/}
+               {/*     //                    <input*/}
+               {/*     //                        onChange={(e) => this.handlePartialPaymentChange(index, e.target.value)}*/}
+               {/*     //                        type="number"*/}
+               {/*     //                        className="form-control"*/}
+               {/*     //                        id={`floatingPartialPayment${index}`}*/}
+               {/*     //                        placeholder=""*/}
+               {/*     //                        name="partialPaymentAmount"*/}
+               {/*     //                        style={{ paddingLeft: '25px' }}*/}
+               {/*     //                        min={1}*/}
+               {/*     //                        //value={payment.value}*/}
+               {/*     //                    />*/}
+               {/*     //                    <label>Amount</label>*/}
+               {/*     //            </div>*/}
+               {/*     //        </div>*/}
+
+               {/*     //    </div>*/}
+               {/*     //))}*/}
+               {/*     //<br></br>*/}
+               {/*     //<div style={{ textAlign: "right" }}>*/}
+               {/*     //<button onClick={this.handleAddOneMoreField} style={{ backgroundColor: "#526D82", borderRadius: "60px", border: "none", textAlign: "right" }}  >*/}
+               {/*     //    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="25"  class="bi bi-plus" viewBox="0 0 16 16">*/}
+               {/*     //        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />*/}
+               {/*     //    </svg>*/}
+               {/*     //    </button>*/}
+               {/*     //</div>*/}
+                    {/*// </>*/}
+
+
+                </div >
+
+
             );
         }
     };
+
+
 
     QGetTextFromField = (e) => {
         this.setState((prevState) => ({
@@ -146,7 +297,6 @@ class EditSchedule extends React.Component {
         console.log(this.props.editSchedule)
         const edited = this.props.editSchedule;
         console.log(edited)
-       
 
         const isValid = this.validateInput();
 
@@ -189,46 +339,26 @@ class EditSchedule extends React.Component {
                 console.log(response.data.summary)
                 console.log("Sent to server...")
 
-                this.props.QIDFromChild({
-                    page: "editcalculation", editSum: response.data.summary, editSchedules: response.data.schedules })
+                //this.props.QIDFromChild({
+                //    page: "editcalculation", editSum: response.data.summary, editSchedules: response.data.schedules
+                //})
 
-                //const partialPaymentsValues = this.state.partialPayments.map(payment => payment.value);
+                const parameterData = {};
+                this.state.formData.forEach((item) => {
+                    parameterData[item.key] = parseFloat(item.value);
+                });
 
-                //axios.post('https://localhost:7224/CalculateAmortizationPlan/applypartial',
-                //    {
-                //        //additionalProp1: 0,
-                //        //additionalProp2: 0,
-                //        //additionalProp3: 0,
-                //        //...partialPaymentsValues.reduce((obj, value, index) => {
-                //        //    obj[`additionalProp${index + 1}`] = value;
-                //        //    return obj;
-                //        //}, {}),
-                //    },
-                //    {
-                //        headers: {
-                //            Authorization: `Bearer ${localStorage.getItem('token')}`
-                //        },
-                //        params:
-                //        {
-                //            reqName: response.data //promeni
-                //        }
-                //    }).then(secondResponse => {
-                //        console.log('Second POST request successful:', secondResponse.data);
-
-                //        this.props.QIDFromChild({
-                //            page: "editcalculation", editSum: response.data.summary, editSchedules: response.data.schedules
-
-                //        }).catch(err => {
-                //            console.log('Error in second POST request:', err);
-                //        });
-
-                //    })
-                //    .catch(err => {
-                //        console.log(err)
-                //        console.log(err.response.data);
-                //        alert(err.response.data)
-
-                //    })
+                axios.post('https://localhost:7224/CalculateAmortizationPlan/applypartial', parameterData, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                    params: {
+                        reqName: response.data.summary.request_Id
+                    }
+                }).then(sndRes => {
+                    console.log(sndRes.data)
+                    console.log("Sent to server...")
+                })
 
             }).catch(err => {
                 console.log(err)
@@ -259,7 +389,8 @@ class EditSchedule extends React.Component {
 
         console.log(edited.loan_Amount)
         const amount = edited.loan_Amount;
-
+        
+        console.log(this.state.formData);
         return (
             <div>
 

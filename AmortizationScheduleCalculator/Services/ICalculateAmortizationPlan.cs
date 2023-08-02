@@ -12,5 +12,6 @@ namespace AmortizationScheduleCalculator.Services
         Task<Request> getRequest(string reqName);
         Task<Request> updateRequest(string reqName);
         Task<List<Request>> getAuditHistory(string parentReqId);
+        Task updateAuditHistory(string childReqId, string parentReqId);
     }
 }

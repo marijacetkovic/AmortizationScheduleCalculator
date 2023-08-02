@@ -42,6 +42,8 @@ namespace AmortizationScheduleCalculator.Controllers
             try
             {
                 scheduleList = await _calculate.CreateNewCalculation(scheduleReq);
+                var id = scheduleList.Summary.Request_Id;
+                await _calculate.updateAuditHistory(id.ToString(), id.ToString()); //first entry in audit history
                 return Ok(scheduleList);
 
             }
