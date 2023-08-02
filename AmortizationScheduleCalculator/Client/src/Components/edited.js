@@ -20,7 +20,9 @@ class EditSchedule extends React.Component {
             showPartialPaymentFields: false,
             partialPayments: [],
             formData: [{ key: '', value: '' }, { key: '', value: '' }],
-            keyValueStore: {}
+            keyValueStore: {},
+            showEarlyPaymentFields: false,
+            formDataEarly: [{ key: '', value: '' }, { key: '', value: '' }],
 
         };
     };
@@ -31,6 +33,15 @@ class EditSchedule extends React.Component {
             const updatedFormData = [...prevState.formData];
             updatedFormData[index] = { ...updatedFormData[index], [name]: value };
             return { formData: updatedFormData };
+        });
+    };
+
+    handleInputChangeEarly = (e, index) => {
+        const { name, value } = e.target;
+        this.setState((prevState) => {
+            const updatedFormData = [...prevState.formDataEarly];
+            updatedFormData[index] = { ...updatedFormData[index], [name]: value };
+            return { formDataEarly: updatedFormData };
         });
     };
 
@@ -46,30 +57,25 @@ class EditSchedule extends React.Component {
         }
     };
 
-    //handlePartialPaymentChange = (index, value) => {
-    //    // Update the value for the corresponding partial payment in the state array
-    //    this.setState((prevState) => {
-    //        const updatedPartialPayments = prevState.partialPayments.map((payment, i) =>
-    //            i === index ? { value } : payment
-    //        );
-    //        console.log(updatedPartialPayments)
-    //        return { partialPayments: updatedPartialPayments };
-    //    });
-    //};
-
     togglePartialPaymentFields = () => {
         this.setState((prevState) => ({
             showPartialPaymentFields: !prevState.showPartialPaymentFields,
        }));
     };
 
+    toggleEarlyPaymentFields = () => {
+        this.setState((prevState) => ({
+            showEarlyPaymentFields: !prevState.showEarlyPaymentFields,
+        }));
+    };
+
 
     renderPartialPaymentFields = () => {
-        const { showPartialPaymentFields, partialPayments } = this.state;
+        const { showPartialPaymentFields} = this.state;
 
         if (showPartialPaymentFields) {
             return (
-                //<>
+                
                 <div>
                     <div className="form-floating">
                         <span className="spanInput">&euro;</span>
@@ -122,144 +128,9 @@ class EditSchedule extends React.Component {
                                 </div>
 
                             </div>
-
-                           
-
                         ))}
-
-                        {/*<div>*/}
-                        {/*    <div className="form-floating">*/}
-
-                        {/*        <input*/}
-                        {/*            onChange={this.handleInputChange}*/}
-                        {/*            type="number"*/}
-                        {/*            className="form-control"*/}
-                        {/*            id={`floatingPartialPayment`}*/}
-                        {/*            placeholder=""*/}
-                        {/*            name="key"*/}
-                        {/*            style={{ paddingLeft: '25px' }}*/}
-                        {/*            min={1}*/}
-                        {/*            value={this.state.formData.key}*/}
-                        {/*        />*/}
-                        {/*        <label>Number of payment </label>*/}
-                        {/*    </div>*/}
-
-                        {/*    <div className="form-floating">*/}
-
-                        {/*        <span className="spanInput">&euro;</span>*/}
-                        {/*        <input*/}
-                        {/*            onChange={this.handleInputChange}*/}
-                        {/*            type="number"*/}
-                        {/*            className="form-control"*/}
-                        {/*            id={`floatingPartialPayment`}*/}
-                        {/*            placeholder=""*/}
-                        {/*            name="value"*/}
-                        {/*            style={{ paddingLeft: '25px' }}*/}
-                        {/*            min={1}*/}
-                        {/*            value={this.state.formData.value}*/}
-                        {/*        />*/}
-                        {/*        <label>Amount</label>*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
-                        {/*<div>*/}
-                        {/*    <div className="form-floating">*/}
-
-                        {/*        <input*/}
-                        {/*            onChange={this.handleInputChange}*/}
-                        {/*            type="number"*/}
-                        {/*            className="form-control"*/}
-                        {/*            id={`floatingPartialPayment`}*/}
-                        {/*            placeholder=""*/}
-                        {/*            name="key"*/}
-                        {/*            style={{ paddingLeft: '25px' }}*/}
-                        {/*            min={1}*/}
-                        {/*            value={this.state.formData.key}*/}
-                        {/*        />*/}
-                        {/*        <label>Number of payment </label>*/}
-                        {/*    </div>*/}
-
-                        {/*    <div className="form-floating">*/}
-
-                        {/*        <span className="spanInput">&euro;</span>*/}
-                        {/*        <input*/}
-                        {/*            onChange={this.handleInputChange}*/}
-                        {/*            type="number"*/}
-                        {/*            className="form-control"*/}
-                        {/*            id={`floatingPartialPayment`}*/}
-                        {/*            placeholder=""*/}
-                        {/*            name="value"*/}
-                        {/*            style={{ paddingLeft: '25px' }}*/}
-                        {/*            min={1}*/}
-                        {/*            value={this.state.formData.value}*/}
-                        {/*        />*/}
-                        {/*        <label>Amount</label>*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-
-                        {/*<h2>Key-Value Store</h2>*/}
-                        {/*<ul>*/}
-                        {/*    {Object.entries(this.state.keyValueStore).map(([key, value]) => (*/}
-                        {/*        <li key={key}>*/}
-                        {/*            <strong>{key}:</strong> {value}*/}
-                        {/*        </li>*/}
-                        {/*    ))}*/}
-                        {/*</ul>*/}
-
-
-
                     </div>
 
-
-                    {/*{partialPayments.map((numMonth, payment, index) => (*/}
-               {/*     //    <div style={{ display: "flex", flexDirection: "row" }}>*/}
-
-               {/*     //        <div key={index}>*/}
-               {/*     //            <div className="form-floating">*/}
-
-               {/*     //                <input*/}
-               {/*     //                    onChange={(e) => this.handlePartialPaymentChange(index, e.target.value)}*/}
-               {/*     //                    type="number"*/}
-               {/*     //                    className="form-control"*/}
-               {/*     //                    id={`floatingPartialPayment${index}`}*/}
-               {/*     //                    placeholder=""*/}
-               {/*     //                    name="partialPaymentNum"*/}
-               {/*     //                    style={{ paddingLeft: '25px' }}*/}
-               {/*     //                    min={1}*/}
-               {/*     //                    //value={numMonth.value}*/}
-               {/*     //                />*/}
-               {/*     //                <label>Number of payment </label>*/}
-               {/*     //            </div>*/}
-
-               {/*     //            <div className="form-floating">*/}
-
-               {/*     //                    <span className="spanInput">&euro;</span>*/}
-               {/*     //                    <input*/}
-               {/*     //                        onChange={(e) => this.handlePartialPaymentChange(index, e.target.value)}*/}
-               {/*     //                        type="number"*/}
-               {/*     //                        className="form-control"*/}
-               {/*     //                        id={`floatingPartialPayment${index}`}*/}
-               {/*     //                        placeholder=""*/}
-               {/*     //                        name="partialPaymentAmount"*/}
-               {/*     //                        style={{ paddingLeft: '25px' }}*/}
-               {/*     //                        min={1}*/}
-               {/*     //                        //value={payment.value}*/}
-               {/*     //                    />*/}
-               {/*     //                    <label>Amount</label>*/}
-               {/*     //            </div>*/}
-               {/*     //        </div>*/}
-
-               {/*     //    </div>*/}
-               {/*     //))}*/}
-               {/*     //<br></br>*/}
-               {/*     //<div style={{ textAlign: "right" }}>*/}
-               {/*     //<button onClick={this.handleAddOneMoreField} style={{ backgroundColor: "#526D82", borderRadius: "60px", border: "none", textAlign: "right" }}  >*/}
-               {/*     //    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="25"  class="bi bi-plus" viewBox="0 0 16 16">*/}
-               {/*     //        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />*/}
-               {/*     //    </svg>*/}
-               {/*     //    </button>*/}
-               {/*     //</div>*/}
-                    {/*// </>*/}
 
 
                 </div >
@@ -269,7 +140,58 @@ class EditSchedule extends React.Component {
         }
     };
 
+    renderEarlyPaymentFields = () => {
+        const { showEarlyPaymentFields } = this.state;
 
+        if (showEarlyPaymentFields) {
+            return (
+
+                <div>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+
+                        {this.state.formDataEarly.map((data, index) => (
+                            <div key={index}>
+                                <div className="form-floating">
+                                    <input
+                                        onChange={(e) => this.handleInputChangeEarly(e, index)}
+                                        type="number"
+                                        className="form-control"
+                                        id={`floatingPartialPayment${index}`}
+                                        placeholder=""
+                                        name="key"
+                                        style={{ paddingLeft: '25px' }}
+                                        min={1}
+                                        value={data.key}
+                                    />
+                                    <label>Number of payment </label>
+                                </div>
+
+                                <div className="form-floating">
+                                    <span className="spanInput">&euro;</span>
+                                    <input
+                                        onChange={(e) => this.handleInputChangeEarly(e, index)}
+                                        type="number"
+                                        className="form-control"
+                                        id={`floatingPartialPayment${index}`}
+                                        placeholder=""
+                                        name="value"
+                                        style={{ paddingLeft: '25px' }}
+                                        min={1}
+                                        value={data.value}
+                                    />
+                                    <label>Amount</label>
+                                </div>
+
+                            </div>
+                        ))}
+                    </div>
+
+                </div >
+
+
+            );
+        }
+    };
 
     QGetTextFromField = (e) => {
         this.setState((prevState) => ({
@@ -291,7 +213,6 @@ class EditSchedule extends React.Component {
         return !Object.values(errorMessages).some((message) => message);
     };
 
-    //put the fields
     QPostField = () => {
 
         console.log(this.props.editSchedule)
@@ -343,21 +264,61 @@ class EditSchedule extends React.Component {
                 //    page: "editcalculation", editSum: response.data.summary, editSchedules: response.data.schedules
                 //})
 
-                const parameterData = {};
-                this.state.formData.forEach((item) => {
-                    parameterData[item.key] = parseFloat(item.value);
+                //const parameterData = {};
+                //this.state.formData.forEach((item) => {
+                //    parameterData[item.key] = parseFloat(item.value);
+                //});
+
+                //axios.post('https://localhost:7224/CalculateAmortizationPlan/applypartial', parameterData, {
+                //    headers: {
+                //        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                //    },
+                //    params: {
+                //        reqName: response.data.summary.request_Id
+                //    }
+                //}).then(sndRes => {
+                //    console.log(sndRes.data)
+                //    console.log("Sent to server...")
+                //    this.props.QIDFromChild({
+                //     page: "editcalculation", editSum: response.data.summary, editSchedules: response.data.schedules
+                //        })
+                //   })
+
+                const parameterDataEarly = {};
+                this.state.formDataEarly.forEach((item) => {
+                    parameterDataEarly[item.key] = parseFloat(item.value);
                 });
 
-                axios.post('https://localhost:7224/CalculateAmortizationPlan/applypartial', parameterData, {
+                axios.post('https://localhost:7224/CalculateAmortizationPlan/applyearly', parameterDataEarly,{
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
                     },
                     params: {
                         reqName: response.data.summary.request_Id
                     }
                 }).then(sndRes => {
-                    console.log(sndRes.data)
+                    console.log(sndRes.data);
+
+                    const parameterData = {};
+                    this.state.formData.forEach((item) => {
+                    parameterData[item.key] = parseFloat(item.value);
+                    });
+
+                    axios.post('https://localhost:7224/CalculateAmortizationPlan/applypartial', parameterData, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    },
+                    params: {
+                        reqName: sndRes.data.summary.request_Id
+                    }
+                    }).then(rdRes => {
+                    console.log(rdRes.data)
                     console.log("Sent to server...")
+                    this.props.QIDFromChild({
+                     page: "editcalculation", editSum: response.data.summary, editSchedules: response.data.schedules
+                        })
+                   
+
                 })
 
             }).catch(err => {
@@ -366,6 +327,7 @@ class EditSchedule extends React.Component {
                 alert(err.response.data)
 
             })
+        })
 
     }
     
@@ -386,11 +348,13 @@ class EditSchedule extends React.Component {
         const surname = localStorage.getItem('surname');
         const edited = this.props.editSchedule;
         const { showPartialPaymentFields } = this.state;
+        const { showEarlyPaymentFields } = this.state;
 
         console.log(edited.loan_Amount)
         const amount = edited.loan_Amount;
         
         console.log(this.state.formData);
+        console.log(this.state.formDataEarly);
         return (
             <div>
 
@@ -504,12 +468,23 @@ class EditSchedule extends React.Component {
                         <br></br>
 
                         <div >
+                            <button onClick={this.toggleEarlyPaymentFields} className="btn btn-outline-primary">
+                                {showEarlyPaymentFields ? 'Hide' : 'Early Payments'}
+                            </button>
+                        </div>
+                        {this.renderEarlyPaymentFields()}
+
+                        <br></br>
+
+                        <div >
                             <button onClick={this.togglePartialPaymentFields} className="btn btn-outline-primary">
-                            {showPartialPaymentFields ? 'Hide' : 'Partial Payments'}
-                        </button>
-                    </div>
+                                     {showPartialPaymentFields ? 'Hide' : 'Partial Payments'}
+                             </button>
+                         </div>
                         {this.renderPartialPaymentFields()}
-                    <br></br>
+                        <br></br>
+
+
 
                     <button onClick={() => this.QPostField()} className="buttona" type="button">Calculate</button>
                 </div>

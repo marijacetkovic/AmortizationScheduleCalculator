@@ -68,15 +68,6 @@ class Calculation extends React.Component {
         return graphData;
     };
 
-    //formatDate1 = (inputDate) => {
-    //    const [datePart, monthPart, yearPart] = inputDate.split(/[T/]/);
-    //    const day = datePart.slice(0, 2);
-    //    const month = monthPart.padStart(2, '0');
-    //    const year = yearPart;
-    //    const formattedDate = `${day}/${month}/${year}`;
-    //    this.setState({ formattedDate });
-    //};
-
     getPdf = (reqid) => {
         console.log((reqid));
         axios.post('https://localhost:7224/CalculateAmortizationPlan/generatepdf', {}, {
@@ -116,16 +107,6 @@ class Calculation extends React.Component {
         const summaryData = this.props.data;
         console.log(summaryData)
         const schedulesData = this.props.schedule;
-
-        //let loanAm = this.props.amount;
-        //let loanP = this.props.period;
-        //let loanS = this.props.start;
-        //let rate = this.props.rate;
-        //let app = this.props.approval;
-        //let ins = this.props.insuren;
-        //let other = this.props.other;
-        //let account = this.props.loanaccount;
-
         console.log(this.props.data)
 
         console.log(schedulesData);
@@ -142,11 +123,8 @@ class Calculation extends React.Component {
         return (
             <div style={{
                 display: "flex",
-
                 flexDirection: "column",
-
                 alignItems: "center",
-
                 justifyContent: "center"
             }}>
                 <div className="container">
@@ -166,7 +144,7 @@ class Calculation extends React.Component {
 
                         </div>
 
-                        <div style={{ textAlign: "center" }} id="title">Amortization Calculator </div>
+                        <div  style={{ textAlign: "center" }} id="title">Amortization Calculator </div>
 
                         <div className="col-md-3 text-end">
                             <button type="button" onClick={() => this.QSetViewInParent({ page: "history" })} className="btn btn-outline me-2">History</button>
@@ -302,9 +280,6 @@ class Calculation extends React.Component {
 
                     </div>
                     : "Loading.."}
-
-               
-
                 
             </div>
         );
