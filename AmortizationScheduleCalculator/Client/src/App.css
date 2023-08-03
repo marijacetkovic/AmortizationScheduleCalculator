@@ -42,15 +42,133 @@
 #title {
     font-family: 'Segoe UI';
     font-weight: 400;
-    font-size: 44px;
+    font-size: 2.8vw;
     letter-spacing: 2px;
     text-align: center;
     justify-content: center;
+}
+
+/* Media query for phone views */
+@media (max-width: 767px) {
+    #title {
+        font-size: 28px; /* Adjust the minimum font size as needed */
+    }
+}
+/* Media query for phone views */
+@media (max-width: 767px) {
+    .text-end {
+        font-size: 14px; /* Adjust the minimum font size as needed */
+        justify-content: center; /* Center the buttons on phone views */
+        margin-left: -190px;
+    }
 }
 
 .uniButton {
     background-color: #F8F9FA;
     border: none;
 }
+
+.btn{
+    border: none;
+}
+
+.calculation-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.responsive-summary {
+    font-size: 20px; /* Set the default font size for SUMMARY text */
+}
+
+
+/* Media query for phone view */
+@media (max-width: 767px) {
+    /* Adjust the layout for phone view here */
+    .calculation-container {
+        /* Example adjustments: */
+        width: 100%; /* You can set the width to 70% or any value suitable for your design */
+        padding: 10px; /* Add some padding for better spacing */
+    }
+}
+
+@media (max-width: 767px) {
+    .card {
+        /* Adjust the maximum width to fit the phone screen */
+        max-width: 350px; /* You can set the maximum width to any value suitable for your design */
+    }
+    .responsive-table .thElement{
+        font-size: 11px; /* You can set the font size to any value suitable for your design */
+    }
+
+    .responsive-table .tdElement {
+        font-size: 11px; /* You can set the font size to any value suitable for your design */
+    }
+    .responsive-summary {
+        font-size: 11px; /* Set the font size to 11px for SUMMARY text on phone view */
+        /* Add any other styles you need for SUMMARY text on phone view */
+    }
+    .responsive-summary{
+        font-size: 11px
+    }
+    .responsive-table .responsive-summary {
+        font-size: 14px;
+    }
+
+
+}
+
+@media (max-width: 767px) {
+    div[style*="width: 100%; margin-right: -160px;"] {
+        margin-right: 0;
+    }
+
+    div[style*="display: flex; width: 90%;"] {
+        flex-direction: column;
+    }
+
+    .line-chart-container {
+        width: 300px;
+        height: 250px; /* Adjust the height as per your requirements */
+    }
+
+    .line-chart-svg {
+        width: 300px 
+    }
+
+    .line-chart-axis-text {
+        font-size: 10px; /* Adjust the font size for axis labels */
+    }
+
+}
+
+@media (max-width: 767px) {
+    .card .thElement {
+        font-size: 14px;
+    }
+
+    .card .tdElement {
+        font-size: 14px;
+    }
+    .card .svg{
+        width: 10px
+    }
+    .card-body p {
+        font-size: 14px;
+        /* Add any other styles you want for paragraphs in the card body */
+    }
+}
+
+.table-container {
+    margin: auto;
+    max-width: 100%; /* Ensure the table doesn't exceed the screen width */
+}
+
+/* Apply responsive styles for screens with a maximum width of 768px (adjust as needed) */
+
+
+
+
 
 

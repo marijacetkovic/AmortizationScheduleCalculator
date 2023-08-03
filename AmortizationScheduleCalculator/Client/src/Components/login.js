@@ -69,7 +69,7 @@ class LoginForm extends React.Component {
                 }, 1000);
             }).catch(err => {
                 alert(err.response.data)
-                window.location.reload(); //ako postoji bolji nacin pls replace this
+                window.location.reload(); 
 
             })
 
@@ -128,7 +128,7 @@ class LoginForm extends React.Component {
                             </div>
                             <div className="createAccounta">
                                 <button onClick={() => this.QPostLogin()} className="buttona" type="button">Login</button>
-                                <a onClick={(e) => this.QSetViewInParent({ page: "registration" })} ><small> Don't have an account?</small></a>
+                                <div onClick={(e) => this.QSetViewInParent({ page: "registration" })} ><small> Don't have an account?</small></div>
                             </div>
                         </form>
                     </div>
