@@ -408,7 +408,7 @@ namespace AmortizationScheduleCalculator.Services
 
             await updateRequest(childId.ToString()); //changes display flag to false 
 
-
+            decimal totalInterestPaid = 0;
             decimal currentRemainingLoan= req.Loan_Amount; //at beginning equal to total loan amount
             decimal additionalMonthlyCosts = req.Account_Cost + req.Insurance_Cost + req.Other_Costs;
             double interestRatio;
@@ -464,6 +464,7 @@ namespace AmortizationScheduleCalculator.Services
                 currentRemainingLoan -= newEntry.Principal_Paid;
                 newEntry.Monthly_Paid = Math.Round(newEntry.Monthly_Paid, 2);
                 newEntry.Interest_Paid = Math.Round(newEntry.Interest_Paid, 2);
+                totalInterestPaid += newEntry.Interest_Paid;
                 newEntry.Principal_Paid = Math.Round(newEntry.Principal_Paid, 2);
                 newEntry.Remaining_Loan = Math.Round(currentRemainingLoan, 2);
                 //add the entry
@@ -471,6 +472,10 @@ namespace AmortizationScheduleCalculator.Services
                 editedPlan.Add(newEntry);
                 i++;
             }
+            //update interest
+            editedRequest.Total_Loan_Cost -= editedRequest.Total_Interest_Paid;
+            editedRequest.Total_Interest_Paid = totalInterestPaid;
+            editedRequest.Total_Loan_Cost += totalInterestPaid;
             //get the new id to link the new entries
             int id = await InsertRequestDb(editedRequest);
             editedRequest.Request_Id = id;
