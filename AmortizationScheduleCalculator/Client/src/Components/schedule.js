@@ -16,11 +16,72 @@ class Schedule extends React.Component {
         };
     };
 
+    componentDidUpdate() {
+        this.checkTokenExpiry();
+    }
+
+    redirectToLogin = () => {
+        // redirect to the login page and inform the user about the session expiration
+        this.props.QIDFromChild({ page: "login" });
+        localStorage.setItem('token', "");
+        localStorage.setItem('name', "");
+        localStorage.setItem('surname', "");
+        alert('Your session has expired. Please log in again.');
+    };
+
+    checkTokenExpiry() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            this.redirectToLogin();
+            return;
+        }
+
+
+
+        const tokenExp = this.getTokenExpiration(token);
+        const currentTime = Date.now();
+
+
+
+        // get time until expiry
+        const timeUntilExpiry = tokenExp - currentTime;
+        if (timeUntilExpiry > 0) {
+            console.log("time untile xpiry" + timeUntilExpiry)
+            // check when the token expires
+            this.expiryTimeout = setTimeout(this.redirectToLogin, timeUntilExpiry);
+        } else {
+            this.redirectToLogin();
+        }
+    }
+
+    componentWillUnmount() {
+        // Clear the scheduled timeout when the component unmounts
+        clearTimeout(this.expiryTimeout);
+    }
+
+
+
+    getTokenExpiration(token) {
+        try {
+            const tokenParts = token.split('.');
+            const decodedPayload = JSON.parse(atob(tokenParts[1]));
+            console.log("decoded payload" + decodedPayload.exp * 1000)
+
+
+
+            return decodedPayload.exp * 1000; // Convert to milliseconds
+        } catch (error) {
+            return 0;
+        }
+    }
+
     QSetViewInParent = (obj) => {
         this.props.QIDFromChild(obj);
     };
 
     componentDidMount() {
+
+        this.checkTokenExpiry();
 
         var idR = this.props.idR;
         console.log(typeof idR)
@@ -67,6 +128,40 @@ class Schedule extends React.Component {
         return graphData;
     };
 
+    getPdf = (reqid) => {
+        console.log(typeof (reqid));
+        axios.post('https://localhost:7224/CalculateAmortizationPlan/generatepdf', {}, {
+            responseType: 'arraybuffer',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+            params: {
+                reqName: reqid
+            }
+        })
+            .then((response) => {
+
+                console.log(response)
+                this.setState({ pdfData: response.data }, () => {
+                    // The callback function is executed after the state is updated
+                    const { pdfData } = this.state;
+                    console.log(typeof (pdfData))
+                    // Check if PDF data is available
+                    if (pdfData) {
+                        const blob = new Blob([pdfData], { type: 'application/pdf' });
+                        const pdfUrl = URL.createObjectURL(blob);
+                        console.log(blob)
+
+                        // Open the PDF in a new tab
+                        window.open(pdfUrl, '_blank');
+                    }
+                });
+            })
+            .catch(error => {
+                console.error(error.response); // Log the error response for debugging
+            });
+    }
+
 
 
     render() {
@@ -76,6 +171,7 @@ class Schedule extends React.Component {
         const surname = localStorage.getItem('surname');
         let calc = this.state.calculation;
         console.log(calc);
+
         const pieChart = [
             { name: 'Principal Paid', value: calc.loan_Amount },
             { name: 'Interest Paid', value: calc.total_Interest_Paid },
@@ -123,12 +219,12 @@ class Schedule extends React.Component {
                                 <div className="card-body">
                                     <div style={{ display: "flex" }}>
                                         <p style={{ marginRight: "auto", fontWeight: "bolder", fontSize: "20px" }} className="card-text">SUMMARY</p>
-                                        <button onClick={() => this.getPdf(data.request_Id)} className="defaultButton">
+                                        <button onClick={() => this.getPdf(calc.request_Id)} className="defaultButton">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="18" fill="currentColor" className="bi bi-filetype-pdf" viewBox="0 0 16 16">
                                                 <path fillRule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM1.6 11.85H0v3.999h.791v-1.342h.803c.287 0 .531-.057.732-.173.203-.117.358-.275.463-.474a1.42 1.42 0 0 0 .161-.677c0-.25-.053-.476-.158-.677a1.176 1.176 0 0 0-.46-.477c-.2-.12-.443-.179-.732-.179Zm.545 1.333a.795.795 0 0 1-.085.38.574.574 0 0 1-.238.241.794.794 0 0 1-.375.082H.788V12.48h.66c.218 0 .389.06.512.181.123.122.185.296.185.522Zm1.217-1.333v3.999h1.46c.401 0 .734-.08.998-.237a1.45 1.45 0 0 0 .595-.689c.13-.3.196-.662.196-1.084 0-.42-.065-.778-.196-1.075a1.426 1.426 0 0 0-.589-.68c-.264-.156-.599-.234-1.005-.234H3.362Zm.791.645h.563c.248 0 .45.05.609.152a.89.89 0 0 1 .354.454c.079.201.118.452.118.753a2.3 2.3 0 0 1-.068.592 1.14 1.14 0 0 1-.196.422.8.8 0 0 1-.334.252 1.298 1.298 0 0 1-.483.082h-.563v-2.707Zm3.743 1.763v1.591h-.79V11.85h2.548v.653H7.896v1.117h1.606v.638H7.896Z" />
                                             </svg>
                                         </button>
-                                        <button onClick={() => this.QSetViewInParent({ page: "editschedule", editnew: data })} className="defaultButton">
+                                        <button onClick={() => this.QSetViewInParent({ page: "editschedule", editnew: calc })} className="defaultButton">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
                                                 <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
                                                 <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
@@ -137,7 +233,8 @@ class Schedule extends React.Component {
                                     </div>
 
                                     <hr></hr>
-                                    <MDBTable borderless responsive style={{ minWidth: "200px", margin: "auto" }}>
+                                    <div className="table-container">
+                                    <MDBTable borderless responsive style={{margin: "auto" }}>
                                         <MDBTableHead>
                                             <tr>
                                                 <th className="thElement" scope='col'>Request name</th>
@@ -159,7 +256,8 @@ class Schedule extends React.Component {
                                             </tr>
 
                                         </MDBTableBody>
-                                    </MDBTable>
+                                        </MDBTable>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -168,19 +266,19 @@ class Schedule extends React.Component {
 
            
 
-                <div style={{ display: 'flex', width: '90%' }}>
-                    <div style={{ width: '60%', marginRight: '50px' }}>
+                <div style={{ display: 'flex', width: '50%', margin: "auto" }}>
+                    <div style={{ width: '100%' }}>
                         <LineChart
-                            width={900}
+                            className="line-chart-container"
+                            width={600}
                             height={400}
                             data={this.getGraphData(data)}
                             margin={{
                                 top: 20,
                                 right: 40,
-                                left: -10,
+                                left: -25,
                                 bottom: -10,
                             }} 
-                            minWidth= "900px"
 
                         >
                             <CartesianGrid />
@@ -196,8 +294,8 @@ class Schedule extends React.Component {
 
                     </div>
 
-                    <div style={{ width: '60%', marginRight: "-160px" }}>
-                        <ResponsiveContainer width="100%" height={400}>
+                    <div style={{ width: '100%' }}>
+                        <ResponsiveContainer width={350 } height={350}>
                             <PieChart>
                                 <Pie data={pieChart} dataKey="value" cx="50%" cy="50%" outerRadius={80} fill="#27374D" />
                                 <Pie data={pieChart} dataKey="value" cx="50%" cy="50%" innerRadius={90} outerRadius={120} fill="#9DB2BF" label />
@@ -206,12 +304,12 @@ class Schedule extends React.Component {
                     </div>
                 </div>
 
-                    <br></br>
 
-                    <div>
-                    <MDBTable responsive striped hover style={{ maxWidth: "1150px", margin: "auto", marginTop: "60px" }}>
+                <div style={{ width: "100%", maxWidth: "1100px" }}>
+                    <MDBTable className="responsive-table" responsive striped hover style={{ margin: "auto", marginTop: "60px" }}>
                             <MDBTableHead >
-                                <tr >
+                            <tr >
+                                <th className="thSchedule" style={{ backgroundColor: "#526D82", color: "#fafdff" }} scope='col'>#</th>
                                     <th className="thSchedule" style={{ backgroundColor: "#526D82", color: "#fafdff" }} scope='col'>Date</th>
                                     <th className="thSchedule" style={{ backgroundColor: "#526D82", color: "#fafdff" }} scope='col'>Monthly payment</th>
                                     <th className="thSchedule" style={{ backgroundColor: "#526D82", color: "#fafdff" }} scope='col'>Principal</th>
@@ -222,16 +320,17 @@ class Schedule extends React.Component {
                             </MDBTableHead>
 
                             {data.length > 0 ?
-                                data.map((d) => {
+                                data.map((d, index) => {
                                     return (
                                         <MDBTableBody key={d.schedule_Id}>
-                                            <tr style={{ backgroundColor: "#9DB2BF"} }>
-                                                <td style={{ backgroundColor: "#eef3f6" }}>{this.formatDate(d.current_Date)}</td>
-                                                <td style={{ backgroundColor: "#eef3f6" }}>{d.monthly_Paid}&euro;</td>
-                                                <td style={{ backgroundColor: "#eef3f6" }}>{d.principal_Paid}&euro;</td>
-                                                <td style={{ backgroundColor: "#eef3f6" }}>{d.interest_Paid}&euro;</td>
-                                                <td style={{ backgroundColor: "#eef3f6" }}>{d.monthly_Costs}&euro;</td>
-                                                <td style={{ backgroundColor: "#eef3f6" }}>{d.remaining_Loan}&euro;</td>
+                                            <tr>
+                                                <td>{ index }</td>
+                                                <td>{this.formatDate(d.current_Date)}</td>
+                                                <td >{d.monthly_Paid}&euro;</td>
+                                                <td >{d.principal_Paid}&euro;</td>
+                                                <td >{d.interest_Paid}&euro;</td>
+                                                <td >{d.monthly_Costs}&euro;</td>
+                                                <td >{d.remaining_Loan}&euro;</td>
                                             </tr>
                                         </MDBTableBody>
 

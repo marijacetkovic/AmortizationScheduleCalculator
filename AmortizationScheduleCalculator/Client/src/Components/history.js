@@ -15,6 +15,70 @@ class history extends React.Component {
 
     };
 
+
+    componentDidUpdate() {
+        this.checkTokenExpiry();
+    }
+
+
+    redirectToLogin = () => {
+        // redirect to the login page and inform the user about the session expiration
+        this.props.QIDFromChild({ page: "login" });
+        localStorage.setItem('token', "");
+        localStorage.setItem('name', "");
+        localStorage.setItem('surname', "");
+        alert('Your session has expired. Please log in again.');
+    };
+
+
+    checkTokenExpiry() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            this.redirectToLogin();
+            return;
+        }
+
+
+
+        const tokenExp = this.getTokenExpiration(token);
+        const currentTime = Date.now();
+
+
+
+        // get time until expiry
+        const timeUntilExpiry = tokenExp - currentTime;
+        if (timeUntilExpiry > 0) {
+            console.log("time untile xpiry" + timeUntilExpiry)
+            // check when the token expires
+            this.expiryTimeout = setTimeout(this.redirectToLogin, timeUntilExpiry);
+        } else {
+            this.redirectToLogin();
+        }
+    }
+
+
+
+    componentWillUnmount() {
+        // Clear the scheduled timeout when the component unmounts
+        clearTimeout(this.expiryTimeout);
+    }
+
+
+
+    getTokenExpiration(token) {
+        try {
+            const tokenParts = token.split('.');
+            const decodedPayload = JSON.parse(atob(tokenParts[1]));
+            console.log("decoded payload" + decodedPayload.exp * 1000)
+
+
+
+            return decodedPayload.exp * 1000; // Convert to milliseconds
+        } catch (error) {
+            return 0;
+        }
+    }
+
     //function for page
     QSetViewInParent = (obj) => {
         this.props.QIDFromChild(obj);
@@ -28,6 +92,7 @@ class history extends React.Component {
 
     componentDidMount() {
         // Perform both the axios request and dynamic import using Promise.all
+        this.checkTokenExpiry();
 
         axios.get('https://localhost:7224/CalculateAmortizationPlan/getallrequests', {
             headers: {
@@ -110,26 +175,28 @@ class history extends React.Component {
         let data = this.state.calculation;
         const name = localStorage.getItem('name');
         const surname = localStorage.getItem('surname');
-        
+        data = data.slice().reverse();
+
 
         return (
             <div>
                 <div className="container">
                     <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-3 border-bottom">
-                        <div>
+      
+                            <div>
                             <button className="uniButton" onClick={() => this.QSetViewInParent({ page: "profile" })}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left" viewBox="0 0 16 16">
                                     <path fillRule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z" />
                                 </svg>
                             </button>
                         </div>
-                        <div className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+                            <div className="d-flex  flex-row align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-person" viewBox="0 0 16 16">
                                 <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
                             </svg>
                             <div>{name} {" "} {surname}</div>
-                        </div>
-
+                            </div>
+                        
                         <div style={{ textAlign: "center" }} id="title">Amortization Calculator </div>
 
                         <div className="col-md-3 text-end">
@@ -145,8 +212,8 @@ class history extends React.Component {
                     data.map((d, index) => {
                         return (
 
-                            <div style={{ overflowX: "auto" }}>
-                                <div style={{ width: "60%", margin: "auto", marginTop: "4%", marginBottom: "4%" }}>
+                            <div style={{ overflowX: "auto", width: "100%", maxWidth: "900px", margin: "auto" }}>
+                                <div style={{ width: "100%", margin: "auto", marginTop: "4%", marginBottom: "4%" }}>
                                     <div className="col" style={{ margin: "auto", }}>
                                         <div className="card" key={index} style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
                                             <div className="card-body">

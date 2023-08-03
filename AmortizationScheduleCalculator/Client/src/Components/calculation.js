@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import axios from "axios";
 import "./style.css";
 import { MDBTable, MDBTableHead, MDBTableBody } from 'mdb-react-ui-kit';
@@ -22,13 +22,63 @@ class Calculation extends React.Component {
 
     };
 
-    handleClik() {
-        this.setState({ disabled: !this.state.disabled , placeholder1: ""})
-    } 
-
-    handleP() {
-        this.setState({ placeholder1: this.props.amount })
+    componentDidMount() {
+        this.checkTokenExpiry();
     }
+
+    componentDidUpdate() {
+        this.checkTokenExpiry();
+    }
+
+    redirectToLogin = () => {
+        // redirect to the login page and inform the user about the session expiration
+        this.props.QIDFromChild({ page: "login" });
+        localStorage.setItem('token', "");
+        localStorage.setItem('name', "");
+        localStorage.setItem('surname', "");
+        alert('Your session has expired. Please log in again.');
+    };
+
+    checkTokenExpiry() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            this.redirectToLogin();
+            return;
+        }
+
+        const tokenExp = this.getTokenExpiration(token);
+        const currentTime = Date.now();
+
+        // get time until expiry
+        const timeUntilExpiry = tokenExp - currentTime;
+        if (timeUntilExpiry > 0) {
+            console.log("time untile xpiry" + timeUntilExpiry)
+            // check when the token expires
+            this.expiryTimeout = setTimeout(this.redirectToLogin, timeUntilExpiry);
+        } else {
+            this.redirectToLogin();
+        }
+    }
+
+
+    componentWillUnmount() {
+        // Clear the scheduled timeout when the component unmounts
+        clearTimeout(this.expiryTimeout);
+    };
+
+    getTokenExpiration(token) {
+        try {
+            const tokenParts = token.split('.');
+            const decodedPayload = JSON.parse(atob(tokenParts[1]));
+            console.log("decoded payload" + decodedPayload.exp * 1000)
+
+
+
+            return decodedPayload.exp * 1000; // Convert to milliseconds
+        } catch (error) {
+            return 0;
+        }
+    };
 
     QSetViewInParent = (obj) => {
         this.props.QIDFromChild(obj);
@@ -120,12 +170,7 @@ class Calculation extends React.Component {
         ];
 
         return (
-            <div style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center"
-            }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }} >
                 <div className="container">
                     <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-3 border-bottom">
                         <div>
@@ -152,16 +197,19 @@ class Calculation extends React.Component {
                     </header>
                 </div>
 
-                {summaryData  ?
-                    <div>
+                {summaryData ?
+                    <div className="calculation-container ">
 
                         <div style={{ overflowX: "auto" }}>
                             <div style={{ marginTop: "1%" }}>
                                 <div className="col" style={{ margin: "auto", marginTop: "5%" }}>
                                     <div className="card" style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
                                         <div className="card-body">
-                                            <div style={{ display: "flex"}}>
-                                                <p style={{ marginRight: "auto", fontWeight: "bolder", fontSize: "20px" }} className="card-text">SUMMARY</p>
+                                            <div className="responsive-table">
+                                            <div style={{ display: "flex" }}>
+                                                    <p style={{
+                                                        marginRight: "auto", fontWeight: "bolder", fontSize: "120%"
+                                                    }} className="card-text responsive-summary">SUMMARY</p>
                                                 <button onClick={() => this.getPdf(summaryData.request_Id)} className="defaultButton">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="18" fill="currentColor" className="bi bi-filetype-pdf" viewBox="0 0 16 16">
                                                          <path fillRule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM1.6 11.85H0v3.999h.791v-1.342h.803c.287 0 .531-.057.732-.173.203-.117.358-.275.463-.474a1.42 1.42 0 0 0 .161-.677c0-.25-.053-.476-.158-.677a1.176 1.176 0 0 0-.46-.477c-.2-.12-.443-.179-.732-.179Zm.545 1.333a.795.795 0 0 1-.085.38.574.574 0 0 1-.238.241.794.794 0 0 1-.375.082H.788V12.48h.66c.218 0 .389.06.512.181.123.122.185.296.185.522Zm1.217-1.333v3.999h1.46c.401 0 .734-.08.998-.237a1.45 1.45 0 0 0 .595-.689c.13-.3.196-.662.196-1.084 0-.42-.065-.778-.196-1.075a1.426 1.426 0 0 0-.589-.68c-.264-.156-.599-.234-1.005-.234H3.362Zm.791.645h.563c.248 0 .45.05.609.152a.89.89 0 0 1 .354.454c.079.201.118.452.118.753a2.3 2.3 0 0 1-.068.592 1.14 1.14 0 0 1-.196.422.8.8 0 0 1-.334.252 1.298 1.298 0 0 1-.483.082h-.563v-2.707Zm3.743 1.763v1.591h-.79V11.85h2.548v.653H7.896v1.117h1.606v.638H7.896Z" />
@@ -176,7 +224,8 @@ class Calculation extends React.Component {
                                             </div>
 
                                             <hr></hr>
-                                            <MDBTable borderless responsive style={{ minWidth: "200px", margin: "auto" }}>
+                                           
+                                            <MDBTable borderless responsive style={{ margin: "auto" }}>
                                                 <MDBTableHead>
                                                     <tr>
                                                         <th className="thElement" scope='col'>Request name</th>
@@ -198,7 +247,8 @@ class Calculation extends React.Component {
                                                     </tr>
 
                                                 </MDBTableBody>
-                                            </MDBTable>
+                                                </MDBTable>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -206,17 +256,17 @@ class Calculation extends React.Component {
                         </div>
                         <br></br>
 
-                        <div style={{ display: 'flex', width: '90%' }}>
-                            <div style={{ width: '60%', marginRight: '50px' }}>
+                        <div style={{ display: 'flex', width: '90%', marign: "auto" }}>
+                            <div style={{ width: '100%', marginBottom: '20px' }}>
                                 <LineChart
-                                    width={750}
-
+                                    className="line-chart-container"
+                                    width={600}
                                     height={400}
                                     data={this.getGraphData(schedulesData)}
                                     margin={{
                                         top: 20,
                                         right: 40,
-                                        left: -10,
+                                        left: -25,
                                         bottom: -10,
                                     }}
                                 >
@@ -233,8 +283,8 @@ class Calculation extends React.Component {
 
 
 
-                            <div style={{ width: '60%', marginRight: "-160px" }}>
-                                <ResponsiveContainer width="100%" height={400}>
+                            <div style={{ width: '100%' }}>
+                                <ResponsiveContainer width={350} height={350}>
 
                                     <PieChart>
                                         <Pie data={pieChart} dataKey="value" cx="50%" cy="50%" outerRadius={80} fill="#27374D" />
@@ -245,25 +295,27 @@ class Calculation extends React.Component {
                         </div>
 
 
-                        <div>
-
-                            <MDBTable striped hover style={{ maxWidth: "1150px", margin: "auto", marginTop: "60px" }}>
+                        <div style={{ width: "100%", margin: "auto", marginTop: "60px" }}>
+                            <div className="table-responsive">
+                            <MDBTable striped hover responsive>
                                 <MDBTableHead >
-                                    <tr>
+                                        <tr>
+                                         <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>#</th>
                                         <th style={{ backgroundColor: "#526D82", color:"#DDE6ED" }} scope='col'>Date</th>
                                         <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Monthly payment</th>
                                         <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Principal</th>
                                         <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Interest</th>
-                                        <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Total other costs</th>
+                                        <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Monthly costs</th>
                                         <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Remaining balance</th>
                                     </tr>
                                 </MDBTableHead>
 
                                 {schedulesData.length > 0 ?
-                                    schedulesData.map((d) => {
+                                    schedulesData.map((d, index) => {
                                         return (
                                             <MDBTableBody>
                                                 <tr>
+                                                    <td >{index+1 }</td>
                                                     <td >{this.formatDate(d.current_Date)}</td>
                                                     <td>{d.monthly_Paid}&euro;</td>
                                                     <td>{d.principal_Paid}&euro;</td>
@@ -279,7 +331,7 @@ class Calculation extends React.Component {
                             </MDBTable>
 
                         </div>
-
+                        </div>
                     </div>
                     : "Loading.."}
                 

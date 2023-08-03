@@ -1,9 +1,10 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import axios from "axios";
 import "./style.css";
 import { MDBTable, MDBTableHead, MDBTableBody } from 'mdb-react-ui-kit';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import "./style.css";
+import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
 
 
 
@@ -21,6 +22,65 @@ class editCalculation extends React.Component {
         };
 
     };
+
+    componentDidMount() {
+        this.checkTokenExpiry();
+    }
+
+    componentDidUpdate() {
+        this.checkTokenExpiry();
+    }
+
+
+    redirectToLogin = () => {
+        // redirect to the login page and inform the user about the session expiration
+        this.props.QIDFromChild({ page: "login" });
+        localStorage.setItem('token', "");
+        localStorage.setItem('name', "");
+        localStorage.setItem('surname', "");
+        alert('Your session has expired. Please log in again.');
+    };
+
+    checkTokenExpiry() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            this.redirectToLogin();
+            return;
+        }
+
+        const tokenExp = this.getTokenExpiration(token);
+        const currentTime = Date.now();
+
+        // get time until expiry
+        const timeUntilExpiry = tokenExp - currentTime;
+        if (timeUntilExpiry > 0) {
+            console.log("time untile xpiry" + timeUntilExpiry)
+            // check when the token expires
+            this.expiryTimeout = setTimeout(this.redirectToLogin, timeUntilExpiry);
+        } else {
+            this.redirectToLogin();
+        }
+    }
+
+    componentWillUnmount() {
+        // Clear the scheduled timeout when the component unmounts
+        clearTimeout(this.expiryTimeout);
+    }
+
+
+    getTokenExpiration(token) {
+        try {
+            const tokenParts = token.split('.');
+            const decodedPayload = JSON.parse(atob(tokenParts[1]));
+            console.log("decoded payload" + decodedPayload.exp * 1000)
+
+
+
+            return decodedPayload.exp * 1000; // Convert to milliseconds
+        } catch (error) {
+            return 0;
+        }
+    }
 
     handleClik() {
         this.setState({ disabled: !this.state.disabled, placeholder1: "" })
@@ -62,15 +122,6 @@ class editCalculation extends React.Component {
         }
         return graphData;
     };
-
-    //formatDate1 = (inputDate) => {
-    //    const [datePart, monthPart, yearPart] = inputDate.split(/[T/]/);
-    //    const day = datePart.slice(0, 2);
-    //    const month = monthPart.padStart(2, '0');
-    //    const year = yearPart;
-    //    const formattedDate = `${day}/${month}/${year}`;
-    //    this.setState({ formattedDate });
-    //};
 
     getPdf = (reqid) => {
         console.log((reqid));
@@ -114,7 +165,11 @@ class editCalculation extends React.Component {
 
         //const summaryData = this.props.editCalSummary;
         //const schedulesData = this.props.editCalSchedule
-
+        const pieChart = [
+            { name: 'Principal Paid', value: summaryData.loan_Amount },
+            { name: 'Interest Paid', value: summaryData.total_Interest_Paid },
+            { name: 'Other costs', value: summaryData.total_Other_Costs }
+        ];
 
         const name = localStorage.getItem('name');
         const surname = localStorage.getItem('surname');
@@ -155,8 +210,6 @@ class editCalculation extends React.Component {
                     </header>
                 </div>
 
-                <div>edit calculation</div>
-
                 {summaryData ?
                     <div>
 
@@ -195,7 +248,7 @@ class editCalculation extends React.Component {
                                                         <th className="thElement" scope='col'>Monthly payment</th>
                                                         <th className="thElement" scope='col'>Total interest paid</th>
                                                         <th className="thElement" scope='col'>Total cost of loan</th>
-                                                        <th className="thElement" scope='col'>Total other costs</th>
+                                                        <th className="thElement" scope='col'>Monthly costs</th>
                                                         <th className="thElement" scope='col'>Payoff date</th>
                                                     </tr>
                                                 </MDBTableHead>
@@ -218,7 +271,8 @@ class editCalculation extends React.Component {
                         </div>
                         <br></br>
 
-                        <div>
+                        <div style={{ display: 'flex', width: '90%', marign: "auto" }}>
+                        <div style={{ width: '100%', marginBottom: '20px' }}>
                             <LineChart
                                 width={900}
                                 height={400}
@@ -242,6 +296,16 @@ class editCalculation extends React.Component {
                                 <Line type="monotone" dataKey="Balance" stroke="#82ca9d" />
                             </LineChart>
 
+                            </div>
+                            <div style={{ width: '100%' }}>
+                                <ResponsiveContainer width={350} height={350}>
+
+                                    <PieChart>
+                                        <Pie data={pieChart} dataKey="value" cx="50%" cy="50%" outerRadius={80} fill="#27374D" />
+                                        <Pie data={pieChart} dataKey="value" cx="50%" cy="50%" innerRadius={90} outerRadius={120} fill="#9DB2BF" label />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
                         </div>
 
                         <div>
@@ -249,6 +313,7 @@ class editCalculation extends React.Component {
                             <MDBTable striped hover style={{ maxWidth: "1150px", margin: "auto", marginTop: "60px" }}>
                                 <MDBTableHead >
                                     <tr>
+                                        <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>#</th>
                                         <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Date</th>
                                         <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Monthly payment</th>
                                         <th style={{ backgroundColor: "#526D82", color: "#DDE6ED" }} scope='col'>Principal</th>
@@ -259,10 +324,11 @@ class editCalculation extends React.Component {
                                 </MDBTableHead>
 
                                 {schedulesData.length > 0 ?
-                                    schedulesData.map((d) => {
+                                    schedulesData.map((d, index) => {
                                         return (
                                             <MDBTableBody>
                                                 <tr>
+                                                    <td >{index+1}</td>
                                                     <td >{this.formatDate(d.current_Date)}</td>
                                                     <td>{d.monthly_Paid}&euro;</td>
                                                     <td>{d.principal_Paid}&euro;</td>

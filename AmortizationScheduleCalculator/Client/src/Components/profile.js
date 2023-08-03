@@ -1,7 +1,6 @@
 import React from "react";
 import './style.css';
 import axios from "axios";
-import { withRouter } from 'react-router-dom';
 
 class Profile extends React.Component {
 
@@ -21,6 +20,79 @@ class Profile extends React.Component {
             }
         };
     };
+
+    componentDidMount() {
+        this.checkTokenExpiry();
+    }
+
+
+
+    componentDidUpdate() {
+        this.checkTokenExpiry();
+    }
+
+
+
+
+
+    redirectToLogin = () => {
+        // redirect to the login page and inform the user about the session expiration
+        this.props.QIDFromChild({ page: "login" });
+        localStorage.setItem('token', "");
+        localStorage.setItem('name', "");
+        localStorage.setItem('surname', "");
+        alert('Your session has expired. Please log in again.');
+    };
+
+
+
+    checkTokenExpiry() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            this.redirectToLogin();
+            return;
+        }
+
+
+
+        const tokenExp = this.getTokenExpiration(token);
+        const currentTime = Date.now();
+
+
+
+        // get time until expiry
+        const timeUntilExpiry = tokenExp - currentTime;
+        if (timeUntilExpiry > 0) {
+            console.log("time untile xpiry" + timeUntilExpiry)
+            // check when the token expires
+            this.expiryTimeout = setTimeout(this.redirectToLogin, timeUntilExpiry);
+        } else {
+            this.redirectToLogin();
+        }
+    }
+
+
+
+    componentWillUnmount() {
+        // Clear the scheduled timeout when the component unmounts
+        clearTimeout(this.expiryTimeout);
+    }
+
+
+
+    getTokenExpiration(token) {
+        try {
+            const tokenParts = token.split('.');
+            const decodedPayload = JSON.parse(atob(tokenParts[1]));
+            console.log("decoded payload" + decodedPayload.exp * 1000)
+
+
+
+            return decodedPayload.exp * 1000; // Convert to milliseconds
+        } catch (error) {
+            return 0;
+        }
+    }
 
 
     QGetTextFromField = (e) => {
@@ -95,8 +167,8 @@ class Profile extends React.Component {
             })
             .catch(err => {
                 console.log(err)
-                console.log(err.response.data);
-                alert(err.response.data)
+                console.log(err.response.data.detail);
+                alert(err.response.data.detail)
 
             })
         this.props.QIDFromChild({ page: "profile" })
@@ -116,13 +188,9 @@ class Profile extends React.Component {
         const { errorMessages } = this.state;
         const name = localStorage.getItem('name');
         const surname = localStorage.getItem('surname');
-        //const edited = this.props.editSchedule;
 
-
-       // if (edited === {}) {
-
-            return (
-                <div>
+        return (
+            <div >
 
                     <div className="container">
                         <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-3 border-bottom">
@@ -133,7 +201,6 @@ class Profile extends React.Component {
                                 <div>{name} {" "} {surname}</div>
 
                             </div>
-
 
                             <div id="title">Amortization Calculator </div>
 
@@ -146,15 +213,13 @@ class Profile extends React.Component {
                     </div>
                     <br></br>
 
-                    <div className="centerDiv">
-                        <form id="formH">
+                <div className="centerDiv">
 
+                    <form id="formH">
 
                             <div className="form-floating">
                                 <input onChange={(e) => this.QGetTextFromField(e)} type="text" className="form-control" id="floatingInput" placeholder="" name="nameFor" style={{ paddingLeft: '25px' }} ></input>
-
                                 <label>Request name</label>
-                                
                             </div>
 
                             <div className="form-floating">
@@ -232,120 +297,6 @@ class Profile extends React.Component {
 
                 </div>
             );
-       //}
-        //else {
-
-        //   return (
-        //        <div>
-
-        //            <div className="container">
-        //                <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-3 border-bottom">
-        //                    <div className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
-        //                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-person" viewBox="0 0 16 16">
-        //                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
-        //                       </svg>
-        //                        <div>{name} {" "} {surname}</div>
-
-        //                    </div>
-
-
-        //                    <div id="title">Amortization Calculator </div>
-
-
-        //                    <div className="col-md-3 text-end">
-        //                        <button type="button" onClick={() => this.QSetViewInParent({ page: "history" })} className="btn btn-outline me-2">History</button>
-        //                        <button type="button" onClick={() => { this.QSetViewInParent({ page: "login" }); localStorage.setItem('token', ""); localStorage.setItem('name', ""); localStorage.setItem('surname', "") }} className="btn">Logout</button>
-        //                    </div>
-        //                </header>
-        //            </div>
-        //            <br></br>
-
-
-
-
-        //            <div className="centerDiv">
-        //                <form id="formH">
-
-
-        //                    <div className="form-floating">
-        //                       <input onChange={(e) => this.QGetTextFromField(e)} type="text" className="form-control" id="floatingInput" placeholder="" name="nameFor" style={{ paddingLeft: '25px' }} value={edited.request_Name }></input>
-
-        //                        <label>Request name</label>
-        //                    </div>
-
-        //                    <div className="form-floating">
-        //                        <span className="spanInput">
-        //                            €
-        //                        </span>
-        //                        <input onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingInput" placeholder="" name="amount" style={{ paddingLeft: '25px' }} min={1}></input>
-        //                        <label>Loan amount</label>
-        //                    </div>
-
-        //                    <div className="form-floating">
-        //                        <span className="spanInputPeriod">
-        //                            years
-        //                        </span>
-        //                        <input onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingPassword" placeholder="" name="period" style={{ paddingLeft: '25px' }} min={1}></input>
-        //                        <label>Loan period</label>
-        //                    </div>
-
-        //                    <div className="form-floating">
-
-        //                        <input onChange={(e) => { this.QGetTextFromField(e) }} type="date" className="form-control" id="floatingDate" placeholder="" name="start" style={{ paddingLeft: '25px' }}></input>
-
-        //                        <label>Loan start</label>
-        //                    </div>
-
-        //                   <div className="form-floating">
-        //                        <span className="spanInput"
-        //                        >
-        //                            %
-        //                        </span>
-        //                        <input onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingRate" placeholder="" name="rate" style={{ paddingLeft: '25px' }} min={1}></input>
-        //                        <label>Interest rate</label>
-        //                    </div>
-
-        //                    <div className="form-floating">
-        //                        <span className="spanInput">
-        //                           €
-        //                        </span>
-        //                        <input onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingApproval" placeholder="" name="approval" style={{ paddingLeft: '25px' }} min={1}></input>
-        //                        <label>Approval</label>
-        //                    </div>
-
-        //                    <div className="form-floating">
-        //                        <span className="spanInput">
-        //                            €
-        //                        </span>
-        //                        <input onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingInsurance" placeholder="" name="insurance" style={{ paddingLeft: '25px' }} min={1}></input>
-        //                        <label>Insurance</label>
-        //                    </div>
-
-        //                    <div className="form-floating">
-        //                        <span className="spanInput">
-        //                            €
-        //                        </span>
-        //                        <input onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingAccount" placeholder="" name="account" style={{ paddingLeft: '25px' }} min={1}></input>
-        //                        <label>Account</label>
-        //                    </div>
-
-        //                    <div className="form-floating">
-        //                        <span className="spanInput">
-        //                            €
-        //                        </span>
-        //                        <input onChange={(e) => this.QGetTextFromField(e)} type="number" className="form-control" id="floatingCosts" placeholder="" name="costs" style={{ paddingLeft: '25px' }} min={1}></input>
-        //                        <label>Other costs</label>
-        //                    </div>
-        //                    <br></br>
-
-        //                    <button onClick={() => this.QPostField()} className="buttona" type="button">Calculate</button>
-
-        //                </form>
-        //            </div>
-
-        //        </div>
-        //    );
-      //  };
     }
 
 }

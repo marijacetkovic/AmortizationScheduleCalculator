@@ -17,10 +17,74 @@ class AuditHistory extends React.Component {
         super(props);
 
         this.state = {
-            auditHistory: {}
+            auditHistory: []
         }
 
     };
+
+    componentDidUpdate() {
+        this.checkTokenExpiry();
+    }
+
+
+    redirectToLogin = () => {
+        // redirect to the login page and inform the user about the session expiration
+        this.props.QIDFromChild({ page: "login" });
+        localStorage.setItem('token', "");
+        localStorage.setItem('name', "");
+        localStorage.setItem('surname', "");
+        alert('Your session has expired. Please log in again.');
+    };
+
+
+
+    checkTokenExpiry() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            this.redirectToLogin();
+            return;
+        }
+
+
+
+        const tokenExp = this.getTokenExpiration(token);
+        const currentTime = Date.now();
+
+
+
+        // get time until expiry
+        const timeUntilExpiry = tokenExp - currentTime;
+        if (timeUntilExpiry > 0) {
+            console.log("time untile xpiry" + timeUntilExpiry)
+            // check when the token expires
+            this.expiryTimeout = setTimeout(this.redirectToLogin, timeUntilExpiry);
+        } else {
+            this.redirectToLogin();
+        }
+    }
+
+
+
+    componentWillUnmount() {
+        // Clear the scheduled timeout when the component unmounts
+        clearTimeout(this.expiryTimeout);
+    }
+
+
+
+    getTokenExpiration(token) {
+        try {
+            const tokenParts = token.split('.');
+            const decodedPayload = JSON.parse(atob(tokenParts[1]));
+            console.log("decoded payload" + decodedPayload.exp * 1000)
+
+
+
+            return decodedPayload.exp * 1000; // Convert to milliseconds
+        } catch (error) {
+            return 0;
+        }
+    }
 
     QSetViewInParent = (obj) => {
         this.props.QIDFromChild(obj);
@@ -39,6 +103,8 @@ class AuditHistory extends React.Component {
     };
 
     componentDidMount() {
+
+        this.checkTokenExpiry();
 
         const id = this.props.redId;
 
@@ -79,7 +145,8 @@ class AuditHistory extends React.Component {
         const name = localStorage.getItem('name');
         const surname = localStorage.getItem('surname');
         console.log(this.state.auditHistory)
-        const data = this.state.auditHistory;
+        let data = this.state.auditHistory;
+        data= data.slice().reverse();
 
         const firstRequestName = data && data.length > 0 ? data[0].request_Name : '';
 
