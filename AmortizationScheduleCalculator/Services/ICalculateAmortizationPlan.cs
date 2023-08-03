@@ -6,6 +6,7 @@ namespace AmortizationScheduleCalculator.Services
     {
         Task<AmortizationPlan> CreateNewCalculation(Request request);
         Task<AmortizationPlan> EditCalculation(Request scheduleReq, string originalId);
+        Task StoreNewCalculation(AmortizationPlan plan);
 
         Task<AmortizationPlan> ApplyPartialPayments(string reqName, Dictionary<int, decimal> missedPayments, decimal fee);
         Task<AmortizationPlan> ApplyEarlyPayments(string reqName, Dictionary<int, decimal> earlyPayments);

@@ -32,17 +32,24 @@ namespace AmortizationScheduleCalculator.Controllers
             _pdfgenerator = pdfgenerator;
         }
 
-
-
         [HttpPost, Authorize]
         public async Task<IActionResult> CreateNewCalculation(Request scheduleReq)
         {
 
-          var scheduleList = await _calculate.CreateNewCalculation(scheduleReq);
-          var id = scheduleList.Summary.Request_Id;
-          await _calculate.updateAuditHistory(id.ToString(), id.ToString()); //first entry in audit history
-          return Ok(scheduleList);
+            var scheduleList = await _calculate.CreateNewCalculation(scheduleReq);
+            await _calculate.StoreNewCalculation(scheduleList);
+            var id = scheduleList.Summary.Request_Id;
+            await _calculate.updateAuditHistory(id.ToString(), id.ToString()); //first entry in audit history
+            return Ok(scheduleList);
         }
+        [HttpPost("open")]
+        public async Task<IActionResult> CreateNewCalculationOpen(Request scheduleReq)
+        {
+
+            var scheduleList = await _calculate.CreateNewCalculation(scheduleReq);
+            return Ok(scheduleList);
+        }
+
         [HttpPost("edit"), Authorize]
         public async Task<IActionResult> EditCalculation(Request scheduleReq, [FromQuery] string reqId)
         {   
