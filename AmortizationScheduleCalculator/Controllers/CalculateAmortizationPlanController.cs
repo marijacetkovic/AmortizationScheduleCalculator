@@ -58,21 +58,21 @@ namespace AmortizationScheduleCalculator.Controllers
         }
 
         [HttpGet("getallrequests"), Authorize]
-        public List<Request> getAllRequests()
+        public List<Request> GetAllRequests()
         {
             var id = Int32.Parse(_register.getUserId());
             return _db.Query<Request>("select * from \"Request\" where r_user_id=@id and last_version=@value", new { id = id, value = true }).ToList();
 
         }
         [HttpGet("deleterequest"), Authorize]
-        public async Task<ActionResult> deleteRequest([FromQuery] string reqName)
+        public async Task<ActionResult> DeleteRequest([FromQuery] string reqName)
         {
             var req = await _calculate.updateRequest(reqName);
             return Ok(req);
 
         }
         [HttpGet("schedule"), Authorize]
-        public async Task<IActionResult> getSchedule([FromQuery] string reqName)
+        public async Task<IActionResult> GetSchedule([FromQuery] string reqName)
 
         {
             var amortizationSchedule = await _calculate.getSchedule(reqName);
@@ -82,7 +82,7 @@ namespace AmortizationScheduleCalculator.Controllers
 
         [HttpPost("applypartial"), Authorize]
 
-        public async Task<IActionResult> applyPartialPayment([FromQuery] string reqName, Dictionary<int, decimal> missedPayments,decimal fee)
+        public async Task<IActionResult> ApplyPartialPayment([FromQuery] string reqName, Dictionary<int, decimal> missedPayments,decimal fee)
         {
 
                 var amortizationSchedule = await _calculate.ApplyPartialPayments(reqName, missedPayments,fee);
@@ -91,7 +91,7 @@ namespace AmortizationScheduleCalculator.Controllers
 
         [HttpPost("applyearly"), Authorize]
 
-        public async Task<IActionResult> applyEarlyPayment([FromQuery] string reqName, Dictionary<int, decimal> earlyPayments)
+        public async Task<IActionResult> ApplyEarlyPayment([FromQuery] string reqName, Dictionary<int, decimal> earlyPayments)
         {
                var amortizationSchedule = await _calculate.ApplyEarlyPayments(reqName, earlyPayments);
                 return Ok(amortizationSchedule); 
@@ -107,7 +107,7 @@ namespace AmortizationScheduleCalculator.Controllers
 
         [HttpGet("audithistory"), Authorize]
 
-        public async Task<List<Request>> getAuditHistory([FromQuery] string parentReqName)
+        public async Task<List<Request>> GetAuditHistory([FromQuery] string parentReqName)
         {
             return (await _calculate.getAuditHistory(parentReqName));
         }

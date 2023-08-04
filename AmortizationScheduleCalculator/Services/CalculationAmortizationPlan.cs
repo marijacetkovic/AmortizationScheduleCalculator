@@ -24,6 +24,7 @@ namespace AmortizationScheduleCalculator.Services
 
         {
             if (scheduleReq.IsEmpty())
+
             {
                 var calculatedPlan = await getSchedule(originalId);
                 return calculatedPlan; //nothing to do 
