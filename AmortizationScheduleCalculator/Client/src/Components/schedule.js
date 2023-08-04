@@ -324,7 +324,7 @@ class Schedule extends React.Component {
                                     return (
                                         <MDBTableBody key={d.schedule_Id}>
                                             <tr>
-                                                <td>{ index }</td>
+                                                <td>{ index + 1 }</td>
                                                 <td>{this.formatDate(d.current_Date)}</td>
                                                 <td >{d.monthly_Paid}&euro;</td>
                                                 <td >{d.principal_Paid}&euro;</td>

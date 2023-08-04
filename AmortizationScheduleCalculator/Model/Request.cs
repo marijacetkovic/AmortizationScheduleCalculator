@@ -31,5 +31,10 @@ namespace AmortizationScheduleCalculator.Model
         //foreign key
         public int R_User_Id { get; set; }
 
+        public bool IsEmpty()
+        {
+            return Loan_Amount == 0 && Loan_Period == 0 && Interest_Rate == 0;
+        }
+
     }
 }

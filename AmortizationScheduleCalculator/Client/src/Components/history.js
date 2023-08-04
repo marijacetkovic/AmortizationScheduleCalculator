@@ -156,6 +156,7 @@ class history extends React.Component {
         })
             .then((response) => {
                 console.log(response)
+                this.componentDidMount();
                 
             })
             .catch(error => {

@@ -25,14 +25,9 @@ class Profile extends React.Component {
         this.checkTokenExpiry();
     }
 
-
-
     componentDidUpdate() {
         this.checkTokenExpiry();
     }
-
-
-
 
 
     redirectToLogin = () => {
