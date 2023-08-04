@@ -23,6 +23,11 @@ namespace AmortizationScheduleCalculator.Services
         public async Task<AmortizationPlan> EditCalculation(Request scheduleReq, string originalId)
 
         {
+            if (scheduleReq == null)
+            {
+                var calculatedPlan = await getSchedule(originalId);
+                return calculatedPlan; //nothing to do 
+            }
             //set original to not visible 
             await updateRequest(originalId);
             //create new calculation
