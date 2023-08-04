@@ -315,7 +315,7 @@ class Calculation extends React.Component {
                                         return (
                                             <MDBTableBody>
                                                 <tr>
-                                                    <td >{index+1 }</td>
+                                                    <td >{index + 1 }</td>
                                                     <td >{this.formatDate(d.current_Date)}</td>
                                                     <td>{d.monthly_Paid}&euro;</td>
                                                     <td>{d.principal_Paid}&euro;</td>

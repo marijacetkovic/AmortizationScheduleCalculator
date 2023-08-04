@@ -23,6 +23,11 @@ namespace AmortizationScheduleCalculator.Services
         public async Task<AmortizationPlan> EditCalculation(Request scheduleReq, string originalId)
 
         {
+            if (scheduleReq.IsEmpty())
+            {
+                var calculatedPlan = await getSchedule(originalId);
+                return calculatedPlan; //nothing to do 
+            }
             //set original to not visible 
             await updateRequest(originalId);
             //create new calculation
@@ -355,6 +360,7 @@ namespace AmortizationScheduleCalculator.Services
                 }
                 i++;
                 early = false;
+                monthlyPayment = req.Monthly_Payment;
             }
             //get the new id to link the new entries
             int id = await InsertRequestDb(editedRequest);

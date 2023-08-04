@@ -186,34 +186,14 @@ class AuditHistory extends React.Component {
                     data.length > 0 ?
                         data.map((d, index) => {
                             return (
-                                //<MDBRow className='row-cols-1 row-cols-md-3 g-4'>
-                                //    <MDBCol>
-                                //        <MDBCard style={{ backgroundColor: "#DDE6ED" }}>
-
-                                //            <MDBCardBody>
-                                //                <MDBCardTitle>{d.request_Name}</MDBCardTitle>
-                                //                <br></br>
-                                //                <MDBCardText style={{ textAlign: "left" }}>
-                                //                    Date issued: {this.formatDateWithHour(d.date_Issued)}
-                                //                    <br></br>
-                                //                    Issuer: {d.issuer}
-                                //                    <br></br>
-                                //                </MDBCardText>
-                                //            </MDBCardBody>
-                                //        </MDBCard>
-                                //    </MDBCol>
-
-
-                                //</MDBRow>
-
                                 <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem",padding: "2rem", width: "400px", minWidth: "30%", margin: "auto" }}>
                                     <MDBCol>
                                         <MDBCard style={{
-                                            backgroundColor: "rgba(221, 230, 237,0.5)", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", border: "#526D82"}}>
+                                            backgroundColor: "rgb(236, 243, 248)", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", border: "#526D82"}}>
 
                                             <MDBCardBody>
                                                 {/*<MDBCardTitle>Request name: {d.request_Name}</MDBCardTitle>*/}
-                                                <button onClick={() => this.QSetViewInParent({ page: "Schedule", idForSchedule: d.request_Id })} style={{ margin: "right", border: "none", backgroundColor: "rgba(221, 230, 237,0.5)" }}>
+                                                <button onClick={() => this.QSetViewInParent({ page: "Schedule", idForSchedule: d.request_Id })} style={{ margin: "right", border: "none", backgroundColor: "rgb(236, 243, 248)" }}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" className="bi bi-calendar-plus" >
                                                         <path d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7z" />
                                                         <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />

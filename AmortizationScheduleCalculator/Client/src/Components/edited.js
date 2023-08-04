@@ -23,9 +23,13 @@ class EditSchedule extends React.Component {
             keyValueStore: {},
             showEarlyPaymentFields: false,
             formDataEarly: [{ key: '', value: '' }, { key: '', value: '' }],
-            fee: {}
+            fee: { fee: "" },
+            edit: 0,
+            currentReqId:""
 
         };
+
+        this.validateInput = this.validateInput.bind(this);
     };
 
     componentDidMount() {
@@ -167,11 +171,11 @@ class EditSchedule extends React.Component {
                         <label>Fee</label>
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column" }}>
+                    <div style={{ display: "flex", flexDirection: "row" }}>
 
                         {this.state.formData.map((data, index) => (
-                            <div key={index}>
-                                <div className="form-floating">
+                            <div key={index} style={{ display: "flex", flexDirection: "column" }} >
+                                <div className="form-floating" style={{marginLeft: "1%"} }>
                                     <input
                                         onChange={(e) => this.handleInputChange(e, index)}
                                         type="number"
@@ -222,11 +226,11 @@ class EditSchedule extends React.Component {
             return (
 
                 <div>
-                    <div style={{ display: "flex", flexDirection: "column" }}>
+                    <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
 
                         {this.state.formDataEarly.map((data, index) => (
-                            <div key={index}>
-                                <div className="form-floating">
+                            <div key={index} style={{ display: "flex", flexDirection: "column" }}>
+                                <div style={{marginLeft: "1%", width: "100%"}} className="form-floating">
                                     <input
                                         onChange={(e) => this.handleInputChangeEarly(e, index)}
                                         type="number"
@@ -241,7 +245,7 @@ class EditSchedule extends React.Component {
                                     <label>Number of payment </label>
                                 </div>
 
-                                <div className="form-floating">
+                                <div style={{ marginRight: "1%", width: "100%" }}  className="form-floating">
                                     <span className="spanInput">&euro;</span>
                                     <input
                                         onChange={(e) => this.handleInputChangeEarly(e, index)}
@@ -276,148 +280,224 @@ class EditSchedule extends React.Component {
 
     validateInput = () => {
         const { amount, period, start, rate } = this.state.calculation;
+        const { formData, formDataEarly, fee } = this.state;
         const errorMessages = {};
+        //const edit = 0;
 
-        if ( !amount || amount.trim().length === 0 || !period || period.trim().length === 0 || !start || start.trim().length === 0 || !rate || rate.trim().length === 0) {
-            errorMessages.error = 'Required fields cannot be empty.';
+
+
+        if ((!amount || amount.trim().length === 0) &&
+            (!period || period.trim().length === 0) &&
+            (!rate || rate.trim().length === 0)
+        ) {
+            console.log("UBCIUS E")
+            this.setState({ edit: 1 });
+
+
+        }
+        else if (
+            (!amount || amount.trim().length === 0) ||
+            (!period || period.trim().length === 0) ||
+            (!start || start.trim().length === 0) ||
+            (!rate || rate.trim().length === 0)
+        ) {
+            console.log("UBCIUS E2222222222222222222222222")
+
+            errorMessages.error = 'All fields are required.';
+
         }
 
+        console.log(amount + "amount")
+        console.log(period + "period")
+        console.log(rate + "rate")
+
+
+
+
+        // Check if any of the early payment fields are filled
+        const isEarlyPaymentFilled = formDataEarly.every(
+            (data) => !!data.key && data.key.trim().length > 0 && !!data.value && data.value.trim().length > 0
+        );
+
+        if (!isEarlyPaymentFilled) {
+            this.setState({ formDataEarly: [] });
+        }
+
+        // Check if any of the partial payment fields are filled
+        const isPartialPaymentFilled = formData.every(
+            (data) => !!data.key && data.key.trim().length > 0 && !!data.value && data.value.trim().length > 0
+        );
+
+        if (!isPartialPaymentFilled) {
+            this.setState({ formData: [] });
+        }
+
+        // Check if the fee field is filled
+        //const isFeeFilled = !!fee.fee && fee.fee.trim().length > 0;
+
         this.setState({ errorMessages });
+        //this.setState({edit})
 
         // Return true if all fields are valid, otherwise return false
         return !Object.values(errorMessages).some((message) => message);
     };
 
-    QPostField = () => {
+QPostField = () => {
 
-        console.log(this.props.editSchedule)
-        const edited = this.props.editSchedule;
-        console.log(edited)
+    console.log(this.props.editSchedule)
+    const edited = this.props.editSchedule;
+    console.log(edited)
 
-        const isValid = this.validateInput();
+    const isValid = this.validateInput();
 
-        console.log(isValid);
+    console.log(isValid);
 
-        if (!isValid) {
-            return;
+    if (!isValid) {
+        return;
+    }
+    const { edit } = this.state;
+
+    let editedInput = {
+        request_Id: 0,
+        request_Name: "string",
+        loan_Amount: 0,
+        loan_Period: 0,
+        interest_Rate: 0,
+        loan_Start_Date: "2023-08-04T09:51:01.848Z",
+        last_Version: true,
+        date_Issued: "2023-08-04T09:51:01.848Z",
+        issuer: "string",
+        approval_Cost: 0,
+        insurance_Cost: 0,
+        account_Cost: 0,
+        other_Costs: 0,
+        monthly_Payment: 0,
+        total_Interest_Paid: 0,
+        total_Other_Costs: 0,
+        total_Loan_Cost: 0,
+        loan_Payoff_Date: "2023-08-04T09:51:01.848Z",
+        r_User_Id: 0
+    };
+    console.log(this.state.edit+" this edit")
+    if (edit === 0) {
+        editedInput = {
+            request_Id: 0,
+            request_Name: edited.request_Name,
+            loan_Amount: this.state.calculation.amount,
+            loan_Period: this.state.calculation.period,
+            interest_Rate: this.state.calculation.rate,
+            loan_Start_Date: this.state.calculation.start,
+            approval_Cost: this.state.calculation.approval,
+            insurance_Cost: this.state.calculation.insurance,
+            account_Cost: this.state.calculation.account,
+            other_Costs: this.state.calculation.costs,
+            monthly_Payment: 0,
+            last_version: true,
+            issuer: "",
+            date_issued: "2023-07-19T07:22:56.004Z",
+            total_Interest_Paid: 0,
+            total_Loan_Cost: 0,
+            loan_Payoff_Date: "2023-07-19T07:22:56.004Z",
+            r_User_Id: 0
         }
+    }
 
-        axios.post('https://localhost:7224/CalculateAmortizationPlan/edit',
-            {
-                request_Id: 0,
-                request_Name: edited.request_Name,
-                loan_Amount: this.state.calculation.amount,
-                loan_Period: this.state.calculation.period,
-                interest_Rate: this.state.calculation.rate,
-                loan_Start_Date: this.state.calculation.start,
-                approval_Cost: this.state.calculation.approval,
-                insurance_Cost: this.state.calculation.insurance,
-                account_Cost: this.state.calculation.account,
-                other_Costs: this.state.calculation.costs,
-                monthly_Payment: 0,
-                last_version: true,
-                issuer: "",
-                date_issued: "2023-07-19T07:22:56.004Z",
-                total_Interest_Paid: 0,
-                total_Loan_Cost: 0,
-                loan_Payoff_Date: "2023-07-19T07:22:56.004Z",
-                r_User_Id: 0
+    this.setState({ currentReqId: edited.request_Id + "" })
+    console.log("lalalalala" + edited.request_Id + "")
+
+    axios.post('https://localhost:7224/CalculateAmortizationPlan/edit', editedInput,
+        {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
             },
-            {
+            params: {
+                reqId: edited.request_Id + ""
+            }
+        })
+        .then(response => {
+            console.log(response.data.summary)
+            console.log("Sent to server...")
+
+            const parameterDataEarly = {};
+            if (this.state.formDataEarly !== 0) {
+                this.state.formDataEarly.forEach((item) => {
+                    parameterDataEarly[item.key] = parseFloat(item.value);
+                });
+            }
+            console.log(parameterDataEarly)
+            console.log("first" + response.data.summary.request_Id)
+            axios.post('https://localhost:7224/CalculateAmortizationPlan/applyearly', parameterDataEarly, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 },
                 params: {
-                    reqId: edited.request_Id + ""
+                    reqName: response.data.summary.request_Id
                 }
-            })
-            .then(response => {
-                console.log(response.data.summary)
-                console.log("Sent to server...")
+            }).then(sndRes => {
+                console.log(sndRes.data);
+                console.log("snd" + sndRes.data.summary.request_Id)
 
-                //this.props.QIDFromChild({
-                //    page: "editcalculation", editSum: response.data.summary, editSchedules: response.data.schedules
-                //})
-
-                //const parameterData = {};
-                //this.state.formData.forEach((item) => {
-                //    parameterData[item.key] = parseFloat(item.value);
-                //});
-
-                //axios.post('https://localhost:7224/CalculateAmortizationPlan/applypartial', parameterData, {
-                //    headers: {
-                //        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                //    },
-                //    params: {
-                //        reqName: response.data.summary.request_Id
-                //    }
-                //}).then(sndRes => {
-                //    console.log(sndRes.data)
-                //    console.log("Sent to server...")
-                //    this.props.QIDFromChild({
-                //     page: "editcalculation", editSum: response.data.summary, editSchedules: response.data.schedules
-                //        })
-                //   })
-
-                const parameterDataEarly = {};
-                this.state.formDataEarly.forEach((item) => {
-                    parameterDataEarly[item.key] = parseFloat(item.value);
-                });
-                console.log(parameterDataEarly)
-
-                axios.post('https://localhost:7224/CalculateAmortizationPlan/applyearly', parameterDataEarly,{
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    },
-                    params: {
-                        reqName: response.data.summary.request_Id
-                    }
-                }).then(sndRes => {
-                    console.log(sndRes.data);
-
-                    const parameterData = {};
+                const parameterData = {};
+                if (this.state.formData !== {}) {
                     this.state.formData.forEach((item) => {
-                    parameterData[item.key] = parseFloat(item.value);
+                        parameterData[item.key] = parseFloat(item.value);
                     });
-                    console.log(parameterData)
+                }
+                console.log(parameterData)
+                let inputFee = 0
+                if (this.state.fee.fee !== "") {
+                    inputFee = parseFloat(this.state.fee.fee)
+                    }
+                //if fee not empty 
 
-                    axios.post('https://localhost:7224/CalculateAmortizationPlan/applypartial', parameterData, {
+                axios.post('https://localhost:7224/CalculateAmortizationPlan/applypartial', parameterData, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     },
                     params: {
                         reqName: sndRes.data.summary.request_Id,
-                        fee: parseFloat( this.state.fee.fee )
+                        fee: inputFee
                     }
-                    }).then(rdRes => {
+                }).then(rdRes => {
                     console.log(rdRes.data)
+                    console.log("trd" + rdRes.data.summary.request_Id)
+
                     console.log("Sent to server...")
                     this.props.QIDFromChild({
-                        page: "editcalculation", editSum: rdRes.data.summary, editSchedules: rdRes.data.schedules})
-                   
-
+                        page: "editcalculation", editSum: rdRes.data.summary, editSchedules: rdRes.data.schedules
+                    })
+                }).catch(err => {
+                    console.log(err)
+                    console.log(err.response.data);
+                    alert(err.response.data.detail)
                 })
 
             }).catch(err => {
                 console.log(err)
                 console.log(err.response.data);
-                alert(err.response.data)
+                alert(err.response.data.detail)
 
             })
-        })
 
-    }
+        }).catch(err => {
+            console.log(err)
+            console.log(err.response.data);
+            alert(err.response.data.detail)
+
+        })
+};
     
+
 
     QSetViewInParent = (obj) => {
         this.props.QIDFromChild(obj);
     };
 
-    QSetView = (obj) => {
-        this.setState({
-            CurrentPage: obj.page
-        });
-    };
+QSetView = (obj) => {
+    this.setState({
+        CurrentPage: obj.page
+    });
+};
 
     render() {
         const { errorMessages } = this.state;
@@ -569,7 +649,8 @@ class EditSchedule extends React.Component {
                 </div>
 
             </div>
-        );
+          );
+        
 
     }
 
